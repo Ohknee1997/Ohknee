@@ -1,0 +1,6 @@
+{
+  "name": "OHKNEE.COM",
+  "description": "Verified offers, sign-up bonus links, casino codes, instant cash promotions, and secret sauce strategies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
