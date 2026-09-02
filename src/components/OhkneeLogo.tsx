@@ -60,12 +60,15 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
       <img
         src={transparentDataUrl || logoImg}
         alt="OHKNEE Logo"
-        className="ohk-logo-img"
+        className="ohk-logo-img object-contain"
         id="ohknee-logo-image"
         referrerPolicy="no-referrer"
         style={{
           background: 'transparent',
           mixBlendMode: transparentDataUrl ? 'normal' : 'multiply',
+          height: '100%',
+          width: 'auto',
+          maxHeight: 'none',
         }}
         onError={(e) => {
           (e.currentTarget as HTMLElement).style.display = 'none';
@@ -78,7 +81,7 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
         id="ohknee-svg-fallback"
         className="ohk-logo-svg"
         viewBox="0 0 200 130"
-        style={{ display: 'none', background: 'transparent' }}
+        style={{ display: 'none', background: 'transparent', height: '100%', width: 'auto' }}
         aria-hidden="true"
       >
         <g fill="none" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round">

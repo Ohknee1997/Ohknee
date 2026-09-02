@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Flame,
-  Zap,
-  Coins,
-  Gift,
-  Gamepad2,
-  Sparkles,
-  Layers,
-} from 'lucide-react';
+import { Flame, Zap, Coins, Gamepad2 } from 'lucide-react';
 
 export interface CategoryTabItem {
   id: string;
@@ -23,49 +15,28 @@ export const CATEGORY_NAV_TABS: CategoryTabItem[] = [
     rowId: 'row-featured',
     title: 'Featured',
     subtitle: 'Top Rewards',
-    icon: <Flame size={22} className="stroke-[2.2]" />,
+    icon: <Flame size={20} className="stroke-[2.2]" />,
   },
   {
     id: 'fast-easy',
     rowId: 'row-fast-offers',
     title: 'Fast Cash',
     subtitle: '$100 - $150 Easy',
-    icon: <Zap size={22} className="stroke-[2.2]" />,
+    icon: <Zap size={20} className="stroke-[2.2]" />,
   },
   {
     id: 'finance',
     rowId: 'row-finance',
     title: 'Finance & Crypto',
     subtitle: 'High Value Bonus',
-    icon: <Coins size={22} className="stroke-[2.2]" />,
+    icon: <Coins size={20} className="stroke-[2.2]" />,
   },
   {
-    id: 'signup-trial',
-    rowId: 'row-signup',
-    title: 'Sign Up Trials',
-    subtitle: 'Instant Cashback',
-    icon: <Gift size={22} className="stroke-[2.2]" />,
-  },
-  {
-    id: 'puzzles',
-    rowId: 'row-puzzles',
-    title: 'Puzzles & Spins',
-    subtitle: 'Free Daily SC',
-    icon: <Gamepad2 size={22} className="stroke-[2.2]" />,
-  },
-  {
-    id: 'sweepstakes',
-    rowId: 'row-sweepstakes',
-    title: 'Sweepstakes',
-    subtitle: 'Free SC Daily',
-    icon: <Coins size={22} className="stroke-[2.2]" />,
-  },
-  {
-    id: 'play-to-earn',
+    id: 'games',
     rowId: 'row-play-to-earn',
-    title: 'Play to Earn',
-    subtitle: 'Games & Tasks',
-    icon: <Sparkles size={22} className="stroke-[2.2]" />,
+    title: 'Games & Free SC',
+    subtitle: 'Play & Sweepstakes',
+    icon: <Gamepad2 size={20} className="stroke-[2.2]" />,
   },
 ];
 
@@ -79,11 +50,11 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
   onSelectCategory,
 }) => {
   return (
-    <div className="w-full mb-5">
-      {/* Category Navigation Strip: Perfectly straight, organized row with identical tab dimensions */}
+    <div className="w-full mb-4 sm:mb-5">
+      {/* 4 Categorized Tabs at Top - Responsive 2x2 grid on mobile, 4 in a row on tablet/desktop */}
       <nav
         aria-label="Category Navigation"
-        className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 px-0.5"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 py-1 px-0.5"
       >
         {CATEGORY_NAV_TABS.map((tab) => {
           const isActive = activeCategory === tab.id;
@@ -93,47 +64,33 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
               key={tab.id}
               type="button"
               onClick={() => onSelectCategory(tab)}
-              /* Every category tab has:
-                 - The exact same overall height: h-[64px]
-                 - The exact same width: w-[185px]
-                 - The exact same padding: p-2.5
-                 - The exact same internal spacing: gap-3
-                 - The exact same alignment: flex items-center
-              */
-              className={`group relative flex items-center gap-3 w-[175px] sm:w-[190px] h-[64px] min-h-[64px] max-h-[64px] flex-shrink-0 rounded-2xl p-2.5 transition-all text-left cursor-pointer border select-none ${
+              className={`group relative flex items-center gap-2.5 sm:gap-3 w-full h-[62px] sm:h-[68px] rounded-2xl p-2 sm:p-2.5 transition-all text-left cursor-pointer border select-none ${
                 isActive
-                  ? 'bg-slate-900/95 border-teal-400 shadow-md shadow-teal-500/10'
-                  : 'bg-[#0a101d]/90 border-slate-800/90 hover:border-teal-500/40 hover:bg-slate-900/80 shadow-sm'
+                  ? 'bg-white border-purple-500 shadow-md shadow-purple-500/10 ring-2 ring-purple-400/30'
+                  : 'bg-white/85 hover:bg-white border-purple-100/90 hover:border-purple-300 shadow-xs'
               }`}
             >
-              {/* FIXED-SIZE ICON CONTAINER:
-                  - Exact same icon container size: h-11 w-11
-                  - Pinned at the exact same horizontal position relative to the tab (left)
-                  - Significantly larger icons that are clearly visible and visually important
-              */}
+              {/* Category Icon */}
               <div
-                className={`flex h-11 w-11 min-w-[44px] items-center justify-center rounded-xl transition-transform group-hover:scale-105 flex-shrink-0 ${
+                className={`flex h-10 w-10 sm:h-11 sm:w-11 min-w-[40px] items-center justify-center rounded-xl transition-transform group-hover:scale-105 flex-shrink-0 ${
                   isActive
-                    ? 'bg-teal-500/20 border border-teal-400/60 text-teal-300'
-                    : 'bg-teal-500/10 border border-teal-500/25 text-teal-400'
+                    ? 'bg-purple-100 border border-purple-300 text-purple-800'
+                    : 'bg-purple-50/80 border border-purple-100 text-purple-600 group-hover:bg-purple-100/70'
                 }`}
               >
                 {tab.icon}
               </div>
 
-              {/* ADAPTING TEXT AREA:
-                  - Category names of different lengths adapt with truncate inside their area
-                  - Length never alters the position of the icon container
-              */}
+              {/* Text Info */}
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <span
-                  className={`text-xs font-black uppercase tracking-tight truncate transition-colors ${
-                    isActive ? 'text-teal-300' : 'text-slate-200 group-hover:text-white'
+                  className={`text-xs sm:text-[13px] font-black uppercase tracking-tight truncate transition-colors ${
+                    isActive ? 'text-purple-900' : 'text-slate-800 group-hover:text-purple-900'
                   }`}
                 >
                   {tab.title}
                 </span>
-                <span className="text-[10.5px] font-semibold text-slate-400 truncate mt-0.5">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 truncate mt-0.5">
                   {tab.subtitle}
                 </span>
               </div>
@@ -144,3 +101,4 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
     </div>
   );
 };
+

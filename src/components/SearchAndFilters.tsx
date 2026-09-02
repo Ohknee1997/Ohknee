@@ -5,14 +5,7 @@ import {
   Smartphone,
   Monitor,
   Apple,
-  SlidersHorizontal,
   ArrowUpDown,
-  Zap,
-  Flame,
-  Coins,
-  Gift,
-  Gamepad2,
-  Sparkles,
 } from 'lucide-react';
 
 export type PlatformFilter = 'all' | 'apple' | 'android' | 'desktop';
@@ -33,13 +26,13 @@ interface SearchAndFiltersProps {
   onSearchChange: (val: string) => void;
   selectedPlatform: PlatformFilter;
   onPlatformChange: (plat: PlatformFilter) => void;
-  selectedCategory: CategoryFilter;
-  onCategoryChange: (cat: CategoryFilter) => void;
+  selectedCategory?: CategoryFilter;
+  onCategoryChange?: (cat: CategoryFilter) => void;
   selectedSort: SortOption;
   onSortChange: (sort: SortOption) => void;
-  totalFilteredCount: number;
-  totalCount: number;
-  onResetFilters: () => void;
+  totalFilteredCount?: number;
+  totalCount?: number;
+  onResetFilters?: () => void;
 }
 
 export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
@@ -47,33 +40,11 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   onSearchChange,
   selectedPlatform,
   onPlatformChange,
-  selectedCategory,
-  onCategoryChange,
   selectedSort,
   onSortChange,
-  totalFilteredCount,
-  totalCount,
-  onResetFilters,
 }) => {
-  const isFiltered =
-    searchQuery.trim() !== '' ||
-    selectedPlatform !== 'all' ||
-    selectedCategory !== 'all' ||
-    selectedSort !== 'recommended';
-
-  const categories: Array<{ id: CategoryFilter; label: string; icon: React.ReactNode }> = [
-    { id: 'all', label: 'All Offers', icon: <Sparkles size={13} /> },
-    { id: 'fast-easy', label: 'Fast Cash ($150+)', icon: <Zap size={13} /> },
-    { id: 'featured', label: 'Featured', icon: <Flame size={13} /> },
-    { id: 'sweepstakes', label: 'Sweepstakes', icon: <Coins size={13} /> },
-    { id: 'finance', label: 'Finance & Crypto', icon: <Coins size={13} /> },
-    { id: 'signup-trial', label: 'Sign Up Trials', icon: <Gift size={13} /> },
-    { id: 'puzzles', label: 'Puzzles & Casual', icon: <Gamepad2 size={13} /> },
-    { id: 'play-to-earn', label: 'Play to Earn', icon: <Gamepad2 size={13} /> },
-  ];
-
   return (
-    <div className="w-full mb-6 space-y-3">
+    <div className="w-full mb-4 space-y-3">
       {/* Primary Search Bar & Platform Selector Row */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
         {/* Search Input */}
@@ -177,59 +148,6 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           </select>
         </div>
       </div>
-
-      {/* Category Horizontal Tabs with exact same height, width, icon container, and alignment */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-        {categories.map((cat) => {
-          const isActive = selectedCategory === cat.id;
-          return (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => onCategoryChange(cat.id)}
-              className={`flex items-center gap-2.5 w-[160px] h-10 flex-shrink-0 px-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isActive
-                  ? 'bg-slate-800 text-teal-300 border-teal-400 shadow-sm'
-                  : 'bg-[#0f172a]/90 text-slate-300 border-slate-800/90 hover:bg-slate-800/80 hover:border-teal-500/40 hover:text-white'
-              }`}
-            >
-              <div
-                className={`flex h-6 w-6 min-w-[24px] items-center justify-center rounded-lg flex-shrink-0 ${
-                  isActive
-                    ? 'bg-teal-500/20 text-teal-300'
-                    : 'bg-teal-500/10 text-teal-400'
-                }`}
-              >
-                {cat.icon}
-              </div>
-              <span className="truncate flex-1 text-left">{cat.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Active Search & Filter Status (shown when filtering) */}
-      {isFiltered && (
-        <div className="flex items-center justify-between rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-xs text-amber-200">
-          <div className="flex items-center gap-2">
-            <span>
-              Showing <strong>{totalFilteredCount}</strong> of <strong>{totalCount}</strong> offers
-            </span>
-            {searchQuery && (
-              <span className="text-slate-300 font-mono text-[11px]">
-                matching "{searchQuery}"
-              </span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onResetFilters}
-            className="text-xs font-bold underline hover:text-white transition-colors"
-          >
-            Reset All Filters
-          </button>
-        </div>
-      )}
     </div>
   );
 };

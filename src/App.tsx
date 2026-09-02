@@ -24,22 +24,21 @@ import { trackPageView, startPresenceTracking } from './utils/trafficTracker';
 // Components
 import { Navbar } from './components/Navbar';
 import {
-  SearchAndFilters,
   PlatformFilter,
   CategoryFilter,
   SortOption,
 } from './components/SearchAndFilters';
 import { MyOffersRow } from './components/MyOffersRow';
 import { CategoryOfferRow } from './components/CategoryOfferRow';
-import { CategoryNavStrip, CategoryTabItem } from './components/CategoryNavStrip';
+import { CategoryNavStrip } from './components/CategoryNavStrip';
 import { CompactOfferCard } from './components/CompactOfferCard';
 import { OfferDetailModal } from './components/OfferDetailModal';
-import { LiveChatPanel } from './components/LiveChatPanel';
 import { MobileBottomNav, MobileTab } from './components/MobileBottomNav';
 import { OwnerAnalyticsModal } from './components/OwnerAnalyticsModal';
 import { StaffAuthModal } from './components/StaffAuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { HomepageHero } from './components/HomepageHero';
+import { Top10MobileView } from './components/Top10MobileView';
 import { TrustReviewsSection } from './components/TrustReviewsSection';
 import { ScammerMemeModal } from './components/ScammerMemeModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
@@ -53,14 +52,10 @@ import {
   Gamepad2,
   Sparkles,
   Layers,
-  Star,
-  ExternalLink,
-  Maximize2,
-  Minimize2,
+  Trophy,
   BarChart2,
   Lock,
   User,
-  ArrowLeft,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -108,10 +103,6 @@ export default function App() {
 
   // Active detail modal
   const [selectedOffer, setSelectedOffer] = useState<EnrichedOffer | null>(null);
-
-  // Live Chat state
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isChatDocked, setIsChatDocked] = useState(false);
 
   // Other system modals
   const [isOwnerAnalyticsOpen, setIsOwnerAnalyticsOpen] = useState(false);
@@ -249,6 +240,18 @@ export default function App() {
     return allOffers.filter((o) => savedOfferIds.has(o.id));
   }, [allOffers, savedOfferIds]);
 
+  const top10Offers = useMemo(() => {
+    return [...allOffers]
+      .sort((a, b) => {
+        const getVal = (p: string) => {
+          const match = p.match(/\$(\d+)/);
+          return match ? parseInt(match[1], 10) : 10;
+        };
+        return getVal(b.payout) - getVal(a.payout);
+      })
+      .slice(0, 10);
+  }, [allOffers]);
+
   const featuredOffers = useMemo(() => {
     return filteredOffers.filter((o) => o.isFeatured || o.categories.includes('featured'));
   }, [filteredOffers]);
@@ -314,51 +317,38 @@ export default function App() {
     if (tab === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setSelectedCategory('all');
-    } else if (tab === 'fast-cash') {
-      setOpenRowIds((prev) => new Set([...prev, 'row-fast-offers']));
+      setSearchQuery('');
+    } else if (tab === 'top-10') {
+      setSelectedCategory('top-10' as any);
+      setOpenRowIds((prev) => new Set([...prev, 'row-top10']));
       setTimeout(() => {
-        const el = document.getElementById('row-fast-offers');
+        const el = document.getElementById('row-top10') || document.getElementById('offers-explorer-section');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        else setSelectedCategory('fast-easy');
       }, 50);
-    } else if (tab === 'sweepstakes') {
-      setOpenRowIds((prev) => new Set([...prev, 'row-sweepstakes']));
-      setTimeout(() => {
-        const el = document.getElementById('row-sweepstakes');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        else setSelectedCategory('sweepstakes');
-      }, 50);
-    } else if (tab === 'saved') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tab === 'earn') {
       setSelectedCategory('all');
+      setMobileTab('earn');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const isFilteringActive =
-    searchQuery.trim() !== '' ||
-    selectedPlatform !== 'all' ||
-    selectedCategory !== 'all' ||
-    selectedSort !== 'recommended';
-
-  const handleSelectNavTab = (tab: CategoryTabItem) => {
-    setSelectedCategory(tab.id as CategoryFilter);
-    setOpenRowIds((prev) => {
-      const next = new Set(prev);
-      next.add(tab.rowId);
-      return next;
-    });
+  // Transition from Cash App cartoon to Top 10 section
+  const handleFinishCashAppAnimation = () => {
+    setIsScammerMemeOpen(false);
+    setSelectedCategory('top-10' as any);
+    setMobileTab('top-10');
+    setOpenRowIds((prev) => new Set([...prev, 'row-top10']));
     setTimeout(() => {
-      const el = document.getElementById(tab.rowId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 60);
+      const el = document.getElementById('row-top10') || document.getElementById('offers-explorer-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
-  const isHomepage = selectedCategory === 'all' && searchQuery.trim() === '';
+  const isHomepage = selectedCategory === 'all' && searchQuery.trim() === '' && mobileTab === 'home';
 
   const handleSelectCategory = (catId: string) => {
     setSelectedCategory(catId as CategoryFilter);
+    setMobileTab(catId === 'top-10' ? 'top-10' : 'earn');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (catId !== 'all') {
       const rowMap: Record<string, string> = {
@@ -369,181 +359,99 @@ export default function App() {
         'puzzles': 'row-puzzles',
         'play-to-earn': 'row-play-to-earn',
         'featured': 'row-featured',
+        'top-10': 'row-top10',
       };
-      const rowId = rowMap[catId];
-      if (rowId) {
-        setOpenRowIds((prev) => new Set(prev).add(rowId));
-      }
+      const rowId = rowMap[catId] || `row-${catId}`;
+      setOpenRowIds((prev) => new Set(prev).add(rowId));
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#080c15] text-slate-100 flex flex-col selection:bg-teal-400 selection:text-slate-950">
+    <div
+      className={
+        isHomepage
+          ? 'h-screen max-h-screen overflow-hidden bg-transparent text-slate-900 flex flex-col selection:bg-purple-200 selection:text-purple-950'
+          : 'min-h-screen bg-transparent text-slate-900 flex flex-col selection:bg-purple-200 selection:text-purple-950'
+      }
+    >
       {/* 1. CLEAN TOP APPLICATION BRANDING & TABS (OHKNEE.COM) */}
       <Navbar
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
         isHomepage={isHomepage}
         onOpenScammerMeme={() => setIsScammerMemeOpen(true)}
+        onGoHome={() => {
+          setSelectedCategory('all');
+          setSearchQuery('');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full transition-all">
-        {/* HOMEPAGE VIEW: Hero + Reviews/Trust */}
-        {isHomepage ? (
-          <>
-            {/* 2. LARGE CENTERED HERO SECTION WITH VISUAL & CATCHY REWARD MESSAGE */}
-            <HomepageHero
-              onExploreClick={() => {
-                const el = document.getElementById('offers-explorer-section');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }}
-              onHowItWorksClick={() => setIsHowItWorksOpen(true)}
-            />
-
-            {/* 3. REVIEWS / TRUST SECTION */}
-            <TrustReviewsSection />
-          </>
-        ) : (
-          /* CATEGORY PAGE HEADER (Scammer Tab & Hero are completely absent!) */
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2 select-none">
-            <div className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-[#0a101d] border border-slate-800 shadow-md">
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory('all');
-                    setSearchQuery('');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:border-teal-400 transition-colors cursor-pointer"
-                >
-                  <ArrowLeft size={14} />
-                  <span>← Back to Homepage</span>
-                </button>
-                <div className="h-5 w-px bg-slate-800" />
-                <h2 className="text-base sm:text-lg font-black text-white">
-                  {selectedCategory === 'fast-easy'
-                    ? 'Fast Cash ($100 - $150 Easy Money)'
-                    : selectedCategory === 'finance'
-                    ? 'Finance & Crypto Bonuses'
-                    : selectedCategory === 'signup-trial'
-                    ? 'Sign Up Trials & Instant Cashback'
-                    : selectedCategory === 'sweepstakes'
-                    ? 'Sweepstakes Casinos (Free SC Daily)'
-                    : selectedCategory === 'puzzles'
-                    ? 'Puzzles, Bingo & Spin Wheels'
-                    : selectedCategory === 'play-to-earn'
-                    ? 'Play to Earn Games'
-                    : selectedCategory === 'featured'
-                    ? 'Featured Offers'
-                    : 'Verified Reward Offers'}
-                </h2>
-              </div>
-              <span className="hidden sm:inline-flex text-xs font-semibold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-lg">
-                Verified Category
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* OFFERS EXPLORER SECTION */}
-        <main
-          id="offers-explorer-section"
-          className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-16"
-        >
-          {/* Section Heading & Expand Controls */}
-          <div className="flex items-center justify-between gap-3 px-1 py-3 mb-3 border-b border-slate-800/80">
-            <div>
-              <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-slate-200">
-                {isHomepage ? 'ALL VERIFIED REWARDS & OFFERS' : 'CATEGORY OFFERS'}
-              </h2>
-              <p className="text-[11px] text-slate-400">
-                {isHomepage
-                  ? 'Browse all curated opportunities below, or filter by platform'
-                  : 'Complete offers in this category to claim verified rewards'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleExpandAllRows}
-                className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-teal-300 transition-colors cursor-pointer py-1.5 px-3 rounded-xl hover:bg-slate-900 border border-transparent hover:border-slate-800"
-                title="Open all category rows"
-              >
-                <Maximize2 size={12} />
-                <span>Expand All</span>
-              </button>
-              <span className="text-slate-700">•</span>
-              <button
-                type="button"
-                onClick={handleCollapseAllRows}
-                className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-teal-300 transition-colors cursor-pointer py-1.5 px-3 rounded-xl hover:bg-slate-900 border border-transparent hover:border-slate-800"
-                title="Close all category rows"
-              >
-                <Minimize2 size={12} />
-                <span>Collapse All</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Search, Platform & Sorting Controls */}
-          <div className="mb-4">
-            <SearchAndFilters
-              searchQuery={searchQuery}
-              selectedPlatform={selectedPlatform}
-              selectedCategory={selectedCategory}
-              selectedSort={selectedSort}
-              totalOfferCount={allOffers.length}
-              matchingOfferCount={filteredOffers.length}
-              onSearchChange={setSearchQuery}
-              onPlatformChange={setSelectedPlatform}
-              onCategoryChange={setSelectedCategory}
-              onSortChange={setSelectedSort}
-              onClearFilters={() => {
-                setSearchQuery('');
-                setSelectedPlatform('all');
-                setSelectedCategory('all');
-                setSelectedSort('recommended');
-              }}
-            />
-          </div>
-
-          <div className="space-y-3">
-            {/* Top Category Navigation Strip */}
-            <CategoryNavStrip
-              activeCategory={selectedCategory}
-              onSelectCategory={handleSelectNavTab}
-            />
-
-            {/* Saved Offers Row (when user has saved offers) */}
-            {savedOffersList.length > 0 && (
-              <MyOffersRow
-                savedOffers={savedOffersList}
-                allOffers={allOffers}
-                onSelectOffer={setSelectedOffer}
-                onToggleSave={handleToggleSaveOffer}
-              />
-            )}
-
-            {/* 4. FEATURED OFFERS */}
-            <CategoryOfferRow
-              id="row-featured"
-              title="Featured Offers"
-              subtitle="Top verified rewards with instant claim access"
-              icon={<Flame size={24} className="stroke-[2.2]" />}
-              offers={featuredOffers}
-              savedOfferIds={savedOfferIds}
-              isOpen={openRowIds.has('row-featured')}
-              onToggleOpen={() => handleToggleRow('row-featured')}
+      <div className="flex-1 flex flex-col w-full transition-all overflow-hidden">
+        {/* HOMEPAGE VIEW vs DEDICATED TOP 10 VIEW vs OFFER MARKETPLACE */}
+        {(mobileTab === 'top-10' || selectedCategory === 'top-10') ? (
+          <div className="flex-1 flex flex-col justify-center items-center overflow-hidden px-2 sm:px-4 pb-16 lg:pb-8">
+            <Top10MobileView
+              offers={top10Offers}
               onSelectOffer={setSelectedOffer}
               onToggleSave={handleToggleSaveOffer}
-              initialOpen={false}
-              initialExpanded={false}
+              savedOfferIds={savedOfferIds}
             />
+          </div>
+        ) : isHomepage ? (
+          <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-4 pb-16 lg:pb-8">
+            <HomepageHero onExploreClick={() => handleSelectMobileTab('top-10')} />
+            {/* Desktop Trusted Community text section (no image, no yellow star, no chat room) */}
+            <div className="hidden md:block w-full">
+              <TrustReviewsSection />
+            </div>
+          </div>
+        ) : (
+          /* OFFERS EXPLORER SECTION */
+          <main
+            id="offers-explorer-section"
+            className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 md:pb-16 overflow-y-auto"
+          >
+            {/* 4 Categorized Tabs at Top of Earn (as requested) */}
+            <CategoryNavStrip
+              activeCategory={selectedCategory}
+              onSelectCategory={(tab) => {
+                setSelectedCategory(tab.id as CategoryFilter);
+                setOpenRowIds((prev) => new Set(prev).add(tab.rowId));
+                setTimeout(() => {
+                  const el = document.getElementById(tab.rowId);
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+              }}
+            />
+
+            <div className="space-y-3 sm:space-y-4">
+              {/* Saved Offers Row (when user has saved offers) */}
+              {savedOffersList.length > 0 && (
+                <MyOffersRow
+                  savedOffers={savedOffersList}
+                  allOffers={allOffers}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                />
+              )}
+
+              {/* 4. FEATURED OFFERS */}
+              <CategoryOfferRow
+                id="row-featured"
+                title="Featured Offers"
+                subtitle="Top verified rewards with instant claim access"
+                icon={<Flame size={24} className="stroke-[2.2]" />}
+                offers={featuredOffers}
+                savedOfferIds={savedOfferIds}
+                isOpen={openRowIds.has('row-featured')}
+                onToggleOpen={() => handleToggleRow('row-featured')}
+                onSelectOffer={setSelectedOffer}
+                onToggleSave={handleToggleSaveOffer}
+                initialOpen={false}
+                initialExpanded={false}
+              />
 
             {/* 5. FAST OFFERS (100$-150$ Fast & Easy sequential order) */}
             <CategoryOfferRow
@@ -671,6 +579,7 @@ export default function App() {
             </p>
           </footer>
         </main>
+      )}
       </div>
 
       {/* Subtle Bottom-Right Owner & Staff Controls */}
@@ -708,37 +617,11 @@ export default function App() {
         </button>
       </aside>
 
-      {/* 12. LIVE CHAT (Desktop right panel / docked OR mobile floating & bottom-sheet) */}
-      <LiveChatPanel
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        isDocked={isChatDocked}
-        onToggleDock={() => setIsChatDocked((d) => !d)}
-      />
-
-      {/* Mobile Floating Chat Trigger (when chat is closed) */}
-      {!isChatOpen && (
-        <button
-          type="button"
-          id="mobile-chat-fab"
-          onClick={() => setIsChatOpen(true)}
-          className="md:hidden fixed bottom-18 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 shadow-xl shadow-amber-500/20 active:scale-95 cursor-pointer"
-          aria-label="Open Live Chat"
-        >
-          <span className="relative">
-            <Sparkles size={20} />
-            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[#080c15]" />
-          </span>
-        </button>
-      )}
-
       {/* 13. DEDICATED MOBILE BOTTOM NAVIGATION */}
       <MobileBottomNav
         currentTab={mobileTab}
         onSelectTab={handleSelectMobileTab}
         savedCount={savedOfferIds.size}
-        isChatOpen={isChatOpen}
-        onToggleChat={() => setIsChatOpen((o) => !o)}
       />
 
       {/* 14. COMPREHENSIVE OFFER DETAIL MODAL */}
@@ -786,6 +669,7 @@ export default function App() {
       <ScammerMemeModal
         isOpen={isScammerMemeOpen}
         onClose={() => setIsScammerMemeOpen(false)}
+        onFinish={handleFinishCashAppAnimation}
       />
 
       {/* 19. HOW IT WORKS MODAL */}

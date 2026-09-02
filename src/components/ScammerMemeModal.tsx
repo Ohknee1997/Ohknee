@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, ShieldCheck } from 'lucide-react';
+import { Sparkles, ShieldCheck } from 'lucide-react';
 
 interface ScammerMemeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onFinish?: () => void;
 }
 
-export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onClose }) => {
+export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onClose, onFinish }) => {
   const [animationStep, setAnimationStep] = useState<1 | 2 | 3 | 4>(1);
 
-  // Auto-advance through the comedic cartoon sequence at a comfortable, readable pace
+  // Auto-advance through the comedic cartoon sequence at a brisk, easily readable pace
   useEffect(() => {
     if (!isOpen) {
       setAnimationStep(1);
@@ -17,16 +18,26 @@ export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onCl
     }
 
     setAnimationStep(1);
-    const timer1 = setTimeout(() => setAnimationStep(2), 5200); // Plenty of time to read pitch
-    const timer2 = setTimeout(() => setAnimationStep(3), 9600); // "No." response + hammer appears
-    const timer3 = setTimeout(() => setAnimationStep(4), 13600); // Bonk!! -> PSA lesson
+    // Slightly faster pacing while keeping dialogue comfortable to read
+    const timer1 = setTimeout(() => setAnimationStep(2), 3400); // Shady stick figure pitch
+    const timer2 = setTimeout(() => setAnimationStep(3), 6000); // "No." response + hammer appears
+    const timer3 = setTimeout(() => setAnimationStep(4), 8000); // Bonk!! impact explosion
+    const timerFinish = setTimeout(() => {
+      // Auto-transition to the Top 10 section
+      if (onFinish) {
+        onFinish();
+      } else {
+        onClose();
+      }
+    }, 11200); // Punchline PSA -> auto transition
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timerFinish);
     };
-  }, [isOpen]);
+  }, [isOpen, onFinish, onClose]);
 
   if (!isOpen) return null;
 
@@ -39,20 +50,7 @@ export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onCl
         className="relative w-full max-w-md rounded-3xl bg-[#0b0f19] border border-amber-500/40 shadow-2xl shadow-amber-500/10 p-5 overflow-hidden select-none"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Simple top bar with only the X button */}
-        <div className="flex items-center justify-end pb-1">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors cursor-pointer"
-            title="Close"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Cartoon Stage Area */}
+        {/* Cartoon Stage Area - No separate exit/X button, no text above */}
         <div className="relative w-full min-h-[300px] bg-[#070b14] border border-slate-800/90 rounded-2xl my-2 overflow-hidden flex flex-col items-center justify-center p-4">
           {/* Ambient background comic burst */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_#f59e0b_0%,_transparent_70%)]" />
@@ -122,7 +120,7 @@ export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onCl
                   <circle cx="44" cy="26" r="3" fill="#000000" />
                   <circle cx="56" cy="26" r="3" fill="#000000" />
                   {/* Sweat drop */}
-                  <ellipse cx="65" cy="18" rx="2" ry="4" fill="#38bdf8" />
+                  <rect x="63" y="14" width="4" height="8" rx="2" ry="4" fill="#38bdf8" />
                   {/* Wobbly mouth */}
                   <path d="M 42 38 Q 48 34 52 38 Q 56 42 60 38" fill="none" stroke="#000000" strokeWidth="2.5" />
                   <line x1="50" y1="44" x2="50" y2="85" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" />
@@ -153,8 +151,10 @@ export const ScammerMemeModal: React.FC<ScammerMemeModalProps> = ({ isOpen, onCl
                 </div>
 
                 {/* Squished head */}
-                <ellipse cx="50" cy="20" rx="30" ry="12" fill="#f8fafc" stroke="#0f172a" strokeWidth="3" className="mt-2" />
-                <div className="text-[11px] font-black text-slate-900 -mt-4">x _ x</div>
+                <svg width="100" height="40" viewBox="0 0 100 40" className="mt-2">
+                  <rect x="20" y="8" width="60" height="24" rx="30" ry="12" fill="#f8fafc" stroke="#0f172a" strokeWidth="3" />
+                </svg>
+                <div className="text-[11px] font-black text-slate-900 -mt-7">x _ x</div>
                 <div className="w-28 h-3 bg-slate-400 rounded-full mt-2" />
               </div>
             </div>

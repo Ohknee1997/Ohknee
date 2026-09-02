@@ -137,20 +137,20 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
     <>
       <div
         id="offer-detail-backdrop"
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
         <div
           id={`offer-detail-modal-${offer.id}`}
-          className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-[#0b0f19] border border-slate-700/80 shadow-2xl text-slate-100 flex flex-col no-scrollbar animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
+          className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-white border border-purple-200 shadow-2xl text-slate-900 flex flex-col no-scrollbar animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header Banner */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-800 bg-[#0b0f19]/95 px-5 py-4 backdrop-blur-md">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-purple-100 bg-white/95 px-5 py-4 backdrop-blur-md">
             <div className="flex items-center gap-3">
-              <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 border border-slate-700/80 p-1 shadow-md">
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 border border-slate-200 p-1 shadow-xs">
                 {logoSrc ? (
                   <img
                     src={logoSrc}
@@ -159,7 +159,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                     onError={() => setImgError(true)}
                   />
                 ) : (
-                  <span className="text-base font-black text-amber-300">
+                  <span className="text-base font-black text-purple-700">
                     {initialsOf(offer.name)}
                   </span>
                 )}
@@ -167,19 +167,19 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
 
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-black tracking-tight text-white">
+                  <h2 className="text-lg font-black tracking-tight text-slate-900">
                     {offer.name}
                   </h2>
-                  <span className="flex items-center gap-1 text-emerald-400 text-xs font-bold" title="Verified partner link">
+                  <span className="flex items-center gap-1 text-emerald-700 text-xs font-bold" title="Verified partner link">
                     <ShieldCheck size={14} />
                     <span className="hidden sm:inline">Verified</span>
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-slate-400">
+                <div className="flex items-center gap-2 text-xs text-slate-500">
                   {offer.domain && <span>{offer.domain}</span>}
                   <span>•</span>
-                  <div className="flex items-center gap-1 text-slate-400">
+                  <div className="flex items-center gap-1 text-slate-500">
                     <Monitor size={11} title="Desktop" />
                     <Smartphone size={11} title="Android" />
                     <Apple size={11} title="iOS" />
@@ -193,10 +193,10 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
               <button
                 type="button"
                 onClick={() => onToggleSave(offer.id)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
                   isSaved
-                    ? 'border-amber-400/50 bg-amber-400/10 text-amber-300'
-                    : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white'
+                    ? 'border-amber-400 bg-amber-100/80 text-amber-900'
+                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
                 }`}
                 title={isSaved ? 'Saved in My Offers' : 'Save to My Offers'}
               >
@@ -207,7 +207,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-colors cursor-pointer"
                 aria-label="Close offer details"
               >
                 <X size={18} />
@@ -218,17 +218,17 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
           {/* Modal Body Content */}
           <div className="p-5 space-y-5">
             {/* Primary Reward Box */}
-            <div className="rounded-xl bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/30 p-4 shadow-lg">
+            <div className="rounded-xl bg-gradient-to-br from-amber-50 via-purple-50 to-sky-50 border border-amber-200 p-4 shadow-xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-amber-700">
                     Exclusive Reward
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-amber-300 leading-tight">
+                  <h3 className="text-xl sm:text-2xl font-black text-emerald-800 leading-tight">
                     {offer.rewardDisplay}
                   </h3>
                   {offer.instructionSub && (
-                    <p className="mt-1 text-xs text-slate-300 font-medium">
+                    <p className="mt-1 text-xs text-slate-700 font-medium">
                       💡 {offer.instructionSub}
                     </p>
                   )}
@@ -239,7 +239,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                   type="button"
                   id={`claim-offer-btn-${offer.id}`}
                   onClick={handleStartOffer}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 px-5 py-3 text-sm font-black text-slate-950 shadow-lg shadow-amber-500/20 hover:from-amber-300 hover:to-orange-400 transition-all cursor-pointer active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 px-5 py-3 text-sm font-black text-white shadow-md shadow-amber-500/20 hover:from-amber-600 hover:to-orange-700 transition-all cursor-pointer active:scale-95"
                 >
                   <span>START OFFER NOW</span>
                   <ExternalLink size={16} />
@@ -249,13 +249,13 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
 
             {/* Promo Code Section (if present) */}
             {offer.code && (
-              <div className="rounded-xl bg-[#0f172a] border border-slate-700/80 p-4">
+              <div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                       Promo / Referral Code
                     </p>
-                    <p className="text-base font-mono font-black text-amber-300 mt-0.5">
+                    <p className="text-base font-mono font-black text-purple-900 mt-0.5">
                       {offer.code}
                     </p>
                   </div>
@@ -264,12 +264,12 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                     type="button"
                     id={`copy-code-btn-${offer.id}`}
                     onClick={handleCopyCode}
-                    className="flex items-center gap-1.5 rounded-lg bg-amber-400/10 border border-amber-400/30 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-400/20 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-lg bg-purple-100 border border-purple-200 px-3 py-2 text-xs font-bold text-purple-900 hover:bg-purple-200 transition-all cursor-pointer"
                   >
                     {copied ? (
                       <>
-                        <Check size={14} className="text-emerald-400" />
-                        <span className="text-emerald-400">COPIED!</span>
+                        <Check size={14} className="text-emerald-600" />
+                        <span className="text-emerald-700">COPIED!</span>
                       </>
                     ) : (
                       <>
@@ -283,15 +283,15 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
             )}
 
             {/* How to Complete Step-by-step */}
-            <div className="rounded-xl bg-[#0f172a] border border-slate-700/80 p-4">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-1.5">
-                <FileText size={14} className="text-amber-400" />
+            <div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-3 flex items-center gap-1.5">
+                <FileText size={14} className="text-amber-600" />
                 <span>How to Complete & Withdraw</span>
               </h4>
 
-              <ol className="space-y-2.5 text-xs text-slate-300">
+              <ol className="space-y-2.5 text-xs text-slate-700">
                 <li className="flex items-start gap-2.5">
-                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-black text-amber-400 border border-slate-700">
+                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-black text-amber-700 border border-slate-300">
                     1
                   </span>
                   <span>
@@ -300,16 +300,16 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                 </li>
                 {offer.code && (
                   <li className="flex items-start gap-2.5">
-                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-black text-amber-400 border border-slate-700">
+                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-black text-amber-700 border border-slate-300">
                       2
                     </span>
                     <span>
-                      Apply code <strong className="font-mono text-amber-300">{offer.code}</strong> during sign up if prompted.
+                      Apply code <strong className="font-mono text-purple-900">{offer.code}</strong> during sign up if prompted.
                     </span>
                   </li>
                 )}
                 <li className="flex items-start gap-2.5">
-                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-black text-amber-400 border border-slate-700">
+                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-black text-amber-700 border border-slate-300">
                     {offer.code ? '3' : '2'}
                   </span>
                   <span>
@@ -317,7 +317,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                   </span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-800 text-[10px] font-black text-amber-400 border border-slate-700">
+                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-black text-amber-700 border border-slate-300">
                     {offer.code ? '4' : '3'}
                   </span>
                   <span>
@@ -328,20 +328,20 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
             </div>
 
             {/* SECRET SAUCE: Private Notes & Proof Screenshot Archive */}
-            <div className="rounded-xl bg-[#0f172a] border border-amber-500/30 p-4">
+            <div className="rounded-xl bg-purple-50/50 border border-purple-200/80 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-base">🌶️</span>
-                  <h4 className="text-xs font-black uppercase tracking-wider text-amber-400">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-900">
                     SECRET SAUCE STRATEGY & PROOF
                   </h4>
                 </div>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-slate-500">
                   Saved on this device
                 </span>
               </div>
 
-              <p className="text-[11px] text-slate-400 mb-3">
+              <p className="text-[11px] text-slate-600 mb-3">
                 Private steps, login used, wagering notes, or tricks to cash out maximum profit.
               </p>
 
@@ -351,12 +351,12 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                 onChange={handleNoteChange}
                 placeholder="Type your personal strategy, deposit amount used, payout verification status, or quick tips here..."
                 rows={3}
-                className="w-full rounded-lg bg-slate-950 border border-slate-700/80 p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:border-amber-400 focus:outline-none transition-colors"
+                className="w-full rounded-lg bg-white border border-slate-200 p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:border-purple-400 focus:outline-none transition-colors"
               />
 
               {/* Optional Secondary Link */}
               <div className="mt-3">
-                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">
+                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-600 block mb-1">
                   Optional Secondary Link / Reference URL
                 </label>
                 <div className="flex items-center gap-2">
@@ -365,13 +365,13 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                     value={link2}
                     onChange={handleLink2Change}
                     placeholder="https://secondary-reference-or-cashout-link.com"
-                    className="flex-1 rounded-lg bg-slate-950 border border-slate-700/80 px-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-600 focus:border-amber-400 focus:outline-none"
+                    className="flex-1 rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
                   />
                   {link2 && (
                     <button
                       type="button"
                       onClick={() => window.open(link2, '_blank')}
-                      className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                      className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900"
                       title="Open secondary link"
                     >
                       <ExternalLink size={14} />
@@ -381,9 +381,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
               </div>
 
               {/* Proof Screenshots Gallery */}
-              <div className="mt-4 pt-3 border-t border-slate-800">
+              <div className="mt-4 pt-3 border-t border-purple-100">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-slate-300">
+                  <span className="text-[11px] font-bold text-slate-700">
                     Proof Screenshots ({images.length}/2)
                   </span>
 
@@ -399,7 +399,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300 cursor-pointer"
+                        className="flex items-center gap-1 text-xs font-bold text-purple-700 hover:text-purple-900 cursor-pointer"
                       >
                         <Upload size={12} />
                         <span>Upload Proof Photo</span>

@@ -109,9 +109,11 @@ export const WiiFaceIcon: React.FC<WiiFaceIconProps> = ({
         />
 
         {/* Head Base */}
-        <ellipse
-          cx="50"
-          cy="48"
+        <rect
+          x="24"
+          y="20"
+          width="52"
+          height="56"
           rx="26"
           ry="28"
           fill={`url(#skin-${av.id})`}
@@ -189,8 +191,8 @@ function renderHair(av: WiiAvatar) {
             d="M 24 45 C 24 24 76 24 76 45 C 68 34 50 32 50 32 C 50 32 32 34 24 45 Z"
             fill={hairGrad}
           />
-          <ellipse cx="18" cy="54" rx="7" ry="14" fill={hairGrad} />
-          <ellipse cx="82" cy="54" rx="7" ry="14" fill={hairGrad} />
+          <rect x="11" y="40" width="14" height="28" rx="7" ry="14" fill={hairGrad} />
+          <rect x="75" y="40" width="14" height="28" rx="7" ry="14" fill={hairGrad} />
         </>
       );
     case 'curly':
@@ -203,7 +205,7 @@ function renderHair(av: WiiAvatar) {
     case 'ponytail':
       return (
         <>
-          <ellipse cx="50" cy="18" rx="10" ry="8" fill={hairGrad} />
+          <rect x="40" y="10" width="20" height="16" rx="10" ry="8" fill={hairGrad} />
           <path
             d="M 24 44 C 24 24 76 24 76 44 C 68 34 50 30 50 30 C 50 30 32 34 24 44 Z"
             fill={hairGrad}
@@ -278,9 +280,9 @@ function renderEyes(av: WiiAvatar) {
     case 'anime-sparkle':
       return (
         <>
-          <ellipse cx="38" cy="45" rx="4.5" ry="5.5" fill="#1e293b" />
+          <rect x="33.5" y="39.5" width="9" height="11" rx="4.5" ry="5.5" fill="#1e293b" />
           <circle cx="36.5" cy="43" r="1.8" fill="#ffffff" />
-          <ellipse cx="62" cy="45" rx="4.5" ry="5.5" fill="#1e293b" />
+          <rect x="57.5" y="39.5" width="9" height="11" rx="4.5" ry="5.5" fill="#1e293b" />
           <circle cx="60.5" cy="43" r="1.8" fill="#ffffff" />
         </>
       );
@@ -347,7 +349,7 @@ function renderMouth(av: WiiAvatar) {
       return (
         <>
           <path d="M 43 59 Q 50 65 57 59" stroke="#0f172a" strokeWidth="2" fill="none" strokeLinecap="round" />
-          <ellipse cx="50" cy="67" rx="3.5" ry="2.5" fill={av.hairColor} />
+          <rect x="46.5" y="64.5" width="7" height="5" rx="3.5" ry="2.5" fill={av.hairColor} />
         </>
       );
     default:
