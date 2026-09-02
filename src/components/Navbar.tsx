@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header
       id="main-brand-header"
-      className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-xl border-b border-purple-200/80 shadow-xs select-none"
+      className="sticky top-0 z-40 w-full bg-white border-b border-purple-200/80 shadow-xs select-none"
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Top Tier: Logo (Left), Category Tabs (Center/Expanded), Scammer Meme Tab (Top-Right, Homepage only) */}

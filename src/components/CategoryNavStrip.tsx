@@ -66,16 +66,16 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
               onClick={() => onSelectCategory(tab)}
               className={`group relative flex items-center gap-2.5 sm:gap-3 w-full h-[62px] sm:h-[68px] rounded-2xl p-2 sm:p-2.5 transition-all text-left cursor-pointer border select-none ${
                 isActive
-                  ? 'bg-white border-purple-500 shadow-md shadow-purple-500/10 ring-2 ring-purple-400/30'
-                  : 'bg-white/85 hover:bg-white border-purple-100/90 hover:border-purple-300 shadow-xs'
+                  ? 'bg-[#1a2030] border-purple-500 shadow-md shadow-purple-900/30 ring-2 ring-purple-500/30'
+                  : 'bg-[#131722] hover:bg-[#181d2b] border-[#242b3d] hover:border-purple-500/50 shadow-sm'
               }`}
             >
               {/* Category Icon */}
               <div
                 className={`flex h-10 w-10 sm:h-11 sm:w-11 min-w-[40px] items-center justify-center rounded-xl transition-transform group-hover:scale-105 flex-shrink-0 ${
                   isActive
-                    ? 'bg-purple-100 border border-purple-300 text-purple-800'
-                    : 'bg-purple-50/80 border border-purple-100 text-purple-600 group-hover:bg-purple-100/70'
+                    ? 'bg-purple-600/30 border border-purple-400 text-purple-300'
+                    : 'bg-[#1c2233] border border-slate-800 text-purple-400 group-hover:bg-purple-950/50'
                 }`}
               >
                 {tab.icon}
@@ -85,12 +85,12 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <span
                   className={`text-xs sm:text-[13px] font-black uppercase tracking-tight truncate transition-colors ${
-                    isActive ? 'text-purple-900' : 'text-slate-800 group-hover:text-purple-900'
+                    isActive ? 'text-purple-300' : 'text-white group-hover:text-purple-300'
                   }`}
                 >
                   {tab.title}
                 </span>
-                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 truncate mt-0.5">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 truncate mt-0.5">
                   {tab.subtitle}
                 </span>
               </div>
@@ -101,4 +101,3 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
     </div>
   );
 };
-

@@ -54,8 +54,11 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onExploreClick }) =>
       {/* Rewards Message */}
       <div className="mt-4 sm:mt-6 text-center max-w-3xl flex flex-col items-center px-4">
         <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-snug">
-          Get rewarded for playing games, sign-up bonuses, and referral bonuses.
+          Cashback, Giveaways, Commissions, Vouchers, Rewards, Bonuses, Referrals.
         </h1>
+        <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-slate-700 italic font-medium">
+          "We don't use the F word cuz ain't shit in life free."
+        </p>
       </div>
     </section>
   );
