@@ -45,7 +45,6 @@ import { HowItWorksModal } from './components/HowItWorksModal';
 import { RedditNotificationBanner } from './components/RedditNotificationBanner';
 import { InboxModal } from './components/InboxModal';
 import { AscendOffersDashboard } from './components/AscendOffersDashboard';
-import { EarnGemslootView } from './components/EarnGemslootView';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
 import { MassCharacterEvacuationOverlay } from './components/MassCharacterEvacuationOverlay';
 
@@ -62,6 +61,12 @@ import {
   BarChart2,
   Lock,
   User,
+  Star,
+  Maximize2,
+  Minimize2,
+  Filter,
+  Check,
+  ChevronDown,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -70,11 +75,7 @@ const ALL_CATEGORY_ROW_IDS = [
   'row-featured',
   'row-fast-offers',
   'row-finance',
-  'row-signup',
-  'row-puzzles',
   'row-sweepstakes',
-  'row-play-to-earn',
-  'row-other',
 ];
 
 export default function App() {
@@ -98,8 +99,13 @@ export default function App() {
     return new Set(saved);
   });
 
-  // Category rows open/closed state (starts empty -> EVERYTHING starts closed and not expanded)
-  const [openRowIds, setOpenRowIds] = useState<Set<string>>(new Set());
+  // Category rows open/closed state (starts with Featured open like in screenshot)
+  const [openRowIds, setOpenRowIds] = useState<Set<string>>(new Set(['row-featured']));
+
+  // Earn Tab single frame view and quick filter states
+  const [isSingleFrame, setIsSingleFrame] = useState(false);
+  const [earnFilterMenuOpen, setEarnFilterMenuOpen] = useState(false);
+  const [quickFilter, setQuickFilter] = useState<'all' | 'instant' | 'high_value' | 'daily' | 'saved'>('all');
 
   // Navigation, Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -234,7 +240,7 @@ export default function App() {
     }
 
     // 3. Category Filter
-    if (selectedCategory !== 'all') {
+    if (selectedCategory !== 'all' && mobileTab !== 'earn') {
       list = list.filter((offer) => offer.categories.includes(selectedCategory));
     }
 
@@ -277,56 +283,92 @@ export default function App() {
       .slice(0, 10);
   }, [allOffers]);
 
+  // 1. FEATURED (Top verified rewards & high yield partners)
   const featuredOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.isFeatured || o.categories.includes('featured'));
-  }, [filteredOffers]);
+    let list = filteredOffers.filter(
+      (o) =>
+        o.isFeatured ||
+        o.categories.includes('featured') ||
+        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
+    );
+    if (quickFilter === 'instant') {
+      list = list.filter((o) => o.payoutTag?.includes('INSTANT') || o.instructionSub?.includes('instant') || o.id.includes('fast-'));
+    } else if (quickFilter === 'high_value') {
+      list = list.filter((o) => o.rewardValue >= 25);
+    } else if (quickFilter === 'daily') {
+      list = list.filter((o) => o.payoutTag?.includes('DAILY') || o.payout?.toLowerCase().includes('daily'));
+    } else if (quickFilter === 'saved') {
+      list = list.filter((o) => savedOfferIds.has(o.id));
+    }
+    return list;
+  }, [filteredOffers, quickFilter, savedOfferIds]);
 
+  // 2. FAST OFFERS (Sequential fast cash, trials & instant cashback)
   const fastOffers = useMemo(() => {
-    return filteredOffers
-      .filter((o) => o.categories.includes('fast-easy'))
+    let list = filteredOffers
+      .filter(
+        (o) =>
+          o.categories.includes('fast-easy') ||
+          o.categories.includes('signup-trial') ||
+          o.tabId === 'fast-easy-money' ||
+          ['free-metawin', 'free-debbie', 'free-myappfree', 'free-fetch', 'free-joko', 'free-shopback', 'free-snaplii', 'free-franki', 'ref-dabble'].includes(o.id)
+      )
       .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
 
+    if (quickFilter === 'instant') {
+      list = list.filter((o) => o.payoutTag?.includes('INSTANT') || o.instructionSub?.includes('instant') || o.id.includes('fast-'));
+    } else if (quickFilter === 'high_value') {
+      list = list.filter((o) => o.rewardValue >= 25);
+    } else if (quickFilter === 'daily') {
+      list = list.filter((o) => o.payoutTag?.includes('DAILY') || o.payout?.toLowerCase().includes('daily'));
+    } else if (quickFilter === 'saved') {
+      list = list.filter((o) => savedOfferIds.has(o.id));
+    }
+    return list;
+  }, [filteredOffers, quickFilter, savedOfferIds]);
+
+  // 3. FINANCE (Banking, crypto, credit boosters, investments)
   const financeOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.categories.includes('finance'));
-  }, [filteredOffers]);
+    let list = filteredOffers.filter(
+      (o) =>
+        o.categories.includes('finance') ||
+        o.categories.includes('banking') ||
+        o.categories.includes('crypto') ||
+        ['free-koinly', 'free-bydfi', 'free-kraken', 'free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion'].includes(o.id)
+    );
+    if (quickFilter === 'instant') {
+      list = list.filter((o) => o.payoutTag?.includes('INSTANT') || o.instructionSub?.includes('instant') || o.id.includes('fast-'));
+    } else if (quickFilter === 'high_value') {
+      list = list.filter((o) => o.rewardValue >= 25);
+    } else if (quickFilter === 'daily') {
+      list = list.filter((o) => o.payoutTag?.includes('DAILY') || o.payout?.toLowerCase().includes('daily'));
+    } else if (quickFilter === 'saved') {
+      list = list.filter((o) => savedOfferIds.has(o.id));
+    }
+    return list;
+  }, [filteredOffers, quickFilter, savedOfferIds]);
 
-  const signupOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.categories.includes('signup-trial'));
-  }, [filteredOffers]);
-
-  const puzzleOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.categories.includes('puzzles'));
-  }, [filteredOffers]);
-
+  // 4. SWEEPSTAKE & CASINOS (All 30 sweepstakes, daily SC, wheels & sports)
   const sweepstakesOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.categories.includes('sweepstakes'));
-  }, [filteredOffers]);
-
-  const playToEarnOffers = useMemo(() => {
-    return filteredOffers.filter((o) => o.categories.includes('play-to-earn'));
-  }, [filteredOffers]);
-
-  // Remaining / other offers
-  const remainingOffers = useMemo(() => {
-    const knownIds = new Set([
-      ...fastOffers.map((o) => o.id),
-      ...financeOffers.map((o) => o.id),
-      ...signupOffers.map((o) => o.id),
-      ...puzzleOffers.map((o) => o.id),
-      ...sweepstakesOffers.map((o) => o.id),
-      ...playToEarnOffers.map((o) => o.id),
-    ]);
-    return filteredOffers.filter((o) => !knownIds.has(o.id));
-  }, [
-    filteredOffers,
-    fastOffers,
-    financeOffers,
-    signupOffers,
-    puzzleOffers,
-    sweepstakesOffers,
-    playToEarnOffers,
-  ]);
+    let list = filteredOffers.filter(
+      (o) =>
+        o.categories.includes('sweepstakes') ||
+        o.categories.includes('bonuses-promos') ||
+        o.categories.includes('puzzles') ||
+        o.tabId === 'casino-codes' ||
+        ['ref-dabble', 'ref-underdog', 'ref-prizepicks'].includes(o.id)
+    );
+    if (quickFilter === 'instant') {
+      list = list.filter((o) => o.payoutTag?.includes('INSTANT') || o.instructionSub?.includes('instant') || o.id.includes('fast-'));
+    } else if (quickFilter === 'high_value') {
+      list = list.filter((o) => o.rewardValue >= 25);
+    } else if (quickFilter === 'daily') {
+      list = list.filter((o) => o.payoutTag?.includes('DAILY') || o.payout?.toLowerCase().includes('daily'));
+    } else if (quickFilter === 'saved') {
+      list = list.filter((o) => savedOfferIds.has(o.id));
+    }
+    return list;
+  }, [filteredOffers, quickFilter, savedOfferIds]);
 
   // Reset all active filters
   const handleResetFilters = () => {
@@ -376,7 +418,7 @@ export default function App() {
           try {
             sessionStorage.setItem('ohknee_initial_anim_played', 'true');
           } catch {}
-        }, 2600);
+        }, 450);
       } else if (tab === 'top-10') {
         // "Top 10" Tab First-Click: Slide & Glitch Breakaway
         setMobileTab('top-10');
@@ -533,6 +575,7 @@ export default function App() {
             <div className="flex-1 w-full overflow-y-auto">
               <Top10MobileView
                 offers={top10Offers}
+                allOffers={allOffers}
                 onSelectOffer={setSelectedOffer}
                 onToggleSave={handleToggleSaveOffer}
                 savedOfferIds={savedOfferIds}
@@ -559,33 +602,264 @@ export default function App() {
               </div>
             )
           ) : (
-            /* OFFERS EXPLORER SECTION (EARN) - EXACT GEMS LOOT LAYOUT WITH LIGHT BLUE & GREENS + CLEAN VERY LIGHT GRAY BACKGROUND */
+            /* OFFERS EXPLORER SECTION (EARN - EXACT 4 TABS & GEMSLOOT GUI) */
             <main
               id="offers-explorer-section"
-              className="flex-1 w-full min-h-screen bg-[#f0f2f6] pb-28 md:pb-20 overflow-y-auto"
+              className={`flex-1 w-full bg-[#0d0f15] text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 select-none ${
+                isSingleFrame
+                  ? 'h-[calc(100vh-80px)] overflow-hidden flex flex-col justify-between pb-24 md:pb-16'
+                  : 'min-h-screen overflow-y-auto pb-28 md:pb-20'
+              }`}
             >
-              <EarnGemslootView
-                allOffers={allOffers}
-                savedOfferIds={savedOfferIds}
-                onSelectOffer={setSelectedOffer}
-                onToggleSave={handleToggleSaveOffer}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+              {/* TOP BAR: My Offers + Filter Dropdown + Single Frame Toggle + Expand All */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5 sm:mb-3 px-0.5">
+                {/* Left: Gem Icon + My Offers Title + Filter Dropdown (Gemsloot GUI) */}
+                <div className="flex items-center gap-2 sm:gap-3 relative">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl">💎</span>
+                    <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
+                      My Offers
+                    </h2>
+                  </div>
+
+                  {/* Filter Dropdown Button */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setEarnFilterMenuOpen((prev) => !prev)}
+                      className="flex items-center gap-1.5 bg-[#151926] hover:bg-[#1c2234] border border-[#242c40] text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <Filter size={12} className="text-purple-400" />
+                      <span>
+                        {quickFilter === 'all'
+                          ? 'Filter'
+                          : quickFilter === 'instant'
+                          ? 'Instant Cash'
+                          : quickFilter === 'high_value'
+                          ? '$25+ Value'
+                          : quickFilter === 'daily'
+                          ? 'Daily SC'
+                          : 'Saved'}
+                      </span>
+                      <ChevronDown size={13} className="text-slate-400" />
+                    </button>
+
+                    {/* Filter Options Dropdown Popover */}
+                    {earnFilterMenuOpen && (
+                      <div className="absolute left-0 top-full mt-1.5 z-30 w-44 rounded-xl bg-[#131722] border border-[#23293b] shadow-2xl p-1.5 space-y-0.5 animate-in fade-in duration-150">
+                        {[
+                          { id: 'all', label: 'All Verified Offers' },
+                          { id: 'instant', label: '⚡ Instant Payouts' },
+                          { id: 'high_value', label: '💰 $25+ High Value' },
+                          { id: 'daily', label: '⭐ Free Daily SC' },
+                          { id: 'saved', label: '🔖 My Saved Offers' },
+                        ].map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setQuickFilter(opt.id as any);
+                              setEarnFilterMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold text-left cursor-pointer transition-colors ${
+                              quickFilter === opt.id
+                                ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40'
+                                : 'text-slate-300 hover:bg-[#1a2030] hover:text-white border border-transparent'
+                            }`}
+                          >
+                            <span>{opt.label}</span>
+                            {quickFilter === opt.id && (
+                              <Check size={12} className="text-purple-400" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right: Single Frame Mode Toggle & Master Expand / Collapse */}
+                <div className="flex items-center gap-2">
+                  {/* Single Frame Mode Toggle (Fits everything in one frame without scrolling) */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSingleFrame((prev) => !prev)}
+                    title={
+                      isSingleFrame
+                        ? 'Switch to Standard Scrolling View'
+                        : 'Fit all 4 categories in a single frame without scrolling'
+                    }
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                      isSingleFrame
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-900/40'
+                        : 'bg-[#151926] hover:bg-[#1c2234] border-[#242c40] text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    {isSingleFrame ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                    <span className="hidden sm:inline">
+                      {isSingleFrame ? 'Exit Single Frame' : 'Single Frame View'}
+                    </span>
+                    <span className="sm:hidden">
+                      {isSingleFrame ? 'Standard' : '1-Frame'}
+                    </span>
+                  </button>
+
+                  {/* Expand / Collapse All Rows Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const allOpen = ALL_CATEGORY_ROW_IDS.every((id) =>
+                        openRowIds.has(id)
+                      );
+                      if (allOpen) {
+                        handleCollapseAllRows();
+                      } else {
+                        handleExpandAllRows();
+                      }
+                    }}
+                    className="bg-[#151926] hover:bg-[#1c2234] border border-[#242c40] text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    {ALL_CATEGORY_ROW_IDS.every((id) => openRowIds.has(id))
+                      ? 'Collapse All'
+                      : 'Expand All'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Categorized Tabs at Top of Earn (as requested: "i want 4 tab only") */}
+              <CategoryNavStrip
+                activeCategory={selectedCategory}
+                onSelectCategory={(tab) => {
+                  setSelectedCategory(tab.id as CategoryFilter);
+                  setOpenRowIds((prev) => new Set(prev).add(tab.rowId));
+                  setTimeout(() => {
+                    const el = document.getElementById(tab.rowId);
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                  }, 50);
+                }}
               />
 
-              {/* Clean Footer Disclaimer */}
-              <footer className="mt-8 pb-10 text-center text-xs text-slate-500 space-y-1.5 px-4">
-                <p className="font-semibold">
-                  © {new Date().getFullYear()} OHKNEE.COM • Verified Rewards & Bonus Drops
-                </p>
-                <p className="text-[11px] text-slate-400 max-w-xl mx-auto">
-                  Please participate responsibly. Offers subject to partner terms and regional availability.
-                </p>
-              </footer>
+              {/* THE EXACT 4 CATEGORY ROWS (Gemsloot GUI with Expandable Ribbons & Carousels) */}
+              <div
+                className={`w-full ${
+                  isSingleFrame
+                    ? 'flex-1 flex flex-col justify-around overflow-hidden'
+                    : 'space-y-3 sm:space-y-4'
+                }`}
+              >
+                {/* 1. FEATURED OFFERS */}
+                <CategoryOfferRow
+                  id="row-featured"
+                  title="Featured"
+                  subtitle="Top verified rewards with instant claim access"
+                  icon={<Flame size={20} className="stroke-[2.2]" />}
+                  offers={featuredOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-featured')}
+                  onToggleOpen={() => handleToggleRow('row-featured')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                  isSingleFrame={isSingleFrame}
+                />
+
+                {/* 2. FAST OFFERS */}
+                <CategoryOfferRow
+                  id="row-fast-offers"
+                  title="Fast Offers"
+                  subtitle="$100 - $150 sequential easy cash & instant tasks"
+                  icon={<Zap size={20} className="stroke-[2.2]" />}
+                  offers={fastOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-fast-offers')}
+                  onToggleOpen={() => handleToggleRow('row-fast-offers')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                  isSingleFrame={isSingleFrame}
+                />
+
+                {/* 3. FINANCE */}
+                <CategoryOfferRow
+                  id="row-finance"
+                  title="Finance"
+                  subtitle="Banking, crypto exchanges, and high-value credit booster rewards"
+                  icon={<Coins size={20} className="stroke-[2.2]" />}
+                  offers={financeOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-finance')}
+                  onToggleOpen={() => handleToggleRow('row-finance')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                  isSingleFrame={isSingleFrame}
+                />
+
+                {/* 4. SWEEPSTAKE */}
+                <CategoryOfferRow
+                  id="row-sweepstakes"
+                  title="Sweepstake"
+                  subtitle="Daily free SC coins, sweepstakes casinos & prize wheels"
+                  icon={<Star size={20} className="stroke-[2.2]" />}
+                  offers={sweepstakesOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-sweepstakes')}
+                  onToggleOpen={() => handleToggleRow('row-sweepstakes')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                  isSingleFrame={isSingleFrame}
+                />
+              </div>
+
+              {/* Footer Disclaimer (Only in normal scrolling mode) */}
+              {!isSingleFrame && (
+                <footer className="mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-2">
+                  <p>
+                    © {new Date().getFullYear()} OHKNEE.COM. All partner bonuses and promo codes verified.
+                  </p>
+                  <p className="text-[11px] text-slate-600 max-w-xl mx-auto">
+                    Please participate responsibly. Offers subject to individual terms and regional availability.
+                  </p>
+                </footer>
+              )}
             </main>
           )}
         </PageTransitionWrapper>
       </div>
+
+      {/* Subtle Bottom-Right Owner & Staff Controls */}
+      <aside
+        id="bottom-right-admin-pod"
+        aria-label="Admin Controls"
+        className="fixed bottom-20 sm:bottom-4 right-4 z-40 flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#090e1a]/85 border border-slate-800/80 backdrop-blur-md shadow-xl"
+      >
+        <button
+          type="button"
+          onClick={() => setIsOwnerAnalyticsOpen(true)}
+          className="p-2 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-slate-800/80 transition-colors cursor-pointer"
+          title="Owner Analytics"
+          aria-label="Owner Analytics"
+        >
+          <BarChart2 size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsStaffAuthOpen(true)}
+          className="p-2 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-slate-800/80 transition-colors cursor-pointer"
+          title="Staff Portal (Full access for Oniamaya3@gmail.com)"
+          aria-label="Staff Portal"
+        >
+          <Lock size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsProfileOpen(true)}
+          className="p-2 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-slate-800/80 transition-colors cursor-pointer"
+          title="User Profile"
+          aria-label="User Profile"
+        >
+          <User size={16} />
+        </button>
+      </aside>
 
       {/* 13. DEDICATED MOBILE BOTTOM NAVIGATION */}
       <MobileBottomNav

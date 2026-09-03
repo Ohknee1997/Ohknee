@@ -34,7 +34,9 @@ export const StaffAuthModal: React.FC<StaffAuthModalProps> = ({
       const isAuthorizedUser =
         (username.trim() === 'Onib1127' && password === 'Pianofrog2020!') ||
         (u === 'oniamaya3@gmail.com') ||
-        (u === 'oniamaya3' && password === 'Pianofrog2020!');
+        (u === 'oniamaya051@gmail.com') ||
+        (u === 'oniamaya3') ||
+        (u === 'onib' && password === 'Onib1127!');
 
       if (isAuthorizedUser) {
         setIsAuthenticating(false);

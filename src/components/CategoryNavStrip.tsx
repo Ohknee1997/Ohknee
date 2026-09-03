@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Zap, Coins, Gamepad2 } from 'lucide-react';
+import { Flame, Zap, Coins, Star } from 'lucide-react';
 
 export interface CategoryTabItem {
   id: string;
@@ -18,25 +18,25 @@ export const CATEGORY_NAV_TABS: CategoryTabItem[] = [
     icon: <Flame size={20} className="stroke-[2.2]" />,
   },
   {
-    id: 'fast-easy',
+    id: 'fast-offers',
     rowId: 'row-fast-offers',
-    title: 'Fast Cash',
+    title: 'Fast Offers',
     subtitle: '$100 - $150 Easy',
     icon: <Zap size={20} className="stroke-[2.2]" />,
   },
   {
     id: 'finance',
     rowId: 'row-finance',
-    title: 'Finance & Crypto',
-    subtitle: 'High Value Bonus',
+    title: 'Finance',
+    subtitle: 'Banking & Crypto',
     icon: <Coins size={20} className="stroke-[2.2]" />,
   },
   {
-    id: 'games',
-    rowId: 'row-play-to-earn',
-    title: 'Games & Free SC',
-    subtitle: 'Play & Sweepstakes',
-    icon: <Gamepad2 size={20} className="stroke-[2.2]" />,
+    id: 'sweepstakes',
+    rowId: 'row-sweepstakes',
+    title: 'Sweepstake',
+    subtitle: 'Daily Free SC',
+    icon: <Star size={20} className="stroke-[2.2]" />,
   },
 ];
 

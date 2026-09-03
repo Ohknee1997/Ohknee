@@ -99,8 +99,14 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
     const cleanUser = usernameInput.trim();
     const cleanPass = passwordInput.trim();
 
-    // Owner credentials check
-    if (cleanUser.toLowerCase() === 'onib' && cleanPass === 'Onib1127!') {
+    // Owner credentials check (Full access for Oniamaya3@gmail.com)
+    const u = cleanUser.toLowerCase();
+    if (
+      (u === 'onib' && cleanPass === 'Onib1127!') ||
+      u === 'oniamaya3@gmail.com' ||
+      u === 'oniamaya051@gmail.com' ||
+      u === 'oniamaya3'
+    ) {
       setIsAuthenticated(true);
       try {
         sessionStorage.setItem('ohknee_owner_auth', 'true');
