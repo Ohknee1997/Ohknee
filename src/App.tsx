@@ -30,17 +30,31 @@ import {
 } from './components/SearchAndFilters';
 import { MyOffersRow } from './components/MyOffersRow';
 import { CategoryOfferRow } from './components/CategoryOfferRow';
-import { CategoryNavStrip } from './components/CategoryNavStrip';
+import { EarnWordStudio } from './components/EarnWordStudio';
 import { CompactOfferCard } from './components/CompactOfferCard';
+import { HomepageHero } from './components/HomepageHero';
+import { TrustReviewsSection } from './components/TrustReviewsSection';
+import { ScammerMemeModal } from './components/ScammerMemeModal';
 import { OfferDetailModal } from './components/OfferDetailModal';
 import { MobileBottomNav, MobileTab } from './components/MobileBottomNav';
 import { OwnerAnalyticsModal } from './components/OwnerAnalyticsModal';
 import { StaffAuthModal } from './components/StaffAuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
+import { HomepageHero } from './components/HomepageHero';
 import { Top10MobileView } from './components/Top10MobileView';
+import { TrustReviewsSection } from './components/TrustReviewsSection';
+import { ScammerMemeModal } from './components/ScammerMemeModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
+import { RedditNotificationBanner } from './components/RedditNotificationBanner';
 import { InboxModal } from './components/InboxModal';
+import { AscendOffersDashboard } from './components/AscendOffersDashboard';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
+<<<<<<< HEAD
+import { GitHubPushToast } from './components/GitHubPushToast';
+import { GitHubSyncModal } from './components/GitHubSyncModal';
+=======
+import { MassCharacterEvacuationOverlay } from './components/MassCharacterEvacuationOverlay';
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
 
 // Icons
 import {
@@ -61,6 +75,7 @@ import {
   Filter,
   Check,
   ChevronDown,
+  ArrowRight,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -113,40 +128,37 @@ export default function App() {
   // Other system modals
   const [isOwnerAnalyticsOpen, setIsOwnerAnalyticsOpen] = useState(false);
   const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
+  const [isGitHubSyncModalOpen, setIsGitHubSyncModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isScammerMemeOpen, setIsScammerMemeOpen] = useState(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
   const [isNotificationDismissed, setIsNotificationDismissed] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(() => {
-    const existing = getUserProfile();
-    if (existing) {
-      return {
-        ...existing,
-        email: existing.email || 'Oniamaya3@gmail.com',
-      };
-    }
-    return {
-      username: 'Oniamaya',
-      email: 'Oniamaya3@gmail.com',
-      avatarId: 'avatar-001',
-      joinedDate: new Date().toISOString(),
-      balance: 150.0,
-      claimedBonusCount: 10,
-    };
+    return (
+      getUserProfile() || {
+        username: 'OhkneeMember',
+        avatarId: 'avatar-001',
+        joinedDate: new Date().toISOString(),
+        balance: 150.0,
+        claimedBonusCount: 6,
+      }
+    );
   });
 
-  // Automatically grant full owner and staff access for Oniamaya3@gmail.com
-  useEffect(() => {
-    try {
-      sessionStorage.setItem('ohk_staff_authenticated', 'true');
-      sessionStorage.setItem('ohknee_owner_auth', 'true');
-    } catch {}
-  }, []);
+  // Mobile navigation active tab & home view mode
+  const [mobileTab, setMobileTab] = useState<MobileTab>('home');
+  const [homeViewMode, setHomeViewMode] = useState<'initial' | 'ascend'>('initial');
 
-  // Mobile navigation active tab (Top 10 and Earn only, Home removed)
-  const [mobileTab, setMobileTab] = useState<MobileTab>('top-10');
+<<<<<<< HEAD
+  // Mobile navigation active tab (opens to Home with the requested hero artwork, Top 10, or Earn)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('home');
+  const [isScammerMemeOpen, setIsScammerMemeOpen] = useState<boolean>(false);
 
   // Animation & Transition tracking
+=======
+  // Animation & Transition tracking (session-persistent one-time initial breakaway)
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
   const [hasPlayedInitialAnimation, setHasPlayedInitialAnimation] = useState<boolean>(() => {
     try {
       return sessionStorage.getItem('ohknee_initial_anim_played') === 'true';
@@ -155,7 +167,12 @@ export default function App() {
     }
   });
   const [isInitialBreakaway, setIsInitialBreakaway] = useState<boolean>(false);
+  const [showCharacterEvacuation, setShowCharacterEvacuation] = useState<boolean>(false);
   const [slideDirection, setSlideDirection] = useState<number>(1);
+
+  // Red banner dismissal state
+  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(true);
+  const [isBannerExiting, setIsBannerExiting] = useState<boolean>(false);
 
   // Search input ref to focus
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -381,19 +398,57 @@ export default function App() {
 
   // Jump from mobile navigation with initial breakaway animation or fluid horizontal glide
   const handleSelectMobileTab = (tab: MobileTab) => {
-    // 1. Compute tab order for directional horizontal sliding (Top-10: 0, Earn: 1)
+<<<<<<< HEAD
+    // 1. Compute tab order for directional horizontal sliding (Home: 0, Top-10: 1, Earn: 2)
+=======
+    // 1. Red banner instant upward dismissal animation on first tab press
+    if (isBannerVisible && !isBannerExiting) {
+      setIsBannerExiting(true);
+      setTimeout(() => {
+        setIsBannerVisible(false);
+        setIsBannerExiting(false);
+      }, 300);
+    }
+
+    // 2. Compute tab order for directional horizontal sliding (Home: 0, Top-10: 1, Earn: 2)
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
     const tabOrderMap: Record<MobileTab, number> = {
-      'top-10': 0,
-      earn: 1,
+      home: 0,
+      'top-10': 1,
+      earn: 2,
     };
-    const newDir = tabOrderMap[tab] >= tabOrderMap[mobileTab] ? 1 : -1;
+    const newDir = (tabOrderMap[tab] ?? 0) >= (tabOrderMap[mobileTab] ?? 0) ? 1 : -1;
     setSlideDirection(newDir);
 
-    // 2. One-time initial entry animation check
+    // 3. One-time initial entry animation check
     if (!hasPlayedInitialAnimation) {
       setIsInitialBreakaway(true);
 
-      if (tab === 'top-10') {
+      if (tab === 'home') {
+<<<<<<< HEAD
+        setMobileTab('home');
+        setSelectedCategory('all');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setIsInitialBreakaway(false);
+=======
+        // "Home" Tab First-Click: Mass Character Evacuation Effect
+        setShowCharacterEvacuation(true);
+        setMobileTab('home');
+        setHomeViewMode('ascend');
+        setSelectedCategory('all');
+        setSearchQuery('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        setTimeout(() => {
+          setShowCharacterEvacuation(false);
+          setIsInitialBreakaway(false);
+          setHasPlayedInitialAnimation(true);
+          try {
+            sessionStorage.setItem('ohknee_initial_anim_played', 'true');
+          } catch {}
+        }, 450);
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
+      } else if (tab === 'top-10') {
         // "Top 10" Tab First-Click: Slide & Glitch Breakaway
         setMobileTab('top-10');
         setSelectedCategory('top-10' as any);
@@ -425,7 +480,16 @@ export default function App() {
       setIsInitialBreakaway(false);
       setMobileTab(tab);
 
-      if (tab === 'top-10') {
+      if (tab === 'home') {
+<<<<<<< HEAD
+        setSelectedCategory('all');
+=======
+        setHomeViewMode('ascend');
+        setSelectedCategory('all');
+        setSearchQuery('');
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'top-10') {
         setSelectedCategory('top-10' as any);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (tab === 'earn') {
@@ -435,7 +499,39 @@ export default function App() {
     }
   };
 
+  // Transition from Cash App cartoon to Top 10 section
+  const handleFinishCashAppAnimation = () => {
+    if (isBannerVisible && !isBannerExiting) {
+      setIsBannerExiting(true);
+      setTimeout(() => {
+        setIsBannerVisible(false);
+        setIsBannerExiting(false);
+      }, 300);
+    }
+    setIsScammerMemeOpen(false);
+    setSelectedCategory('top-10' as any);
+    setMobileTab('top-10');
+    setOpenRowIds((prev) => new Set([...prev, 'row-top10']));
+    setTimeout(() => {
+      const el = document.getElementById('row-top10') || document.getElementById('offers-explorer-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  const isHomepage =
+    selectedCategory === 'all' &&
+    searchQuery.trim() === '' &&
+    mobileTab === 'home' &&
+    homeViewMode === 'initial';
+
   const handleSelectCategory = (catId: string) => {
+    if (isBannerVisible && !isBannerExiting) {
+      setIsBannerExiting(true);
+      setTimeout(() => {
+        setIsBannerVisible(false);
+        setIsBannerExiting(false);
+      }, 300);
+    }
     setSlideDirection(1);
     setIsInitialBreakaway(false);
     setSelectedCategory(catId as CategoryFilter);
@@ -458,259 +554,126 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f15] text-slate-100 flex flex-col selection:bg-purple-600 selection:text-white">
+<<<<<<< HEAD
+    <div className="fixed inset-0 w-full h-full bg-[#0d0f15] text-slate-100 flex flex-col overflow-hidden select-none selection:bg-purple-600 selection:text-white">
+=======
+    <div
+      className={
+        isHomepage
+          ? 'h-screen max-h-screen overflow-hidden bg-transparent text-slate-900 flex flex-col selection:bg-purple-200 selection:text-purple-950'
+          : 'min-h-screen bg-[#0d0f15] text-slate-100 flex flex-col selection:bg-purple-600 selection:text-white'
+      }
+    >
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
       {/* 1. CLEAN TOP APPLICATION BRANDING & TABS (OHKNEE.COM) */}
       <Navbar
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
-        isHomepage={false}
-        onOpenScammerMeme={() => {}}
+<<<<<<< HEAD
+        isHomepage={mobileTab === 'home'}
+=======
+        isHomepage={isHomepage}
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
+        onOpenScammerMeme={() => setIsScammerMemeOpen(true)}
         onGoHome={() => {
-          setSelectedCategory('top-10' as any);
+          setSelectedCategory('all');
           setSearchQuery('');
-          setMobileTab('top-10');
+<<<<<<< HEAD
+          handleSelectMobileTab('home');
+=======
+          setMobileTab('home');
+          setHomeViewMode('initial');
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
 
+      {/* 2. REDDIT-STYLE DROP-DOWN NOTIFICATION BANNER (Slides down from behind top white header on initial load, floats up on dismiss) */}
+      {isBannerVisible && (
+        <RedditNotificationBanner
+          onVisitInbox={() => setIsInboxOpen(true)}
+          isDismissed={isNotificationDismissed}
+          isExiting={isBannerExiting}
+          onDismiss={() => {
+            setIsNotificationDismissed(true);
+            setIsBannerVisible(false);
+          }}
+        />
+      )}
+
+      {/* Mass Character Evacuation Overlay (Home First-Click Breakaway) */}
+      {showCharacterEvacuation && (
+        <MassCharacterEvacuationOverlay
+          onComplete={() => setShowCharacterEvacuation(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full transition-all overflow-hidden">
+      <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col relative">
         <PageTransitionWrapper
           currentTab={mobileTab}
           isInitialBreakaway={isInitialBreakaway}
           slideDirection={slideDirection}
         >
-          {/* DEDICATED TOP 10 VIEW vs OFFER MARKETPLACE (EARN) */}
+<<<<<<< HEAD
+          {/* HOME VIEW (Original Homepage with sunset quest hero image artwork + Community reviews) */}
+          {mobileTab === 'home' ? (
+            <div id="home-view-container" className="flex-1 min-h-0 w-full overflow-y-auto pb-24 md:pb-20 overscroll-contain">
+              <HomepageHero
+                onExploreClick={() => {
+                  handleSelectMobileTab('top-10');
+                }}
+              />
+              <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4">
+                <TrustReviewsSection />
+              </div>
+            </div>
+          ) : mobileTab === 'top-10' ? (
+            <div className="flex-1 min-h-0 w-full overflow-y-auto pb-24 md:pb-20 overscroll-contain">
+=======
+          {/* HOMEPAGE VIEW vs DEDICATED TOP 10 VIEW vs OFFER MARKETPLACE */}
           {mobileTab === 'top-10' ? (
             <div className="flex-1 w-full overflow-y-auto">
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
               <Top10MobileView
                 offers={top10Offers}
                 allOffers={allOffers}
                 onSelectOffer={setSelectedOffer}
                 onToggleSave={handleToggleSaveOffer}
                 savedOfferIds={savedOfferIds}
+                onUpdateOffers={setAllOffers}
               />
             </div>
+          ) : mobileTab === 'home' ? (
+            homeViewMode === 'ascend' ? (
+              <div className="flex-1 w-full overflow-y-auto">
+                <AscendOffersDashboard
+                  onSelectOffer={(offer) => {
+                    const matched = allOffers.find((o) => o.id === offer.id);
+                    setSelectedOffer(matched || (offer as any));
+                  }}
+                  onExploreEarn={() => handleSelectMobileTab('earn')}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-4 pb-16 lg:pb-8">
+                <HomepageHero onExploreClick={() => handleSelectMobileTab('top-10')} />
+                {/* Desktop Trusted Community text section (no image, no yellow star, no chat room) */}
+                <div className="hidden md:block w-full">
+                  <TrustReviewsSection />
+                </div>
+              </div>
+            )
           ) : (
-            /* OFFERS EXPLORER SECTION (EARN - EXACT 4 TABS & GEMSLOOT GUI) */
+            /* EARN VIEW: DEDICATED MICROSOFT WORD TOOLS & BLURRY IMAGE FIXER STUDIO */
             <main
-              id="offers-explorer-section"
-              className={`flex-1 w-full bg-[#0d0f15] text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 select-none ${
-                isSingleFrame
-                  ? 'h-[calc(100vh-80px)] overflow-hidden flex flex-col justify-between pb-24 md:pb-16'
-                  : 'min-h-screen overflow-y-auto pb-28 md:pb-20'
-              }`}
+              id="earn-studio-view"
+              className="flex-1 min-h-0 w-full overflow-y-auto max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4 pb-24 md:pb-20 select-none overscroll-contain"
             >
-              {/* TOP BAR: My Offers + Filter Dropdown + Single Frame Toggle + Expand All */}
-              <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5 sm:mb-3 px-0.5">
-                {/* Left: Gem Icon + My Offers Title + Filter Dropdown (Gemsloot GUI) */}
-                <div className="flex items-center gap-2 sm:gap-3 relative">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xl">💎</span>
-                    <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
-                      My Offers
-                    </h2>
-                  </div>
-
-                  {/* Filter Dropdown Button */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setEarnFilterMenuOpen((prev) => !prev)}
-                      className="flex items-center gap-1.5 bg-[#151926] hover:bg-[#1c2234] border border-[#242c40] text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      <Filter size={12} className="text-purple-400" />
-                      <span>
-                        {quickFilter === 'all'
-                          ? 'Filter'
-                          : quickFilter === 'instant'
-                          ? 'Instant Cash'
-                          : quickFilter === 'high_value'
-                          ? '$25+ Value'
-                          : quickFilter === 'daily'
-                          ? 'Daily SC'
-                          : 'Saved'}
-                      </span>
-                      <ChevronDown size={13} className="text-slate-400" />
-                    </button>
-
-                    {/* Filter Options Dropdown Popover */}
-                    {earnFilterMenuOpen && (
-                      <div className="absolute left-0 top-full mt-1.5 z-30 w-44 rounded-xl bg-[#131722] border border-[#23293b] shadow-2xl p-1.5 space-y-0.5 animate-in fade-in duration-150">
-                        {[
-                          { id: 'all', label: 'All Verified Offers' },
-                          { id: 'instant', label: '⚡ Instant Payouts' },
-                          { id: 'high_value', label: '💰 $25+ High Value' },
-                          { id: 'daily', label: '⭐ Free Daily SC' },
-                          { id: 'saved', label: '🔖 My Saved Offers' },
-                        ].map((opt) => (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => {
-                              setQuickFilter(opt.id as any);
-                              setEarnFilterMenuOpen(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold text-left cursor-pointer transition-colors ${
-                              quickFilter === opt.id
-                                ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40'
-                                : 'text-slate-300 hover:bg-[#1a2030] hover:text-white border border-transparent'
-                            }`}
-                          >
-                            <span>{opt.label}</span>
-                            {quickFilter === opt.id && (
-                              <Check size={12} className="text-purple-400" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right: Single Frame Mode Toggle & Master Expand / Collapse */}
-                <div className="flex items-center gap-2">
-                  {/* Single Frame Mode Toggle (Fits everything in one frame without scrolling) */}
-                  <button
-                    type="button"
-                    onClick={() => setIsSingleFrame((prev) => !prev)}
-                    title={
-                      isSingleFrame
-                        ? 'Switch to Standard Scrolling View'
-                        : 'Fit all 4 categories in a single frame without scrolling'
-                    }
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                      isSingleFrame
-                        ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-900/40'
-                        : 'bg-[#151926] hover:bg-[#1c2234] border-[#242c40] text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    {isSingleFrame ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-                    <span className="hidden sm:inline">
-                      {isSingleFrame ? 'Exit Single Frame' : 'Single Frame View'}
-                    </span>
-                    <span className="sm:hidden">
-                      {isSingleFrame ? 'Standard' : '1-Frame'}
-                    </span>
-                  </button>
-
-                  {/* Expand / Collapse All Rows Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const allOpen = ALL_CATEGORY_ROW_IDS.every((id) =>
-                        openRowIds.has(id)
-                      );
-                      if (allOpen) {
-                        handleCollapseAllRows();
-                      } else {
-                        handleExpandAllRows();
-                      }
-                    }}
-                    className="bg-[#151926] hover:bg-[#1c2234] border border-[#242c40] text-slate-300 hover:text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    {ALL_CATEGORY_ROW_IDS.every((id) => openRowIds.has(id))
-                      ? 'Collapse All'
-                      : 'Expand All'}
-                  </button>
-                </div>
-              </div>
-
-              {/* 4 Categorized Tabs at Top of Earn (as requested: "i want 4 tab only") */}
-              <CategoryNavStrip
-                activeCategory={selectedCategory}
-                onSelectCategory={(tab) => {
-                  setSelectedCategory(tab.id as CategoryFilter);
-                  setOpenRowIds((prev) => new Set(prev).add(tab.rowId));
-                  setTimeout(() => {
-                    const el = document.getElementById(tab.rowId);
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                  }, 50);
-                }}
+              <EarnWordStudio
+                allOffers={allOffers}
+                onUpdateOffers={setAllOffers}
               />
-
-              {/* THE EXACT 4 CATEGORY ROWS (Gemsloot GUI with Expandable Ribbons & Carousels) */}
-              <div
-                className={`w-full ${
-                  isSingleFrame
-                    ? 'flex-1 flex flex-col justify-around overflow-hidden'
-                    : 'space-y-3 sm:space-y-4'
-                }`}
-              >
-                {/* 1. FEATURED OFFERS */}
-                <CategoryOfferRow
-                  id="row-featured"
-                  title="Featured"
-                  subtitle="Top verified rewards with instant claim access"
-                  icon={<Flame size={20} className="stroke-[2.2]" />}
-                  offers={featuredOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-featured')}
-                  onToggleOpen={() => handleToggleRow('row-featured')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                  isSingleFrame={isSingleFrame}
-                />
-
-                {/* 2. FAST OFFERS */}
-                <CategoryOfferRow
-                  id="row-fast-offers"
-                  title="Fast Offers"
-                  subtitle="$100 - $150 sequential easy cash & instant tasks"
-                  icon={<Zap size={20} className="stroke-[2.2]" />}
-                  offers={fastOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-fast-offers')}
-                  onToggleOpen={() => handleToggleRow('row-fast-offers')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                  isSingleFrame={isSingleFrame}
-                />
-
-                {/* 3. FINANCE */}
-                <CategoryOfferRow
-                  id="row-finance"
-                  title="Finance"
-                  subtitle="Banking, crypto exchanges, and high-value credit booster rewards"
-                  icon={<Coins size={20} className="stroke-[2.2]" />}
-                  offers={financeOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-finance')}
-                  onToggleOpen={() => handleToggleRow('row-finance')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                  isSingleFrame={isSingleFrame}
-                />
-
-                {/* 4. SWEEPSTAKE */}
-                <CategoryOfferRow
-                  id="row-sweepstakes"
-                  title="Sweepstake"
-                  subtitle="Daily free SC coins, sweepstakes casinos & prize wheels"
-                  icon={<Star size={20} className="stroke-[2.2]" />}
-                  offers={sweepstakesOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-sweepstakes')}
-                  onToggleOpen={() => handleToggleRow('row-sweepstakes')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                  isSingleFrame={isSingleFrame}
-                />
-              </div>
-
-              {/* Footer Disclaimer (Only in normal scrolling mode) */}
-              {!isSingleFrame && (
-                <footer className="mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-2">
-                  <p>
-                    © {new Date().getFullYear()} OHKNEE.COM. All partner bonuses and promo codes verified.
-                  </p>
-                  <p className="text-[11px] text-slate-600 max-w-xl mx-auto">
-                    Please participate responsibly. Offers subject to individual terms and regional availability.
-                  </p>
-                </footer>
-              )}
             </main>
           )}
         </PageTransitionWrapper>
@@ -756,7 +719,7 @@ export default function App() {
         currentTab={mobileTab}
         onSelectTab={handleSelectMobileTab}
         savedCount={savedOfferIds.size}
-        isDarkTheme={true}
+        isDarkTheme={!isHomepage}
       />
 
       {/* 14. COMPREHENSIVE OFFER DETAIL MODAL */}
@@ -800,7 +763,14 @@ export default function App() {
         }}
       />
 
-      {/* 18. HOW IT WORKS MODAL */}
+      {/* 18. COMEDIC SCAMMER MEME / STICK FIGURE ANIMATION MODAL */}
+      <ScammerMemeModal
+        isOpen={isScammerMemeOpen}
+        onClose={() => setIsScammerMemeOpen(false)}
+        onFinish={handleFinishCashAppAnimation}
+      />
+
+      {/* 19. HOW IT WORKS MODAL */}
       <HowItWorksModal
         isOpen={isHowItWorksOpen}
         onClose={() => setIsHowItWorksOpen(false)}
@@ -824,6 +794,25 @@ export default function App() {
           if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
+        }}
+      />
+
+      {/* 21. REAL-TIME GITHUB PUSH STATUS NOTIFICATION */}
+      <GitHubPushToast onOpenSettings={() => setIsGitHubSyncModalOpen(true)} />
+
+      {/* 22. GITHUB SYNC & AUTO-PUSH MODAL */}
+      <GitHubSyncModal
+        isOpen={isGitHubSyncModalOpen}
+        onClose={() => setIsGitHubSyncModalOpen(false)}
+      />
+
+      {/* 23. SCAMMER MEME CARTOON MODAL */}
+      <ScammerMemeModal
+        isOpen={isScammerMemeOpen}
+        onClose={() => setIsScammerMemeOpen(false)}
+        onFinish={() => {
+          setIsScammerMemeOpen(false);
+          handleSelectMobileTab('top-10');
         }}
       />
     </div>

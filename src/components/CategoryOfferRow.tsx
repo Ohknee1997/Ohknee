@@ -6,13 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Monitor,
-  Smartphone,
-  Apple,
-  LayoutGrid,
-  Search,
   Play,
-  X,
+  Sparkles,
 } from 'lucide-react';
 
 interface CategoryOfferRowProps {
@@ -48,12 +43,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
   const [internalIsOpen, setInternalIsOpen] = useState(initialOpen);
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
-  // Platform device filter for this specific row (Gemsloot GUI)
-  const [activePlatform, setActivePlatform] = useState<'all' | 'apple' | 'android' | 'desktop'>('all');
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isFullGridView, setIsFullGridView] = useState(false);
-
   const carouselRef = useRef<HTMLDivElement>(null);
 
   if (offers.length === 0) return null;
@@ -67,22 +57,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
     }
   };
 
-  // Filter offers based on platform and search
-  const displayedOffers = offers.filter((offer) => {
-    if (activePlatform !== 'all') {
-      if (!offer.platforms?.includes(activePlatform)) {
-        return false;
-      }
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchName = offer.name.toLowerCase().includes(q);
-      const matchPayout = offer.payout?.toLowerCase().includes(q);
-      const matchCode = offer.code?.toLowerCase().includes(q);
-      if (!matchName && !matchPayout && !matchCode) return false;
-    }
-    return true;
-  });
+  const displayedOffers = offers;
 
   // Carousel navigation handlers
   const scrollLeft = () => {
@@ -128,104 +103,6 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
               }`}
             />
           </button>
-
-          {/* Device Platform Filters (Visible when expanded or always available) */}
-          {isOpen && (
-            <div className="flex items-center gap-1 bg-[#131622] border border-[#23293b] rounded-xl p-0.5">
-              {/* Apple (iOS) */}
-              <button
-                type="button"
-                onClick={() => setActivePlatform((p) => (p === 'apple' ? 'all' : 'apple'))}
-                title="Apple iOS offers"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  activePlatform === 'apple'
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1c2234]'
-                }`}
-              >
-                <Apple size={13} />
-              </button>
-
-              {/* Android */}
-              <button
-                type="button"
-                onClick={() => setActivePlatform((p) => (p === 'android' ? 'all' : 'android'))}
-                title="Android offers"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  activePlatform === 'android'
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1c2234]'
-                }`}
-              >
-                <Smartphone size={13} />
-              </button>
-
-              {/* Desktop / PC */}
-              <button
-                type="button"
-                onClick={() => setActivePlatform((p) => (p === 'desktop' ? 'all' : 'desktop'))}
-                title="Desktop & Web offers"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  activePlatform === 'desktop'
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1c2234]'
-                }`}
-              >
-                <Monitor size={13} />
-              </button>
-
-              {/* All / Grid */}
-              <button
-                type="button"
-                onClick={() => setActivePlatform('all')}
-                title="All platforms"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  activePlatform === 'all'
-                    ? 'bg-purple-600/40 text-purple-300'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1c2234]'
-                }`}
-              >
-                <LayoutGrid size={13} />
-              </button>
-
-              {/* Purple Search Toggle */}
-              <button
-                type="button"
-                onClick={() => setShowSearch((s) => !s)}
-                title="Search this row"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  showSearch || searchQuery
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'bg-purple-900/60 hover:bg-purple-800 text-purple-300'
-                }`}
-              >
-                <Search size={13} />
-              </button>
-            </div>
-          )}
-
-          {/* Inline Search Input */}
-          {isOpen && showSearch && (
-            <div className="flex items-center gap-1 bg-[#131622] border border-purple-500/50 rounded-xl px-2 py-0.5 text-xs animate-in fade-in duration-150">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Search ${title}...`}
-                className="bg-transparent text-white placeholder-slate-500 focus:outline-hidden w-28 sm:w-36 text-xs"
-                autoFocus
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="text-slate-400 hover:text-white"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Right: Carousel Navigation Arrows & Hide Row Button (when expanded) */}
@@ -392,7 +269,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 }`}
               >
                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <LayoutGrid size={32} className="text-white" />
+                  <Sparkles size={30} className="text-white" />
                 </div>
                 <span className="text-sm sm:text-base font-black tracking-tight leading-tight">
                   View More

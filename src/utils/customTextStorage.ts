@@ -1,5 +1,6 @@
 import { CustomTextItem } from '../types';
 import { pushFullStateToCloud } from './cloudSync';
+import { pushContentToGitHub } from './githubSyncService';
 
 export const STORE_CUSTOM_TEXTS = 'ohknee_custom_texts_v2';
 
@@ -24,6 +25,10 @@ export function saveCustomTexts(items: CustomTextItem[], syncCloud = true): void
     window.dispatchEvent(new CustomEvent('ohknee:custom-texts-updated', { detail: items }));
     if (syncCloud) {
       pushFullStateToCloud().catch(() => {});
+      pushContentToGitHub({
+        textData: { customTexts: items },
+        actionDescription: 'Updated custom text layer',
+      }).catch(() => {});
     }
   } catch (e) {
     console.error('Failed to save custom texts:', e);

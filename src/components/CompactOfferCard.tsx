@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { initialsOf } from '../utils';
-import { Sparkles } from 'lucide-react';
+import { Monitor, Smartphone, Apple, Sparkles } from 'lucide-react';
 
 interface CompactOfferCardProps {
   offer: EnrichedOffer;
@@ -72,6 +72,13 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
           isCompact ? 'h-[110px] sm:h-[118px]' : 'h-[130px] sm:h-[140px]'
         }`}
       >
+        {/* Platform badge pills on top right (Gemsloot style) */}
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-[#161a28]/90 backdrop-blur-xs border border-slate-700/60 rounded-md px-1.5 py-0.5 z-10">
+          <Monitor size={10} className="text-slate-400" />
+          <Smartphone size={10} className="text-slate-400" />
+          <Apple size={10} className="text-slate-400" />
+        </div>
+
         {/* Hot / Badge indicator on top left if available */}
         {offer.badgeType && (
           <div className="absolute top-2 left-2 z-10">

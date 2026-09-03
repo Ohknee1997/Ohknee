@@ -1,7 +1,7 @@
 import React from 'react';
-import { Trophy, Sparkles } from 'lucide-react';
+import { Home, Trophy, Sparkles } from 'lucide-react';
 
-export type MobileTab = 'top-10' | 'earn';
+export type MobileTab = 'home' | 'top-10' | 'earn';
 
 interface MobileBottomNavProps {
   currentTab: MobileTab;
@@ -18,14 +18,59 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       id="mobile-bottom-nav"
-      className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl px-4 pt-1.5 pb-safe select-none transition-colors duration-300 ${
+      className={`fixed bottom-0 left-0 right-0 z-50 h-16 backdrop-blur-xl px-4 select-none ${
         isDarkTheme
-          ? 'bg-[#12151e]/95 border-t border-[#242b3d] shadow-[0_-4px_25px_rgba(0,0,0,0.7)]'
-          : 'bg-white/95 border-t border-purple-200/80 shadow-[0_-4px_20px_rgba(147,51,234,0.08)]'
+          ? 'bg-[#12151e]/98 border-t border-[#242b3d] shadow-[0_-4px_25px_rgba(0,0,0,0.8)]'
+          : 'bg-white/98 border-t border-purple-200/80 shadow-[0_-4px_20px_rgba(147,51,234,0.08)]'
       }`}
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '64px',
+        zIndex: 99999,
+        touchAction: 'none',
+        WebkitTouchCallout: 'none',
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
     >
-      <div className="flex items-center justify-around h-14 max-w-md mx-auto">
+<<<<<<< HEAD
+      <div className="flex items-center justify-around h-full max-w-md mx-auto">
         {/* 1. Top 10 */}
+=======
+      <div className="flex items-center justify-around h-14 max-w-md mx-auto">
+        {/* 1. Home */}
+        <button
+          id="bottom-nav-tab-home"
+          type="button"
+          onClick={() => onSelectTab('home')}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all cursor-pointer relative py-1 ${
+            currentTab === 'home'
+              ? isDarkTheme
+                ? 'text-purple-400 font-black'
+                : 'text-purple-700 font-black'
+              : isDarkTheme
+              ? 'text-slate-400 hover:text-slate-200 font-medium'
+              : 'text-slate-500 hover:text-slate-800 font-medium'
+          }`}
+          aria-label="Home"
+        >
+          <Home size={20} strokeWidth={currentTab === 'home' ? 2.5 : 2} />
+          <span className="text-[11px] tracking-tight whitespace-nowrap leading-none">Home</span>
+          {currentTab === 'home' && (
+            <span
+              className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
+                isDarkTheme ? 'bg-purple-400 shadow-[0_0_8px_rgba(192,132,252,0.8)]' : 'bg-purple-700'
+              }`}
+            />
+          )}
+        </button>
+
+        {/* 2. Top 10 */}
+>>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
         <button
           id="bottom-nav-tab-top10"
           type="button"
@@ -52,7 +97,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           )}
         </button>
 
-        {/* 2. Earn */}
+        {/* 3. Earn */}
         <button
           id="bottom-nav-tab-earn"
           type="button"
