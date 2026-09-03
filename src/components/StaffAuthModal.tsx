@@ -36,7 +36,7 @@ export const StaffAuthModal: React.FC<StaffAuthModalProps> = ({
         (u === 'oniamaya3@gmail.com') ||
         (u === 'oniamaya051@gmail.com') ||
         (u === 'oniamaya3') ||
-        (u === 'onib' && password === 'Onib1127!');
+        (u === 'onib' && (password === 'onib1127!' || password === 'Onib1127!'));
 
       if (isAuthorizedUser) {
         setIsAuthenticating(false);

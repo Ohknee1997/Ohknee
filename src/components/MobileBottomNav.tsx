@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, Trophy, Sparkles } from 'lucide-react';
+import { Trophy, Sparkles } from 'lucide-react';
 
-export type MobileTab = 'home' | 'top-10' | 'earn';
+export type MobileTab = 'top-10' | 'earn';
 
 interface MobileBottomNavProps {
   currentTab: MobileTab;
@@ -25,34 +25,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       }`}
     >
       <div className="flex items-center justify-around h-14 max-w-md mx-auto">
-        {/* 1. Home */}
-        <button
-          id="bottom-nav-tab-home"
-          type="button"
-          onClick={() => onSelectTab('home')}
-          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all cursor-pointer relative py-1 ${
-            currentTab === 'home'
-              ? isDarkTheme
-                ? 'text-purple-400 font-black'
-                : 'text-purple-700 font-black'
-              : isDarkTheme
-              ? 'text-slate-400 hover:text-slate-200 font-medium'
-              : 'text-slate-500 hover:text-slate-800 font-medium'
-          }`}
-          aria-label="Home"
-        >
-          <Home size={20} strokeWidth={currentTab === 'home' ? 2.5 : 2} />
-          <span className="text-[11px] tracking-tight whitespace-nowrap leading-none">Home</span>
-          {currentTab === 'home' && (
-            <span
-              className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
-                isDarkTheme ? 'bg-purple-400 shadow-[0_0_8px_rgba(192,132,252,0.8)]' : 'bg-purple-700'
-              }`}
-            />
-          )}
-        </button>
-
-        {/* 2. Top 10 */}
+        {/* 1. Top 10 */}
         <button
           id="bottom-nav-tab-top10"
           type="button"
@@ -79,7 +52,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           )}
         </button>
 
-        {/* 3. Earn */}
+        {/* 2. Earn */}
         <button
           id="bottom-nav-tab-earn"
           type="button"

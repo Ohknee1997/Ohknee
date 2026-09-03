@@ -19,21 +19,6 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
   const getVariants = () => {
     if (isInitialBreakaway) {
       switch (currentTab) {
-        case 'home':
-          // Split & Dissolve Breakaway:
-          // Scaled up smoothly from 95% to 100% opacity, exit splits horizontally outward & dissolves
-          return {
-            initial: { opacity: 0, scale: 0.95 },
-            animate: { opacity: 1, scale: 1 },
-            exit: {
-              opacity: 0,
-              scaleX: 1.15,
-              scaleY: 0.95,
-              filter: 'blur(6px)',
-            },
-            transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
-          };
-
         case 'top-10':
           // Slide & Glitch Breakaway:
           // Rapid slide-out to left with 150ms digital glitch/blur-to-focus effect as Top 10 enters

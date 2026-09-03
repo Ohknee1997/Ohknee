@@ -37,16 +37,10 @@ import { MobileBottomNav, MobileTab } from './components/MobileBottomNav';
 import { OwnerAnalyticsModal } from './components/OwnerAnalyticsModal';
 import { StaffAuthModal } from './components/StaffAuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
-import { HomepageHero } from './components/HomepageHero';
 import { Top10MobileView } from './components/Top10MobileView';
-import { TrustReviewsSection } from './components/TrustReviewsSection';
-import { ScammerMemeModal } from './components/ScammerMemeModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
-import { RedditNotificationBanner } from './components/RedditNotificationBanner';
 import { InboxModal } from './components/InboxModal';
-import { AscendOffersDashboard } from './components/AscendOffersDashboard';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
-import { MassCharacterEvacuationOverlay } from './components/MassCharacterEvacuationOverlay';
 
 // Icons
 import {
@@ -120,27 +114,39 @@ export default function App() {
   const [isOwnerAnalyticsOpen, setIsOwnerAnalyticsOpen] = useState(false);
   const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isScammerMemeOpen, setIsScammerMemeOpen] = useState(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
   const [isNotificationDismissed, setIsNotificationDismissed] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(() => {
-    return (
-      getUserProfile() || {
-        username: 'OhkneeMember',
-        avatarId: 'avatar-001',
-        joinedDate: new Date().toISOString(),
-        balance: 150.0,
-        claimedBonusCount: 6,
-      }
-    );
+    const existing = getUserProfile();
+    if (existing) {
+      return {
+        ...existing,
+        email: existing.email || 'Oniamaya3@gmail.com',
+      };
+    }
+    return {
+      username: 'Oniamaya',
+      email: 'Oniamaya3@gmail.com',
+      avatarId: 'avatar-001',
+      joinedDate: new Date().toISOString(),
+      balance: 150.0,
+      claimedBonusCount: 10,
+    };
   });
 
-  // Mobile navigation active tab & home view mode
-  const [mobileTab, setMobileTab] = useState<MobileTab>('home');
-  const [homeViewMode, setHomeViewMode] = useState<'initial' | 'ascend'>('initial');
+  // Automatically grant full owner and staff access for Oniamaya3@gmail.com
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('ohk_staff_authenticated', 'true');
+      sessionStorage.setItem('ohknee_owner_auth', 'true');
+    } catch {}
+  }, []);
 
-  // Animation & Transition tracking (session-persistent one-time initial breakaway)
+  // Mobile navigation active tab (Top 10 and Earn only, Home removed)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('top-10');
+
+  // Animation & Transition tracking
   const [hasPlayedInitialAnimation, setHasPlayedInitialAnimation] = useState<boolean>(() => {
     try {
       return sessionStorage.getItem('ohknee_initial_anim_played') === 'true';
@@ -149,12 +155,7 @@ export default function App() {
     }
   });
   const [isInitialBreakaway, setIsInitialBreakaway] = useState<boolean>(false);
-  const [showCharacterEvacuation, setShowCharacterEvacuation] = useState<boolean>(false);
   const [slideDirection, setSlideDirection] = useState<number>(1);
-
-  // Red banner dismissal state
-  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(true);
-  const [isBannerExiting, setIsBannerExiting] = useState<boolean>(false);
 
   // Search input ref to focus
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -380,46 +381,19 @@ export default function App() {
 
   // Jump from mobile navigation with initial breakaway animation or fluid horizontal glide
   const handleSelectMobileTab = (tab: MobileTab) => {
-    // 1. Red banner instant upward dismissal animation on first tab press
-    if (isBannerVisible && !isBannerExiting) {
-      setIsBannerExiting(true);
-      setTimeout(() => {
-        setIsBannerVisible(false);
-        setIsBannerExiting(false);
-      }, 300);
-    }
-
-    // 2. Compute tab order for directional horizontal sliding (Home: 0, Top-10: 1, Earn: 2)
+    // 1. Compute tab order for directional horizontal sliding (Top-10: 0, Earn: 1)
     const tabOrderMap: Record<MobileTab, number> = {
-      home: 0,
-      'top-10': 1,
-      earn: 2,
+      'top-10': 0,
+      earn: 1,
     };
     const newDir = tabOrderMap[tab] >= tabOrderMap[mobileTab] ? 1 : -1;
     setSlideDirection(newDir);
 
-    // 3. One-time initial entry animation check
+    // 2. One-time initial entry animation check
     if (!hasPlayedInitialAnimation) {
       setIsInitialBreakaway(true);
 
-      if (tab === 'home') {
-        // "Home" Tab First-Click: Mass Character Evacuation Effect
-        setShowCharacterEvacuation(true);
-        setMobileTab('home');
-        setHomeViewMode('ascend');
-        setSelectedCategory('all');
-        setSearchQuery('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        setTimeout(() => {
-          setShowCharacterEvacuation(false);
-          setIsInitialBreakaway(false);
-          setHasPlayedInitialAnimation(true);
-          try {
-            sessionStorage.setItem('ohknee_initial_anim_played', 'true');
-          } catch {}
-        }, 450);
-      } else if (tab === 'top-10') {
+      if (tab === 'top-10') {
         // "Top 10" Tab First-Click: Slide & Glitch Breakaway
         setMobileTab('top-10');
         setSelectedCategory('top-10' as any);
@@ -451,12 +425,7 @@ export default function App() {
       setIsInitialBreakaway(false);
       setMobileTab(tab);
 
-      if (tab === 'home') {
-        setHomeViewMode('ascend');
-        setSelectedCategory('all');
-        setSearchQuery('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (tab === 'top-10') {
+      if (tab === 'top-10') {
         setSelectedCategory('top-10' as any);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (tab === 'earn') {
@@ -466,39 +435,7 @@ export default function App() {
     }
   };
 
-  // Transition from Cash App cartoon to Top 10 section
-  const handleFinishCashAppAnimation = () => {
-    if (isBannerVisible && !isBannerExiting) {
-      setIsBannerExiting(true);
-      setTimeout(() => {
-        setIsBannerVisible(false);
-        setIsBannerExiting(false);
-      }, 300);
-    }
-    setIsScammerMemeOpen(false);
-    setSelectedCategory('top-10' as any);
-    setMobileTab('top-10');
-    setOpenRowIds((prev) => new Set([...prev, 'row-top10']));
-    setTimeout(() => {
-      const el = document.getElementById('row-top10') || document.getElementById('offers-explorer-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  };
-
-  const isHomepage =
-    selectedCategory === 'all' &&
-    searchQuery.trim() === '' &&
-    mobileTab === 'home' &&
-    homeViewMode === 'initial';
-
   const handleSelectCategory = (catId: string) => {
-    if (isBannerVisible && !isBannerExiting) {
-      setIsBannerExiting(true);
-      setTimeout(() => {
-        setIsBannerVisible(false);
-        setIsBannerExiting(false);
-      }, 300);
-    }
     setSlideDirection(1);
     setIsInitialBreakaway(false);
     setSelectedCategory(catId as CategoryFilter);
@@ -521,47 +458,20 @@ export default function App() {
   };
 
   return (
-    <div
-      className={
-        isHomepage
-          ? 'h-screen max-h-screen overflow-hidden bg-transparent text-slate-900 flex flex-col selection:bg-purple-200 selection:text-purple-950'
-          : 'min-h-screen bg-[#0d0f15] text-slate-100 flex flex-col selection:bg-purple-600 selection:text-white'
-      }
-    >
+    <div className="min-h-screen bg-[#0d0f15] text-slate-100 flex flex-col selection:bg-purple-600 selection:text-white">
       {/* 1. CLEAN TOP APPLICATION BRANDING & TABS (OHKNEE.COM) */}
       <Navbar
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
-        isHomepage={isHomepage}
-        onOpenScammerMeme={() => setIsScammerMemeOpen(true)}
+        isHomepage={false}
+        onOpenScammerMeme={() => {}}
         onGoHome={() => {
-          setSelectedCategory('all');
+          setSelectedCategory('top-10' as any);
           setSearchQuery('');
-          setMobileTab('home');
-          setHomeViewMode('initial');
+          setMobileTab('top-10');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
-
-      {/* 2. REDDIT-STYLE DROP-DOWN NOTIFICATION BANNER (Slides down from behind top white header on initial load, floats up on dismiss) */}
-      {isBannerVisible && (
-        <RedditNotificationBanner
-          onVisitInbox={() => setIsInboxOpen(true)}
-          isDismissed={isNotificationDismissed}
-          isExiting={isBannerExiting}
-          onDismiss={() => {
-            setIsNotificationDismissed(true);
-            setIsBannerVisible(false);
-          }}
-        />
-      )}
-
-      {/* Mass Character Evacuation Overlay (Home First-Click Breakaway) */}
-      {showCharacterEvacuation && (
-        <MassCharacterEvacuationOverlay
-          onComplete={() => setShowCharacterEvacuation(false)}
-        />
-      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full transition-all overflow-hidden">
@@ -570,7 +480,7 @@ export default function App() {
           isInitialBreakaway={isInitialBreakaway}
           slideDirection={slideDirection}
         >
-          {/* HOMEPAGE VIEW vs DEDICATED TOP 10 VIEW vs OFFER MARKETPLACE */}
+          {/* DEDICATED TOP 10 VIEW vs OFFER MARKETPLACE (EARN) */}
           {mobileTab === 'top-10' ? (
             <div className="flex-1 w-full overflow-y-auto">
               <Top10MobileView
@@ -581,26 +491,6 @@ export default function App() {
                 savedOfferIds={savedOfferIds}
               />
             </div>
-          ) : mobileTab === 'home' ? (
-            homeViewMode === 'ascend' ? (
-              <div className="flex-1 w-full overflow-y-auto">
-                <AscendOffersDashboard
-                  onSelectOffer={(offer) => {
-                    const matched = allOffers.find((o) => o.id === offer.id);
-                    setSelectedOffer(matched || (offer as any));
-                  }}
-                  onExploreEarn={() => handleSelectMobileTab('earn')}
-                />
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-4 pb-16 lg:pb-8">
-                <HomepageHero onExploreClick={() => handleSelectMobileTab('top-10')} />
-                {/* Desktop Trusted Community text section (no image, no yellow star, no chat room) */}
-                <div className="hidden md:block w-full">
-                  <TrustReviewsSection />
-                </div>
-              </div>
-            )
           ) : (
             /* OFFERS EXPLORER SECTION (EARN - EXACT 4 TABS & GEMSLOOT GUI) */
             <main
@@ -866,7 +756,7 @@ export default function App() {
         currentTab={mobileTab}
         onSelectTab={handleSelectMobileTab}
         savedCount={savedOfferIds.size}
-        isDarkTheme={!isHomepage}
+        isDarkTheme={true}
       />
 
       {/* 14. COMPREHENSIVE OFFER DETAIL MODAL */}
@@ -910,14 +800,7 @@ export default function App() {
         }}
       />
 
-      {/* 18. COMEDIC SCAMMER MEME / STICK FIGURE ANIMATION MODAL */}
-      <ScammerMemeModal
-        isOpen={isScammerMemeOpen}
-        onClose={() => setIsScammerMemeOpen(false)}
-        onFinish={handleFinishCashAppAnimation}
-      />
-
-      {/* 19. HOW IT WORKS MODAL */}
+      {/* 18. HOW IT WORKS MODAL */}
       <HowItWorksModal
         isOpen={isHowItWorksOpen}
         onClose={() => setIsHowItWorksOpen(false)}
