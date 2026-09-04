@@ -19,7 +19,8 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
   const getVariants = () => {
     if (isInitialBreakaway) {
       switch (currentTab) {
-        case 'home':
+        case 'hero':
+        case 'home' as any:
           // Split & Dissolve Breakaway:
           // Scaled up smoothly from 95% to 100% opacity, exit splits horizontally outward & dissolves
           return {

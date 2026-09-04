@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logoImg from '../assets/images/ohknee_bw_logo_1787987005299.jpg';
 
 interface OhkneeLogoProps {
@@ -6,9 +6,8 @@ interface OhkneeLogoProps {
   size?: 'normal' | 'large' | 'huge';
 }
 
-export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = 'large' }) => {
-  const [transparentDataUrl, setTransparentDataUrl] = useState<string | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '' }) => {
+  const [whiteDataUrl, setWhiteDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const img = new Image();
@@ -27,28 +26,35 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imgData.data;
 
-        // Process pixels to make white/light pixels transparent
+        // Process pixels: make dark logo artwork pure white with transparent background
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i];
           const g = data[i + 1];
           const b = data[i + 2];
-          
-          // Calculate brightness
+
+          // Calculate perceived brightness (0 to 255)
           const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
 
-          if (brightness > 235) {
-            // Pure white / light background -> completely transparent
+          if (brightness > 230) {
+            // Background white -> fully transparent
             data[i + 3] = 0;
-          } else if (brightness > 180) {
-            // Anti-aliasing edge smoothing
-            const factor = (235 - brightness) / 55;
-            data[i + 3] = Math.round(data[i + 3] * factor);
+          } else {
+            // Turn logo artwork to pure crisp white
+            data[i] = 255;
+            data[i + 1] = 255;
+            data[i + 2] = 255;
+            // Anti-aliased alpha
+            if (brightness > 160) {
+              const factor = (230 - brightness) / 70;
+              data[i + 3] = Math.round(255 * Math.max(0, Math.min(1, factor)));
+            } else {
+              data[i + 3] = 255;
+            }
           }
-          // Dark parts (the logo cube lines & text) remain fully opaque and rich black
         }
 
         ctx.putImageData(imgData, 0, 0);
-        setTransparentDataUrl(canvas.toDataURL('image/png'));
+        setWhiteDataUrl(canvas.toDataURL('image/png'));
       } catch (err) {
         console.warn('Canvas transparency processing fallback', err);
       }
@@ -56,19 +62,23 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
   }, []);
 
   return (
-    <div className={`ohk-logo-badge ${className}`} id="ohknee-brand-logo-badge" style={{ background: 'transparent' }}>
+    <div
+      className={`ohk-logo-badge ${className} flex items-center justify-center`}
+      id="ohknee-brand-logo-badge"
+      style={{ background: 'transparent' }}
+    >
       <img
-        src={transparentDataUrl || logoImg}
-        alt="OHKNEE Logo"
+        src={whiteDataUrl || logoImg}
+        alt="OHKNEE White Logo"
         className="ohk-logo-img object-contain"
         id="ohknee-logo-image"
         referrerPolicy="no-referrer"
         style={{
           background: 'transparent',
-          mixBlendMode: transparentDataUrl ? 'normal' : 'multiply',
           height: '100%',
           width: 'auto',
           maxHeight: 'none',
+          filter: whiteDataUrl ? 'drop-shadow(0 0 1px rgba(255,255,255,0.4))' : 'brightness(0) invert(1)',
         }}
         onError={(e) => {
           (e.currentTarget as HTMLElement).style.display = 'none';
@@ -76,7 +86,7 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
           if (fallback) fallback.style.display = 'block';
         }}
       />
-      {/* Crisp vector fallback */}
+      {/* Crisp pure white vector fallback */}
       <svg
         id="ohknee-svg-fallback"
         className="ohk-logo-svg"
@@ -84,34 +94,34 @@ export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '', size = '
         style={{ display: 'none', background: 'transparent', height: '100%', width: 'auto' }}
         aria-hidden="true"
       >
-        <g fill="none" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round">
+        <g fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinejoin="round">
           {/* Top Face */}
           <polygon points="100,10 140,28 100,46 60,28" fill="none" />
-          <polygon points="100,10 120,19 100,28 80,19" fill="#000000" />
+          <polygon points="100,10 120,19 100,28 80,19" fill="#ffffff" />
           <polygon points="120,19 140,28 120,37 100,28" fill="none" />
           <polygon points="80,19 100,28 80,37 60,28" fill="none" />
-          <polygon points="100,28 120,37 100,46 80,37" fill="#000000" />
+          <polygon points="100,28 120,37 100,46 80,37" fill="#ffffff" />
 
           {/* Left Face */}
           <polygon points="60,28 100,46 100,90 60,72" fill="none" />
-          <polygon points="60,28 80,37 80,59 60,50" fill="#000000" />
+          <polygon points="60,28 80,37 80,59 60,50" fill="#ffffff" />
           <polygon points="80,37 100,46 100,68 80,59" fill="none" />
           <polygon points="60,50 80,59 80,81 60,72" fill="none" />
-          <polygon points="80,59 100,68 100,90 80,81" fill="#000000" />
+          <polygon points="80,59 100,68 100,90 80,81" fill="#ffffff" />
 
           {/* Right Face */}
-          <polygon points="100,46 140,28 140,72 100,90" fill="#000000" />
-          <polygon points="100,46 120,37 120,59 100,68" fill="#ffffff" stroke="#ffffff" />
-          <polygon points="120,37 140,28 140,50 120,59" fill="#000000" />
-          <polygon points="100,68 120,59 120,81 100,90" fill="#000000" />
-          <polygon points="120,59 140,50 140,72 120,81" fill="#ffffff" stroke="#ffffff" />
+          <polygon points="100,46 140,28 140,72 100,90" fill="#ffffff" />
+          <polygon points="100,46 120,37 120,59 100,68" fill="#141824" stroke="#ffffff" />
+          <polygon points="120,37 140,28 140,50 120,59" fill="#ffffff" />
+          <polygon points="100,68 120,59 120,81 100,90" fill="#ffffff" />
+          <polygon points="120,59 140,50 140,72 120,81" fill="#141824" stroke="#ffffff" />
         </g>
-        {/* OHKNEE text */}
+        {/* OHKNEE text in pure white */}
         <text
           x="100"
           y="118"
           textAnchor="middle"
-          fill="#000000"
+          fill="#ffffff"
           fontFamily="system-ui, -apple-system, sans-serif"
           fontWeight="900"
           fontSize="24"
