@@ -16,7 +16,7 @@ export const CardDrawer: React.FC<CardDrawerProps> = ({
   onUpdateDetail,
   onClose,
 }) => {
-  const [note, setNote] = useState(detail.note || '');
+  const [note, setNote] = useState(detail.note || card.instructionSub || '');
   const [link2, setLink2] = useState(detail.link2 || '');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
