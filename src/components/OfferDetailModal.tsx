@@ -180,9 +180,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                   {offer.domain && <span>{offer.domain}</span>}
                   <span>•</span>
                   <div className="flex items-center gap-1 text-slate-500">
-                    <Monitor size={11} title="Desktop" />
-                    <Smartphone size={11} title="Android" />
-                    <Apple size={11} title="iOS" />
+                    <span title="Desktop"><Monitor size={11} /></span>
+                    <span title="Android"><Smartphone size={11} /></span>
+                    <span title="iOS"><Apple size={11} /></span>
                   </div>
                 </div>
               </div>

@@ -22,56 +22,47 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
         case 'hero':
         case 'home' as any:
           // Split & Dissolve Breakaway:
-          // Scaled up smoothly from 95% to 100% opacity, exit splits horizontally outward & dissolves
+          // Scaled up smoothly from 96% to 100% opacity, exit dissolves cleanly
           return {
-            initial: { opacity: 0, scale: 0.95 },
+            initial: { opacity: 0, scale: 0.96 },
             animate: { opacity: 1, scale: 1 },
             exit: {
               opacity: 0,
-              scaleX: 1.15,
-              scaleY: 0.95,
-              filter: 'blur(6px)',
+              scale: 1.02,
             },
-            transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+            transition: { duration: 0.28, ease: 'easeOut' as const },
           };
 
         case 'top-10':
-          // Slide & Glitch Breakaway:
-          // Rapid slide-out to left with 150ms digital glitch/blur-to-focus effect as Top 10 enters
+          // Rapid slide-in with clean opacity fade
           return {
-            initial: { x: '55%', opacity: 0, filter: 'blur(12px) contrast(140%)' },
-            animate: { x: 0, opacity: 1, filter: 'blur(0px) contrast(100%)' },
+            initial: { x: '30%', opacity: 0 },
+            animate: { x: 0, opacity: 1 },
             exit: {
               x: '-100%',
               opacity: 0,
             },
-            transition: { duration: 0.26, ease: [0.2, 0.9, 0.3, 1] },
+            transition: { duration: 0.24, ease: 'easeOut' as const },
           };
 
         case 'earn':
-          // 3D Card Flip / Drop-In Breakaway:
-          // Current view tilts downward off-screen, while Earn rotates into perspective from subtle 3D tilt
+          // Clean 2D drop-in glide
           return {
             initial: {
               opacity: 0,
-              y: -40,
-              rotateX: 18,
-              transformPerspective: 1000,
+              y: -24,
             },
             animate: {
               opacity: 1,
               y: 0,
-              rotateX: 0,
-              transformPerspective: 1000,
             },
             exit: {
-              y: '60%',
-              rotateX: -18,
+              y: 24,
               opacity: 0,
-              transformPerspective: 1000,
             },
-            transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration: 0.26, ease: 'easeOut' as const },
           };
+
       }
     }
 
@@ -84,14 +75,14 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
         initial: { x: '100%', opacity: 1 },
         animate: { x: 0, opacity: 1 },
         exit: { x: '-100%', opacity: 0.98 },
-        transition: { duration: 0.22, ease: [0.25, 1, 0.5, 1] },
+        transition: { duration: 0.22, ease: 'easeInOut' as const },
       };
     } else {
       return {
         initial: { x: '-100%', opacity: 1 },
         animate: { x: 0, opacity: 1 },
         exit: { x: '100%', opacity: 0.98 },
-        transition: { duration: 0.22, ease: [0.25, 1, 0.5, 1] },
+        transition: { duration: 0.22, ease: 'easeInOut' as const },
       };
     }
   };

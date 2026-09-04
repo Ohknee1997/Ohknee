@@ -14,7 +14,7 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onExploreClick, onEa
       className="relative w-full max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex flex-col items-center justify-center select-none animate-in fade-in duration-300"
     >
       {/* Subtle Ambient Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] sm:w-[700px] h-[300px] bg-gradient-to-tr from-purple-600/20 via-indigo-500/15 to-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] sm:w-[600px] h-[260px] bg-gradient-to-tr from-purple-600/20 via-indigo-500/15 to-amber-500/10 rounded-full blur-xl pointer-events-none -z-10" />
 
       {/* Hero Banner Visual Card */}
       <div

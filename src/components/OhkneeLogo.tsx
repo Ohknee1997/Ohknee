@@ -6,62 +6,83 @@ interface OhkneeLogoProps {
   size?: 'normal' | 'large' | 'huge';
 }
 
+let cachedLogoDataUrl: string | null = null;
+let isProcessingLogo = false;
+
 export const OhkneeLogo: React.FC<OhkneeLogoProps> = ({ className = '' }) => {
-  const [whiteDataUrl, setWhiteDataUrl] = useState<string | null>(null);
+  const [whiteDataUrl, setWhiteDataUrl] = useState<string | null>(() => cachedLogoDataUrl);
 
   useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = logoImg;
+    if (cachedLogoDataUrl || isProcessingLogo) return;
+    isProcessingLogo = true;
 
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+    try {
+      const img = new Image();
+      // Do not set crossOrigin for bundled local images to prevent Firefox iframe canvas tainting
+      img.src = logoImg;
 
-        ctx.drawImage(img, 0, 0);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imgData.data;
+      img.onload = () => {
+        try {
+          // Downscale canvas to target display size (max 256px) for instant, low-memory processing
+          const targetWidth = 256;
+          const ratio = (img.naturalHeight || img.height || 1) / (img.naturalWidth || img.width || 1);
+          const targetHeight = Math.round(targetWidth * ratio);
 
-        // Process pixels: make dark logo artwork pure white with transparent background
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            isProcessingLogo = false;
+            return;
+          }
 
-          // Calculate perceived brightness (0 to 255)
-          const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          const imgData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+          const data = imgData.data;
 
-          if (brightness > 230) {
-            // Background white -> fully transparent
-            data[i + 3] = 0;
-          } else {
-            // Turn logo artwork to pure crisp white
-            data[i] = 255;
-            data[i + 1] = 255;
-            data[i + 2] = 255;
-            // Anti-aliased alpha
-            if (brightness > 160) {
-              const factor = (230 - brightness) / 70;
-              data[i + 3] = Math.round(255 * Math.max(0, Math.min(1, factor)));
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (brightness > 230) {
+              data[i + 3] = 0;
             } else {
-              data[i + 3] = 255;
+              data[i] = 255;
+              data[i + 1] = 255;
+              data[i + 2] = 255;
+              if (brightness > 160) {
+                const factor = (230 - brightness) / 70;
+                data[i + 3] = Math.round(255 * Math.max(0, Math.min(1, factor)));
+              } else {
+                data[i + 3] = 255;
+              }
             }
           }
-        }
 
-        ctx.putImageData(imgData, 0, 0);
-        setWhiteDataUrl(canvas.toDataURL('image/png'));
-      } catch (err) {
-        console.warn('Canvas transparency processing fallback', err);
-      }
-    };
+          ctx.putImageData(imgData, 0, 0);
+          const processedUrl = canvas.toDataURL('image/png');
+          cachedLogoDataUrl = processedUrl;
+          setWhiteDataUrl(processedUrl);
+        } catch (err) {
+          console.warn('Canvas transparency processing fallback:', err);
+        } finally {
+          isProcessingLogo = false;
+        }
+      };
+
+      img.onerror = () => {
+        isProcessingLogo = false;
+      };
+    } catch {
+      isProcessingLogo = false;
+    }
   }, []);
 
   return (
+
     <div
       className={`ohk-logo-badge ${className} flex items-center justify-center`}
       id="ohknee-brand-logo-badge"

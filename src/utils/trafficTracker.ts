@@ -205,16 +205,22 @@ export async function logTrafficEvent(
 
 // Track Page View
 export function trackPageView(tabId: string = 'fast-easy-money') {
-  const isNewSession = !sessionStorage.getItem('ohk_session_viewed');
-  if (isNewSession) {
-    try {
-      sessionStorage.setItem('ohk_session_viewed', 'true');
-    } catch {}
+  let isNewSession = false;
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      isNewSession = !window.sessionStorage.getItem('ohk_session_viewed');
+      if (isNewSession) {
+        window.sessionStorage.setItem('ohk_session_viewed', 'true');
+      }
+    }
+  } catch {
+    // Safe fallback for restricted iframe/privacy modes
   }
 
   logTrafficEvent('page_view', { tabId });
   sendPresenceHeartbeat(tabId);
 }
+
 
 // Track Code Clipped (Promo code copied)
 export function trackCodeClipped(card: {

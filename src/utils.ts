@@ -10,6 +10,7 @@ export const STORE_VIBE = 'ohk_vibe';
 
 export function getFromStorage<T>(key: string, fallback: T): T {
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return fallback;
     const raw = window.localStorage.getItem(key);
     return raw ? JSON.parse(raw) : fallback;
   } catch {
@@ -19,19 +20,73 @@ export function getFromStorage<T>(key: string, fallback: T): T {
 
 export function saveToStorage<T>(key: string, value: T): void {
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // ignore in private browsing or quota limits
+    // ignore in private browsing, sandbox iframe, or quota limits
   }
 }
 
 export function deleteFromStorage(key: string): void {
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     window.localStorage.removeItem(key);
   } catch {
     // ignore
   }
 }
+
+export const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.setItem(key, value);
+    } catch {
+      // safe noop
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.removeItem(key);
+    } catch {
+      // safe noop
+    }
+  },
+  getSession(key: string): string | null {
+    try {
+      if (typeof window === 'undefined' || !window.sessionStorage) return null;
+      return window.sessionStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setSession(key: string, value: string): void {
+    try {
+      if (typeof window === 'undefined' || !window.sessionStorage) return;
+      window.sessionStorage.setItem(key, value);
+    } catch {
+      // safe noop
+    }
+  },
+  removeSession(key: string): void {
+    try {
+      if (typeof window === 'undefined' || !window.sessionStorage) return;
+      window.sessionStorage.removeItem(key);
+    } catch {
+      // safe noop
+    }
+  },
+};
+
 
 export function initialsOf(name: string): string {
   return (name || '?')

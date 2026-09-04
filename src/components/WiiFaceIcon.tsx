@@ -4,6 +4,7 @@ import { WiiAvatar } from '../types';
 interface WiiFaceIconProps {
   avatar?: WiiAvatar | null;
   customUrl?: string;
+  customPfpUrl?: string;
   size?: number;
   frame?: string;
   className?: string;
@@ -13,18 +14,20 @@ interface WiiFaceIconProps {
 export const WiiFaceIcon: React.FC<WiiFaceIconProps> = ({
   avatar,
   customUrl,
+  customPfpUrl,
   size = 48,
   frame,
   className = '',
 }) => {
-  if (customUrl) {
+  const resolvedUrl = customUrl || customPfpUrl;
+  if (resolvedUrl) {
     return (
       <div
         className={`relative inline-flex items-center justify-center shrink-0 rounded-full overflow-hidden ${className}`}
         style={{ width: size, height: size }}
       >
         <img
-          src={customUrl}
+          src={resolvedUrl}
           alt="Custom Avatar"
           className="w-full h-full object-cover rounded-full"
         />

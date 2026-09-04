@@ -91,7 +91,6 @@ body {
     radial-gradient(circle 460px at 92% 20%, rgba(251, 191, 36, 0.18) 0%, transparent 55%),
     radial-gradient(circle 540px at 50% 85%, rgba(52, 211, 153, 0.14) 0%, transparent 65%),
     linear-gradient(180deg, #fdfbff 0%, #f6f0fc 35%, #edf4fd 70%, #f7fdf9 100%);
-  background-attachment: fixed;
   color: #0f172a;
   font-family: var(--font-body);
   font-size: 16px;
@@ -160,7 +159,7 @@ p {
   right: -10%;
   height: 65vh;
   background: radial-gradient(ellipse 90% 70% at 50% 15%, rgba(6, 182, 212, 0.45), rgba(13, 148, 136, 0.35), transparent 75%);
-  filter: blur(80px);
+  filter: blur(24px);
 }
 
 .mist-teal-layer {
@@ -170,7 +169,7 @@ p {
   right: -10%;
   height: 55vh;
   background: radial-gradient(ellipse 80% 60% at 65% 45%, rgba(20, 184, 166, 0.4), rgba(56, 189, 248, 0.32), transparent 70%);
-  filter: blur(90px);
+  filter: blur(24px);
 }
 
 .mist-golden-layer {
@@ -180,7 +179,7 @@ p {
   right: -20%;
   height: 50vh;
   background: radial-gradient(ellipse 85% 55% at 40% 55%, rgba(254, 240, 138, 0.45), rgba(245, 158, 11, 0.3), transparent 75%);
-  filter: blur(85px);
+  filter: blur(24px);
 }
 
 .mist-sunset-layer {
@@ -190,14 +189,14 @@ p {
   right: -20%;
   height: 55vh;
   background: radial-gradient(ellipse 90% 65% at 50% 90%, rgba(234, 88, 12, 0.5), rgba(249, 115, 22, 0.4), transparent 75%);
-  filter: blur(90px);
+  filter: blur(24px);
 }
 
 .blob {
   position: absolute;
   display: block;
   border-radius: 9999px;
-  filter: blur(120px);
+  filter: blur(32px);
 }
 
 .blob-azure {
@@ -1936,17 +1935,17 @@ body.is-editing .ohk-trash {
 
 [data-vibe="goth"] .blob-azure {
   background: #7f1d1d;
-  filter: blur(140px);
+  filter: blur(36px);
 }
 
 [data-vibe="goth"] .blob-emerald {
   background: #581c87;
-  filter: blur(140px);
+  filter: blur(36px);
 }
 
 [data-vibe="goth"] .blob-violet {
   background: #991b1b;
-  filter: blur(140px);
+  filter: blur(36px);
 }
 
 [data-vibe="goth"] .site-header {

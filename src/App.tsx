@@ -112,9 +112,8 @@ export default function App() {
       getUserProfile() || {
         username: 'OhkneeMember',
         avatarId: 'avatar-001',
-        joinedDate: new Date().toISOString(),
-        balance: 150.0,
-        claimedBonusCount: 6,
+        createdAt: new Date().toISOString(),
+        lastLoginDate: new Date().toISOString(),
       }
     );
   });
