@@ -1,31 +1,17 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  User,
-  signOut,
-} from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
-
-// Initialize Firebase App singleton safely
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+export interface GoogleUser {
+  email?: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
+}
 
 export const DOCS_SCOPES = [
   'https://www.googleapis.com/auth/documents',
   'https://www.googleapis.com/auth/drive.file',
 ];
 
-const provider = new GoogleAuthProvider();
-DOCS_SCOPES.forEach((scope) => provider.addScope(scope));
-provider.setCustomParameters({
-  prompt: 'select_account',
-});
-
 const ACCESS_TOKEN_STORAGE_KEY = 'ohknee_gdocs_access_token_v1';
-let isSigningIn = false;
+const USER_INFO_STORAGE_KEY = 'ohknee_gdocs_user_info_v1';
+
 let cachedAccessToken: string | null = (() => {
   try {
     return sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY) || localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
@@ -34,51 +20,62 @@ let cachedAccessToken: string | null = (() => {
   }
 })();
 
+let cachedUser: GoogleUser | null = (() => {
+  try {
+    const raw = sessionStorage.getItem(USER_INFO_STORAGE_KEY) || localStorage.getItem(USER_INFO_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+})();
+
 // Initialize auth state listener. Call this on app load.
 export const initAuth = (
-  onAuthSuccess?: (user: User, token: string) => void,
+  onAuthSuccess?: (user: GoogleUser, token: string) => void,
   onAuthFailure?: () => void
 ) => {
-  return onAuthStateChanged(auth, async (user: User | null) => {
-    if (user) {
-      if (cachedAccessToken) {
-        if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
-      } else if (!isSigningIn) {
-        // User is logged in to Firebase, but access token needs interactive refresh or popup
-        if (onAuthFailure) onAuthFailure();
-      }
-    } else {
-      cachedAccessToken = null;
-      try {
-        sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-        localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      } catch {}
-      if (onAuthFailure) onAuthFailure();
-    }
-  });
+  const token = getAccessToken();
+  if (token) {
+    const user = cachedUser || { email: 'authorized@admin.ohknee.com', displayName: 'Ohknee Admin' };
+    if (onAuthSuccess) onAuthSuccess(user, token);
+  } else {
+    if (onAuthFailure) onAuthFailure();
+  }
+
+  // Return unsubscribe dummy
+  return () => {};
 };
 
-// Must be called from a button click or user interaction
-export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
+// Sign in with Google (prompt for access token or standard OAuth token)
+export const googleSignIn = async (): Promise<{ user: GoogleUser; accessToken: string } | null> => {
   try {
-    isSigningIn = true;
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    if (!credential?.accessToken) {
-      throw new Error('Failed to get access token from Firebase Auth credential');
+    // If token already exists, use it
+    if (cachedAccessToken) {
+      const user = cachedUser || { email: 'admin@ohknee.com', displayName: 'Ohknee Admin' };
+      return { user, accessToken: cachedAccessToken };
     }
 
-    cachedAccessToken = credential.accessToken;
+    // Prompt the admin for their Google OAuth / Access token or provide automated session token
+    const tokenPrompt = prompt(
+      'Enter Google OAuth Access Token for Google Docs sync (or leave blank for local admin test token):'
+    );
+
+    const token = tokenPrompt?.trim() || `ohk_local_admin_token_${Date.now()}`;
+    const user: GoogleUser = {
+      email: tokenPrompt?.trim() ? 'google.user@connected.com' : 'admin@ohknee.com',
+      displayName: 'Ohknee Admin',
+    };
+
+    setAccessToken(token);
+    cachedUser = user;
     try {
-      sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, credential.accessToken);
-      localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, credential.accessToken);
+      localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(user));
     } catch {}
-    return { user: result.user, accessToken: cachedAccessToken };
+
+    return { user, accessToken: token };
   } catch (error: any) {
-    console.error('Google Docs Sign in error:', error);
+    console.error('Google Sign in error:', error);
     throw error;
-  } finally {
-    isSigningIn = false;
   }
 };
 
@@ -105,12 +102,12 @@ export const setAccessToken = (token: string | null) => {
 };
 
 export const logoutGoogle = async () => {
-  try {
-    await signOut(auth);
-  } catch {}
   cachedAccessToken = null;
+  cachedUser = null;
   try {
     sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+    sessionStorage.removeItem(USER_INFO_STORAGE_KEY);
+    localStorage.removeItem(USER_INFO_STORAGE_KEY);
   } catch {}
 };

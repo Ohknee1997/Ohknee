@@ -1,5 +1,3 @@
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { CardData, CardDetail, CustomTextItem, HeaderConfig, TabConfig, VibeType } from '../types';
 import {
   STORE_DATA,
@@ -25,10 +23,6 @@ export interface CloudMasterState {
   lastUpdated?: string;
 }
 
-const MASTER_DOC_PATH = 'app_state';
-const MASTER_DOC_ID = 'master_state';
-const DETAILS_DOC_ID = 'card_details';
-
 let isSyncingToCloud = false;
 let isApplyingFromCloud = false;
 let lastCloudSaveTime: string | null = null;
@@ -43,8 +37,7 @@ export function getLastCloudSaveInfo() {
 }
 
 /**
- * Uploads all current local storage state (cards, custom texts, notes, photos, tabs, vibes)
- * to Firestore so every device and visitor shares the exact same database.
+ * Persists current state locally and dispatches update notification events.
  */
 export async function pushFullStateToCloud(): Promise<{ success: boolean; error?: string }> {
   if (isApplyingFromCloud) return { success: true };
@@ -71,14 +64,6 @@ export async function pushFullStateToCloud(): Promise<{ success: boolean; error?
       lastUpdated: now,
     };
 
-    // Save master layout & custom text layer
-    const masterDocRef = doc(db, MASTER_DOC_PATH, MASTER_DOC_ID);
-    await setDoc(masterDocRef, masterPayload, { merge: true });
-
-    // Save card details & uploaded secret sauce notes/images separately for high capacity
-    const detailsDocRef = doc(db, MASTER_DOC_PATH, DETAILS_DOC_ID);
-    await setDoc(detailsDocRef, { details, lastUpdated: now }, { merge: true });
-
     lastCloudSaveTime = now;
     lastCloudSaveSuccess = true;
     isSyncingToCloud = false;
@@ -91,7 +76,6 @@ export async function pushFullStateToCloud(): Promise<{ success: boolean; error?
 
     return { success: true };
   } catch (err: any) {
-    console.error('Failed to push state to Firestore:', err);
     isSyncingToCloud = false;
     lastCloudSaveSuccess = false;
 
@@ -106,7 +90,7 @@ export async function pushFullStateToCloud(): Promise<{ success: boolean; error?
 }
 
 /**
- * Pulls master state from Firestore and hydrates localStorage & active state.
+ * Hydrates state from storage.
  */
 export async function pullFullStateFromCloud(): Promise<{
   success: boolean;
@@ -117,36 +101,38 @@ export async function pullFullStateFromCloud(): Promise<{
   error?: string;
 }> {
   try {
-    const masterDocRef = doc(db, MASTER_DOC_PATH, MASTER_DOC_ID);
-    const detailsDocRef = doc(db, MASTER_DOC_PATH, DETAILS_DOC_ID);
+    const cardOverrides = getFromStorage<Record<string, Partial<CardData>>>(STORE_DATA, {});
+    const cardOrder = getFromStorage<string[]>(STORE_ORDER, []);
+    const details = getFromStorage<Record<string, CardDetail>>(STORE_DETAIL, {});
+    const customTexts = getFromStorage<CustomTextItem[]>(STORE_CUSTOM_TEXTS, []);
+    const tabs = getFromStorage<TabConfig[]>(STORE_TABS, []);
+    const vibe = getFromStorage<VibeType>(STORE_VIBE, 'default');
+    const headerConfig = getFromStorage<HeaderConfig>(STORE_HEADER, { logoScale: 1, headerBg: '#ffffff' });
 
-    const [masterSnap, detailsSnap] = await Promise.all([
-      getDoc(masterDocRef),
-      getDoc(detailsDocRef),
-    ]);
-
-    const masterData = masterSnap.exists() ? (masterSnap.data() as CloudMasterState) : null;
-    const detailsData = detailsSnap.exists() ? (detailsSnap.data()?.details as Record<string, CardDetail>) : null;
-
-    if (masterData) {
-      applyCloudStateToLocal(masterData, detailsData || undefined);
-    }
+    const masterData: CloudMasterState = {
+      cardOverrides,
+      cardOrder,
+      customTexts,
+      tabs,
+      vibe,
+      headerConfig,
+      lastUpdated: new Date().toISOString(),
+    };
 
     return {
       success: true,
       data: {
         master: masterData,
-        details: detailsData,
+        details,
       },
     };
   } catch (err: any) {
-    console.error('Failed to pull state from Firestore:', err);
     return { success: false, error: err.message };
   }
 }
 
 /**
- * Applies fetched Firestore state to localStorage and fires UI update events.
+ * Applies state to localStorage and fires UI update events.
  */
 export function applyCloudStateToLocal(
   masterData: CloudMasterState,
@@ -190,69 +176,17 @@ export function applyCloudStateToLocal(
 }
 
 /**
- * Sets up a live real-time listener and a 5-minute automated background sync interval.
+ * Sets up state synchronization listener.
  */
 export function initLiveCloudSync(
   onStateReceived?: (master: CloudMasterState, details?: Record<string, CardDetail>) => void
 ): () => void {
-  // 1. Initial pull
+  // Initial pull
   pullFullStateFromCloud().then((res) => {
     if (res.success && res.data?.master && onStateReceived) {
       onStateReceived(res.data.master, res.data.details || undefined);
     }
   });
 
-  // 2. Real-time Snapshot Listener
-  const masterDocRef = doc(db, MASTER_DOC_PATH, MASTER_DOC_ID);
-  const detailsDocRef = doc(db, MASTER_DOC_PATH, DETAILS_DOC_ID);
-
-  let cachedDetails: Record<string, CardDetail> | undefined;
-
-  const unsubDetails = onSnapshot(
-    detailsDocRef,
-    (snap) => {
-      if (snap.exists()) {
-        const d = snap.data()?.details as Record<string, CardDetail>;
-        cachedDetails = d;
-        if (d && !isSyncingToCloud) {
-          saveToStorage(STORE_DETAIL, d);
-          window.dispatchEvent(
-            new CustomEvent('ohknee:details-synced', { detail: d })
-          );
-        }
-      }
-    },
-    (err) => {
-      console.warn('Firestore details listener notice:', err);
-    }
-  );
-
-  const unsubMaster = onSnapshot(
-    masterDocRef,
-    (snap) => {
-      if (snap.exists()) {
-        const data = snap.data() as CloudMasterState;
-        if (!isSyncingToCloud) {
-          applyCloudStateToLocal(data, cachedDetails);
-          if (onStateReceived) {
-            onStateReceived(data, cachedDetails);
-          }
-        }
-      }
-    },
-    (err) => {
-      console.warn('Firestore master listener notice:', err);
-    }
-  );
-
-  // 3. Strict 5-Minute Auto-Save Loop (every 300,000 ms)
-  const intervalId = setInterval(() => {
-    pushFullStateToCloud().catch((e) => console.warn('Periodic 5m cloud sync:', e));
-  }, 5 * 60 * 1000);
-
-  return () => {
-    unsubMaster();
-    unsubDetails();
-    clearInterval(intervalId);
-  };
+  return () => {};
 }

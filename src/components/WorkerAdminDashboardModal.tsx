@@ -60,6 +60,7 @@ import {
   getAccessToken,
   logoutGoogle,
   initAuth,
+  GoogleUser,
 } from '../utils/googleAuth';
 import {
   syncFullStateToGoogleDoc,
@@ -68,7 +69,6 @@ import {
   DocsSyncState,
   TARGET_GOOGLE_DOC_ID,
 } from '../utils/googleDocsSync';
-import { User } from 'firebase/auth';
 
 interface WorkerAdminDashboardModalProps {
   isOpen: boolean;
@@ -97,7 +97,7 @@ export const WorkerAdminDashboardModal: React.FC<WorkerAdminDashboardModalProps>
   const [stateBackupCopied, setStateBackupCopied] = useState(false);
 
   // Google Docs Auth & Live Sync State
-  const [googleUser, setGoogleUser] = useState<User | null>(null);
+  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
   const [googleToken, setGoogleToken] = useState<string | null>(getAccessToken);
   const [isSigningInGoogle, setIsSigningInGoogle] = useState(false);
   const [docsSyncState, setDocsSyncState] = useState<DocsSyncState>(getDocsSyncState);

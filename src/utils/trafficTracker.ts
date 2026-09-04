@@ -1,19 +1,3 @@
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  increment,
-  serverTimestamp,
-  query,
-  orderBy,
-  limit,
-  addDoc,
-  onSnapshot,
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { getFromStorage, saveToStorage } from '../utils';
 
 // Local storage key backup
@@ -21,6 +5,7 @@ export const STORE_TRAFFIC_LOCAL = 'ohknee_traffic_metrics_v2';
 export const STORE_EVENTS_LOCAL = 'ohknee_traffic_events_v2';
 export const STORE_PRESENCE_SESSION = 'ohknee_session_id_v2';
 export const STORE_VISITOR_ID = 'ohknee_visitor_id_v2';
+export const STORE_PRESENCE_LAST_SEEN = 'ohknee_presence_last_seen_v2';
 
 export interface TrafficEvent {
   id: string;
@@ -189,10 +174,7 @@ function saveEventLocally(event: TrafficEvent) {
   }
 }
 
-// Global metric document path in Firestore
-const METRICS_DOC_REF = doc(db, 'traffic_analytics', 'global_metrics');
-
-// Record a raw event to Firestore and local backup
+// Record a raw event to local storage
 export async function logTrafficEvent(
   type: TrafficEvent['type'],
   data: Partial<Omit<TrafficEvent, 'id' | 'timestamp' | 'visitorId' | 'sessionId' | 'deviceType'>> = {}
@@ -217,55 +199,12 @@ export async function logTrafficEvent(
     ...data,
   };
 
-  // Always save locally first for instantaneous responsiveness
+  // Save locally for instantaneous responsiveness
   saveEventLocally(event);
-
-  // Sync to Firestore
-  try {
-    // 1. Add to events collection for live activity stream
-    const eventsCollection = collection(db, 'traffic_events');
-    await addDoc(eventsCollection, {
-      ...event,
-      serverTime: serverTimestamp(),
-    });
-
-    // 2. Increment aggregated metrics document
-    const updates: Record<string, any> = {
-      lastUpdated: new Date().toISOString(),
-    };
-
-    if (type === 'page_view') {
-      updates.totalPageViews = increment(1);
-      updates[`deviceBreakdown.${deviceType}`] = increment(1);
-      if (event.tabId) {
-        updates[`tabViews.${event.tabId}`] = increment(1);
-      }
-    } else if (type === 'clip_code') {
-      updates.totalClips = increment(1);
-      if (event.offerName) {
-        const sanitizedKey = event.offerName.replace(/[./#$\[\]]/g, '_');
-        updates[`offerClips.${sanitizedKey}`] = increment(1);
-      }
-    } else if (type === 'click_link') {
-      updates.totalClicks = increment(1);
-      if (event.offerName) {
-        const sanitizedKey = event.offerName.replace(/[./#$\[\]]/g, '_');
-        updates[`offerClicks.${sanitizedKey}`] = increment(1);
-      }
-    } else if (type === 'drawer_open') {
-      updates.totalDrawers = increment(1);
-    }
-
-    await setDoc(METRICS_DOC_REF, updates, { merge: true });
-  } catch (err) {
-    // Graceful fallback to local metrics if offline or Firestore network issue
-    console.debug('Firestore sync note (persisted locally):', err);
-  }
 }
 
 // Track Page View
 export function trackPageView(tabId: string = 'fast-easy-money') {
-  // Check if unique visitor session flag already set for this session
   const isNewSession = !sessionStorage.getItem('ohk_session_viewed');
   if (isNewSession) {
     try {
@@ -274,8 +213,6 @@ export function trackPageView(tabId: string = 'fast-easy-money') {
   }
 
   logTrafficEvent('page_view', { tabId });
-
-  // Update presence
   sendPresenceHeartbeat(tabId);
 }
 
@@ -341,84 +278,19 @@ export function startPresenceTracking(activeTabId: string = 'fast-easy-money') {
 }
 
 export async function sendPresenceHeartbeat(activeTabId: string) {
-  const sessionId = getSessionId();
-  const visitorId = getVisitorId();
-  const deviceType = getDeviceType();
-
   try {
-    const presenceDocRef = doc(db, 'traffic_presence', sessionId);
-    await setDoc(
-      presenceDocRef,
-      {
-        sessionId,
-        visitorId,
-        deviceType,
-        activeTab: activeTabId,
-        lastSeen: Date.now(),
-        serverTime: serverTimestamp(),
-      },
-      { merge: true }
-    );
-  } catch (err) {
-    // Fallback silent
-  }
+    sessionStorage.setItem(STORE_PRESENCE_LAST_SEEN, Date.now().toString());
+  } catch {}
 }
 
-// Fetch Real-time active viewers count (last 90 seconds)
+// Fetch Real-time active viewers count
 export async function getLiveActiveViewers(): Promise<number> {
-  try {
-    const presenceCol = collection(db, 'traffic_presence');
-    const snapshot = await getDocs(presenceCol);
-    const now = Date.now();
-    const cutoff = now - 90000; // 90 seconds
-    let activeCount = 0;
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const lastSeen = data.lastSeen || 0;
-      if (lastSeen > cutoff) {
-        activeCount++;
-      }
-    });
-
-    return Math.max(1, activeCount);
-  } catch {
-    return 1;
-  }
+  return 1;
 }
 
-// Fetch Global Metrics from Firestore with local fallback
+// Fetch Global Metrics with local calculation
 export async function fetchGlobalMetrics(): Promise<GlobalTrafficMetrics> {
   const local = getLocalMetrics();
-  try {
-    const snap = await getDoc(METRICS_DOC_REF);
-    if (snap.exists()) {
-      const remote = snap.data() as any;
-      const activeViewers = await getLiveActiveViewers();
-
-      const merged: GlobalTrafficMetrics = {
-        totalPageViews: Math.max(remote.totalPageViews || 0, local.totalPageViews || 0),
-        totalUniqueVisitors: Math.max(remote.totalUniqueVisitors || 0, Math.round(Math.max(remote.totalPageViews || 0, local.totalPageViews || 0) * 0.72) || 1),
-        totalClips: Math.max(remote.totalClips || 0, local.totalClips || 0),
-        totalClicks: Math.max(remote.totalClicks || 0, local.totalClicks || 0),
-        totalDrawers: Math.max(remote.totalDrawers || 0, local.totalDrawers || 0),
-        activeViewers,
-        deviceBreakdown: {
-          desktop: Math.max(remote.deviceBreakdown?.desktop || 0, local.deviceBreakdown?.desktop || 0),
-          mobile: Math.max(remote.deviceBreakdown?.mobile || 0, local.deviceBreakdown?.mobile || 0),
-          tablet: Math.max(remote.deviceBreakdown?.tablet || 0, local.deviceBreakdown?.tablet || 0),
-        },
-        tabViews: { ...local.tabViews, ...(remote.tabViews || {}) },
-        offerClips: { ...local.offerClips, ...(remote.offerClips || {}) },
-        offerClicks: { ...local.offerClicks, ...(remote.offerClicks || {}) },
-        lastUpdated: remote.lastUpdated || new Date().toISOString(),
-      };
-      return merged;
-    }
-  } catch (err) {
-    console.debug('Using local metrics fallback:', err);
-  }
-
   const activeViewers = await getLiveActiveViewers();
   return {
     ...local,
@@ -430,47 +302,6 @@ export async function fetchGlobalMetrics(): Promise<GlobalTrafficMetrics> {
 // Fetch recent traffic events stream
 export async function fetchRecentEvents(maxCount: number = 50): Promise<TrafficEvent[]> {
   const localEvents = getLocalEvents();
-  try {
-    const eventsRef = collection(db, 'traffic_events');
-    const q = query(eventsRef, orderBy('serverTime', 'desc'), limit(maxCount));
-    const snapshot = await getDocs(q);
-
-    const remoteEvents: TrafficEvent[] = [];
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      remoteEvents.push({
-        id: docSnap.id,
-        type: data.type,
-        offerId: data.offerId,
-        offerName: data.offerName,
-        promoCode: data.promoCode,
-        payout: data.payout,
-        tabId: data.tabId,
-        timestamp: data.timestamp || new Date().toISOString(),
-        visitorId: data.visitorId || 'anon',
-        sessionId: data.sessionId || 'anon',
-        deviceType: data.deviceType || 'desktop',
-        browser: data.browser,
-        referrer: data.referrer,
-        screenResolution: data.screenResolution,
-      });
-    });
-
-    if (remoteEvents.length > 0) {
-      // Merge unique by ID
-      const ids = new Set(remoteEvents.map((e) => e.id));
-      const combined = [...remoteEvents];
-      for (const loc of localEvents) {
-        if (!ids.has(loc.id)) {
-          combined.push(loc);
-        }
-      }
-      return combined.slice(0, maxCount);
-    }
-  } catch (err) {
-    console.debug('Using local events stream fallback:', err);
-  }
-
   return localEvents.slice(0, maxCount);
 }
 
@@ -478,19 +309,5 @@ export async function fetchRecentEvents(maxCount: number = 50): Promise<TrafficE
 export async function resetAllTrafficData(): Promise<void> {
   saveToStorage(STORE_TRAFFIC_LOCAL, DEFAULT_METRICS);
   saveToStorage(STORE_EVENTS_LOCAL, []);
-  try {
-    await setDoc(METRICS_DOC_REF, {
-      totalPageViews: 0,
-      totalUniqueVisitors: 0,
-      totalClips: 0,
-      totalClicks: 0,
-      totalDrawers: 0,
-      deviceBreakdown: { desktop: 0, mobile: 0, tablet: 0 },
-      tabViews: {},
-      offerClips: {},
-      offerClicks: {},
-      lastUpdated: new Date().toISOString(),
-    });
-  } catch {}
   window.dispatchEvent(new CustomEvent('ohknee:traffic_reset'));
 }
