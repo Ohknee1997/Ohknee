@@ -33,20 +33,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all cursor-pointer relative py-1 ${
             currentTab === 'top-10'
               ? isDarkTheme
-                ? 'text-amber-400 font-black'
-                : 'text-amber-600 font-black'
+                ? 'text-emerald-400 font-black'
+                : 'text-emerald-600 font-black'
               : isDarkTheme
               ? 'text-slate-400 hover:text-slate-200 font-medium'
               : 'text-slate-500 hover:text-slate-800 font-medium'
           }`}
           aria-label="Top 10"
         >
-          <Trophy size={22} strokeWidth={currentTab === 'top-10' ? 2.5 : 2} />
+          <Trophy size={22} className={currentTab === 'top-10' ? 'text-emerald-400' : ''} strokeWidth={currentTab === 'top-10' ? 2.5 : 2} />
           <span className="text-xs tracking-tight whitespace-nowrap leading-none">Top 10</span>
           {currentTab === 'top-10' && (
             <span
               className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
-                isDarkTheme ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-amber-600'
+                isDarkTheme ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-emerald-600'
               }`}
             />
           )}

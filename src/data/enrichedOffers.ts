@@ -103,6 +103,11 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('underdog') ||
     name.includes('prizepicks') ||
     name.includes('sportzino') ||
+    name.includes('fliff') ||
+    name.includes('sleeper') ||
+    name.includes('betting') ||
+    name.includes('draftkings') ||
+    name.includes('fanduel') ||
     id.includes('sports')
   ) {
     categories.push('sports-betting');
@@ -135,6 +140,9 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('kraken') ||
     name.includes('bydfi') ||
     name.includes('koinly') ||
+    name.includes('gemini') ||
+    name.includes('webull') ||
+    name.includes('crypto') ||
     id.includes('crypto')
   ) {
     categories.push('crypto');

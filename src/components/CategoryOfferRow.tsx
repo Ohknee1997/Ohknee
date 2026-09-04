@@ -105,15 +105,15 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
           <button
             type="button"
             onClick={handleToggle}
-            className="flex items-center gap-1.5 text-white hover:text-purple-300 transition-colors font-black tracking-tight text-sm sm:text-base cursor-pointer group"
+            className="flex items-center gap-1.5 text-white hover:text-emerald-300 transition-colors font-black tracking-tight text-sm sm:text-base cursor-pointer group"
           >
-            <span className="text-purple-400 group-hover:scale-110 transition-transform">
+            <span className="text-emerald-400 group-hover:scale-110 transition-transform">
               {icon}
             </span>
-            <span className="capitalize">{title}</span>
+            <span className="tracking-tight">{title}</span>
             <ChevronDown
               size={16}
-              className={`text-slate-400 group-hover:text-purple-300 transition-transform ${
+              className={`text-emerald-400 group-hover:text-emerald-300 transition-transform ${
                 isOpen ? 'rotate-0' : '-rotate-90'
               }`}
             />
@@ -128,18 +128,18 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 title="Search this row"
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                   showSearch || searchQuery
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'bg-purple-900/60 hover:bg-purple-800 text-purple-300'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400'
                 }`}
               >
-                <Search size={13} />
+                <Search size={13} className="text-emerald-300" />
               </button>
             </div>
           )}
 
           {/* Inline Search Input */}
           {isOpen && showSearch && (
-            <div className="flex items-center gap-1 bg-[#131622] border border-purple-500/50 rounded-xl px-2 py-0.5 text-xs animate-in fade-in duration-150">
+            <div className="flex items-center gap-1 bg-[#131622] border border-emerald-500/50 rounded-xl px-2 py-0.5 text-xs animate-in fade-in duration-150">
               <input
                 type="text"
                 value={searchQuery}
@@ -167,7 +167,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={scrollLeft}
-              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-slate-300 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-emerald-400 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
               title="Previous offers"
             >
               <ChevronLeft size={15} />
@@ -175,7 +175,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={scrollRight}
-              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-slate-300 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-emerald-400 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
               title="Next offers"
             >
               <ChevronRight size={15} />
@@ -183,7 +183,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={handleToggle}
-              className="text-xs font-bold text-slate-400 hover:text-purple-300 transition-colors ml-1 px-2 py-1 rounded-lg hover:bg-[#151926] cursor-pointer"
+              className="text-xs font-bold text-slate-400 hover:text-emerald-300 transition-colors ml-1 px-2 py-1 rounded-lg hover:bg-[#151926] cursor-pointer"
             >
               Hide row
             </button>
@@ -203,7 +203,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
               handleToggle();
             }
           }}
-          className="w-full bg-[#131620] hover:bg-[#161a28] border border-[#22283a] hover:border-purple-500/50 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group"
+          className="w-full bg-[#131620] hover:bg-[#161a28] border border-[#22283a] hover:border-emerald-500/50 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group"
         >
           {/* Left: Overlapping real referral logos + hidden count */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -235,7 +235,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                         }}
                       />
                     ) : (
-                      <span className="text-[9px] font-black text-purple-400">
+                      <span className="text-[9px] font-black text-emerald-400">
                         {initialsOf(offer.name)}
                       </span>
                     )}
@@ -251,7 +251,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
           </div>
 
           {/* Right: Show row button */}
-          <span className="text-xs sm:text-sm font-bold text-purple-400 group-hover:text-purple-300 transition-colors flex items-center gap-1">
+          <span className="text-xs sm:text-sm font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1">
             Show row
           </span>
         </div>
@@ -268,7 +268,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsFullGridView(false)}
-                  className="text-xs text-purple-400 hover:text-purple-300 font-bold cursor-pointer"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 font-bold cursor-pointer"
                 >
                   Switch to Carousel ‹ ›
                 </button>
@@ -306,7 +306,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 </div>
               ))}
 
-              {/* Purple "View More" Card (Gemsloot GUI) */}
+              {/* Green "View More" Card (Gemsloot GUI) */}
               <div
                 onClick={() => setIsFullGridView(true)}
                 role="button"
@@ -318,19 +318,19 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                   }
                 }}
                 style={{ scrollSnapAlign: 'start' }}
-                className={`group flex-shrink-0 cursor-pointer rounded-2xl bg-gradient-to-b from-[#8f2bf7] to-[#6d13db] border border-purple-400/40 p-3 flex flex-col items-center justify-center text-center text-white shadow-lg shadow-purple-950/50 hover:scale-[1.02] transition-transform select-none ${
+                className={`group flex-shrink-0 cursor-pointer rounded-2xl bg-gradient-to-b from-[#059669] to-[#047857] border border-emerald-400/40 p-3 flex flex-col items-center justify-center text-center text-white shadow-lg shadow-emerald-950/50 hover:scale-[1.02] transition-transform select-none ${
                   isSingleFrame
                     ? 'w-[150px] sm:w-[165px] h-[215px] sm:h-[225px]'
                     : 'w-[170px] sm:w-[185px] h-[245px] sm:h-[255px]'
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                   <LayoutGrid size={32} className="text-white" />
                 </div>
                 <span className="text-sm sm:text-base font-black tracking-tight leading-tight">
                   View More
                 </span>
-                <span className="text-[10.5px] font-bold text-purple-200/90 mt-0.5">
+                <span className="text-[10.5px] font-bold text-emerald-100/90 mt-0.5">
                   +{offers.length} Offers
                 </span>
                 <div className="mt-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shadow-xs group-hover:bg-white/30 transition-colors">

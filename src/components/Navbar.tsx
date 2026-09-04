@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onGoHome }) => {
             <div className="flex items-center justify-center transition-transform group-hover:scale-105">
               <OhkneeLogo className="h-11 sm:h-14 w-auto object-contain" />
             </div>
-            <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-purple-400 transition-colors">
+            <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors">
               OHKNEE.COM
             </span>
           </div>

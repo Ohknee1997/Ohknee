@@ -61,11 +61,11 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onExploreClick, onEa
           <button
             type="button"
             onClick={onExploreClick}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm shadow-lg shadow-purple-900/40 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg shadow-emerald-950/50 transition-all cursor-pointer hover:scale-105 active:scale-95"
           >
-            <Trophy size={16} />
+            <Trophy size={16} className="text-emerald-200" />
             <span>Explore Top 10</span>
-            <ArrowRight size={15} />
+            <ArrowRight size={15} className="text-emerald-200" />
           </button>
           {onEarnClick && (
             <button

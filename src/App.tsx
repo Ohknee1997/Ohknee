@@ -52,15 +52,18 @@ import {
   Lock,
   User,
   Star,
+  Landmark,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
 
 const ALL_CATEGORY_ROW_IDS = [
+  'row-online-casinos',
+  'row-sports-betting',
+  'row-free-crypto',
   'row-featured',
   'row-fast-offers',
   'row-finance',
-  'row-sweepstakes',
 ];
 
 export default function App() {
@@ -227,53 +230,41 @@ export default function App() {
   }, [allOffers, searchQuery, selectedPlatform, selectedCategory, selectedSort]);
 
   const top10Offers = useMemo(() => {
-    return [...allOffers]
+    // Strictly lock: #1 Stake, #2 Freecash, #3 Gemsloot
+    const isStake = (o: EnrichedOffer) =>
+      o.id === 'fast-stake' || (o.name.toLowerCase().includes('stake') && !o.name.toLowerCase().includes('pulsz'));
+    const isFreecash = (o: EnrichedOffer) =>
+      o.id === 'fast-freecash' || o.name.toLowerCase().includes('freecash');
+    const isGemsloot = (o: EnrichedOffer) =>
+      o.id === 'fast-gemsloot' || o.name.toLowerCase().includes('gemsloot') || o.name.toLowerCase().includes('gems loot');
+
+    const stakeOffer = allOffers.find(isStake);
+    const freecashOffer = allOffers.find(isFreecash);
+    const gemslootOffer = allOffers.find(isGemsloot);
+
+    const lockedTop3 = [stakeOffer, freecashOffer, gemslootOffer].filter(Boolean) as EnrichedOffer[];
+    const lockedIds = new Set(lockedTop3.map((o) => o.id));
+
+    const remainingOffers = allOffers
+      .filter((o) => !lockedIds.has(o.id))
       .sort((a, b) => {
-        const getVal = (p: string) => {
-          const match = p.match(/\$(\d+)/);
+        const orderA = a.orderNumber !== undefined ? a.orderNumber : 999;
+        const orderB = b.orderNumber !== undefined ? b.orderNumber : 999;
+        if (orderA !== orderB) return orderA - orderB;
+
+        const getVal = (p?: string, v?: number) => {
+          if (v && v > 0) return v;
+          const match = p?.match(/\$(\d+)/);
           return match ? parseInt(match[1], 10) : 10;
         };
-        return getVal(b.payout) - getVal(a.payout);
-      })
-      .slice(0, 10);
+        return getVal(b.payout, b.rewardValue) - getVal(a.payout, a.rewardValue);
+      });
+
+    return [...lockedTop3, ...remainingOffers].slice(0, 10);
   }, [allOffers]);
 
-  // 1. FEATURED
-  const featuredOffers = useMemo(() => {
-    return filteredOffers.filter(
-      (o) =>
-        o.isFeatured ||
-        o.categories.includes('featured') ||
-        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
-    );
-  }, [filteredOffers]);
-
-  // 2. FAST OFFERS
-  const fastOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('fast-easy') ||
-          o.categories.includes('signup-trial') ||
-          o.tabId === 'fast-easy-money' ||
-          ['free-metawin', 'free-debbie', 'free-myappfree', 'free-fetch', 'free-joko', 'free-shopback', 'free-snaplii', 'free-franki', 'ref-dabble'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
-
-  // 3. FINANCE
-  const financeOffers = useMemo(() => {
-    return filteredOffers.filter(
-      (o) =>
-        o.categories.includes('finance') ||
-        o.categories.includes('banking') ||
-        o.categories.includes('crypto') ||
-        ['free-koinly', 'free-bydfi', 'free-kraken', 'free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion'].includes(o.id)
-    );
-  }, [filteredOffers]);
-
-  // 4. SWEEPSTAKES
-  const sweepstakesOffers = useMemo(() => {
+  // 1. ONLINE CASINO FREE SPINS (formerly Sweepstakes)
+  const onlineCasinoOffers = useMemo(() => {
     return filteredOffers
       .filter(
         (o) =>
@@ -284,6 +275,63 @@ export default function App() {
           ['casino-realprize', 'casino-chanced', 'casino-crowncoins', 'casino-spree', 'casino-high5', 'casino-pulsz', 'casino-mcluck', 'casino-fortunecoins'].includes(o.id)
       )
       .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
+  }, [filteredOffers]);
+
+  // 2. SPORTS BETTING APPS
+  const sportsBettingOffers = useMemo(() => {
+    return filteredOffers
+      .filter(
+        (o) =>
+          o.categories.includes('sports-betting') ||
+          o.categories.includes('sports') ||
+          o.categories.includes('betting') ||
+          ['ref-sportzino', 'ref-fliff', 'ref-sleeper', 'fast-kalshi', 'ref-dabble'].includes(o.id)
+      )
+      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
+  }, [filteredOffers]);
+
+  // 3. FREE CRYPTO
+  const cryptoOffers = useMemo(() => {
+    return filteredOffers
+      .filter(
+        (o) =>
+          o.categories.includes('crypto') ||
+          ['fast-coinbase', 'free-koinly', 'free-bydfi', 'free-kraken', 'ref-gemini', 'ref-webull'].includes(o.id)
+      )
+      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
+  }, [filteredOffers]);
+
+  // 4. FEATURED
+  const featuredOffers = useMemo(() => {
+    return filteredOffers.filter(
+      (o) =>
+        o.isFeatured ||
+        o.categories.includes('featured') ||
+        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
+    );
+  }, [filteredOffers]);
+
+  // 5. FAST OFFERS
+  const fastOffers = useMemo(() => {
+    return filteredOffers
+      .filter(
+        (o) =>
+          o.categories.includes('fast-easy') ||
+          o.categories.includes('signup-trial') ||
+          o.tabId === 'fast-easy-money' ||
+          ['free-metawin', 'free-debbie', 'free-myappfree', 'free-fetch', 'free-joko', 'free-shopback', 'free-snaplii', 'free-franki'].includes(o.id)
+      )
+      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
+  }, [filteredOffers]);
+
+  // 6. FINANCE
+  const financeOffers = useMemo(() => {
+    return filteredOffers.filter(
+      (o) =>
+        o.categories.includes('finance') ||
+        o.categories.includes('banking') ||
+        ['free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion'].includes(o.id)
+    );
   }, [filteredOffers]);
 
   // Jump from mobile navigation
@@ -362,14 +410,56 @@ export default function App() {
               id="offers-explorer-section"
               className="flex-1 w-full bg-[#0d0f15] text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 select-none min-h-screen overflow-y-auto pb-28 md:pb-20"
             >
-              {/* THE 4 CATEGORY ROWS */}
+              {/* THE 6 CATEGORY ROWS */}
               <div className="w-full space-y-3 sm:space-y-4">
-                {/* 1. FEATURED OFFERS */}
+                {/* 1. ONLINE CASINO FREE SPINS (TOP ROW) */}
+                <CategoryOfferRow
+                  id="row-online-casinos"
+                  title="ONLINE CASINO FREE SPINS"
+                  subtitle="Daily free SC coins, free spins, sweepstakes casinos & prize wheels"
+                  icon={<Gift size={20} className="stroke-[2.2] text-emerald-400" />}
+                  offers={onlineCasinoOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-online-casinos')}
+                  onToggleOpen={() => handleToggleRow('row-online-casinos')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                />
+
+                {/* 2. SPORTS BETTING APPS */}
+                <CategoryOfferRow
+                  id="row-sports-betting"
+                  title="Sports Betting Apps"
+                  subtitle="Top sportsbooks, DFS picks, match deposits & risk-free entries"
+                  icon={<Trophy size={20} className="stroke-[2.2] text-emerald-400" />}
+                  offers={sportsBettingOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-sports-betting')}
+                  onToggleOpen={() => handleToggleRow('row-sports-betting')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                />
+
+                {/* 3. FREE CRYPTO */}
+                <CategoryOfferRow
+                  id="row-free-crypto"
+                  title="Free Crypto"
+                  subtitle="Free Bitcoin bonuses, exchange sign-ups, crypto debit cards & airdrops"
+                  icon={<Coins size={20} className="stroke-[2.2] text-emerald-400" />}
+                  offers={cryptoOffers}
+                  savedOfferIds={savedOfferIds}
+                  isOpen={openRowIds.has('row-free-crypto')}
+                  onToggleOpen={() => handleToggleRow('row-free-crypto')}
+                  onSelectOffer={setSelectedOffer}
+                  onToggleSave={handleToggleSaveOffer}
+                />
+
+                {/* 4. FEATURED OFFERS */}
                 <CategoryOfferRow
                   id="row-featured"
                   title="Featured"
                   subtitle="Top verified rewards with instant claim access"
-                  icon={<Sparkles size={20} className="stroke-[2.2]" />}
+                  icon={<Sparkles size={20} className="stroke-[2.2] text-emerald-400" />}
                   offers={featuredOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-featured')}
@@ -378,12 +468,12 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 2. FAST OFFERS */}
+                {/* 5. FAST OFFERS */}
                 <CategoryOfferRow
                   id="row-fast-offers"
                   title="Fast Offers"
                   subtitle="$100 - $150 sequential easy cash & instant tasks"
-                  icon={<Zap size={20} className="stroke-[2.2]" />}
+                  icon={<Zap size={20} className="stroke-[2.2] text-emerald-400" />}
                   offers={fastOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-fast-offers')}
@@ -392,30 +482,16 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 3. FINANCE */}
+                {/* 6. FINANCE */}
                 <CategoryOfferRow
                   id="row-finance"
                   title="Finance"
-                  subtitle="Banking, crypto exchanges, and high-value credit booster rewards"
-                  icon={<Coins size={20} className="stroke-[2.2]" />}
+                  subtitle="Banking, high-yield accounts, and high-value credit booster rewards"
+                  icon={<Landmark size={20} className="stroke-[2.2] text-emerald-400" />}
                   offers={financeOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-finance')}
                   onToggleOpen={() => handleToggleRow('row-finance')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
-
-                {/* 4. SWEEPSTAKE */}
-                <CategoryOfferRow
-                  id="row-sweepstakes"
-                  title="Sweepstake"
-                  subtitle="Daily free SC coins, sweepstakes casinos & prize wheels"
-                  icon={<Gift size={20} className="stroke-[2.2]" />}
-                  offers={sweepstakesOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-sweepstakes')}
-                  onToggleOpen={() => handleToggleRow('row-sweepstakes')}
                   onSelectOffer={setSelectedOffer}
                   onToggleSave={handleToggleSaveOffer}
                 />

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { initialsOf } from '../utils';
-import { Monitor, Smartphone, Apple, Sparkles } from 'lucide-react';
 
 interface CompactOfferCardProps {
   offer: EnrichedOffer;
@@ -60,7 +59,7 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
           onSelectOffer(offer);
         }
       }}
-      className={`group relative flex flex-col justify-between flex-shrink-0 select-none cursor-pointer rounded-2xl bg-[#131622] hover:bg-[#181d2c] border border-[#22293c] hover:border-purple-500/70 p-2.5 transition-all duration-200 hover:-translate-y-1 shadow-md hover:shadow-purple-950/40 ${
+      className={`group relative flex flex-col justify-between flex-shrink-0 select-none cursor-pointer rounded-2xl bg-[#131622] hover:bg-[#181d2c] border border-[#22293c] hover:border-emerald-500/70 p-2.5 transition-all duration-200 hover:-translate-y-1 shadow-md hover:shadow-emerald-950/40 ${
         isCompact
           ? 'w-[150px] sm:w-[165px] h-[215px] sm:h-[225px]'
           : 'w-[170px] sm:w-[185px] h-[245px] sm:h-[255px]'
@@ -68,27 +67,10 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
     >
       {/* 1. TOP ARTWORK / LOGO CONTAINER */}
       <div
-        className={`w-full rounded-xl bg-[#0c0e16] border border-[#1d2334] relative flex items-center justify-center p-2.5 overflow-hidden flex-shrink-0 group-hover:border-purple-500/40 transition-colors ${
+        className={`w-full rounded-xl bg-[#0c0e16] border border-[#1d2334] relative flex items-center justify-center p-2.5 overflow-hidden flex-shrink-0 group-hover:border-emerald-500/40 transition-colors ${
           isCompact ? 'h-[110px] sm:h-[118px]' : 'h-[130px] sm:h-[140px]'
         }`}
       >
-        {/* Platform badge pills on top right (Gemsloot style) */}
-        <div className="absolute top-2 right-2 flex items-center gap-1 bg-[#161a28]/90 backdrop-blur-xs border border-slate-700/60 rounded-md px-1.5 py-0.5 z-10">
-          <Monitor size={10} className="text-slate-400" />
-          <Smartphone size={10} className="text-slate-400" />
-          <Apple size={10} className="text-slate-400" />
-        </div>
-
-        {/* Hot / Badge indicator on top left if available */}
-        {offer.badgeType && (
-          <div className="absolute top-2 left-2 z-10">
-            <span className="px-1.5 py-0.5 rounded-md bg-purple-950/90 border border-purple-500/40 text-[9px] font-black uppercase tracking-wider text-purple-300 flex items-center gap-0.5">
-              <Sparkles size={9} className="text-purple-400" />
-              {offer.badgeType}
-            </span>
-          </div>
-        )}
-
         {/* High-resolution logo centered */}
         {logoSrc ? (
           <img
@@ -100,7 +82,7 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
           />
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <span className="text-xl sm:text-2xl font-black text-purple-400 tracking-wider">
+            <span className="text-xl sm:text-2xl font-black text-emerald-400 tracking-wider">
               {initialsOf(offer.name)}
             </span>
           </div>
@@ -110,7 +92,7 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
       {/* 2. TEXT INFORMATION (Gemsloot layout) */}
       <div className="flex flex-col items-start text-left w-full min-w-0 pt-2 px-1">
         {/* Offer Name */}
-        <h4 className="w-full truncate text-xs sm:text-[13px] font-bold text-white group-hover:text-purple-300 transition-colors leading-tight">
+        <h4 className="w-full truncate text-xs sm:text-[13px] font-bold text-white group-hover:text-emerald-300 transition-colors leading-tight">
           {offer.name}
         </h4>
 
