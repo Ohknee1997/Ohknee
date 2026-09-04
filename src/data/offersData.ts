@@ -1,9 +1,8 @@
-import { CardData, CardDetail, EngineData, TabConfig } from '../types';
+import { CardData, EngineData, TabConfig } from '../types';
 
 export const DEFAULT_TABS: TabConfig[] = [
   { id: 'fast-easy-money', label: '150$+ EASY DO IN ORDER' },
   { id: 'casino-codes', label: 'Casinos' },
-  { id: 'free-cards-cases', label: 'Free cards and cases' },
   { id: 'free-money', label: 'Literal Free Money' },
   { id: 'referrals', label: 'Referrals / Signup / Bonuses' },
 ];
@@ -872,71 +871,4 @@ export const INITIAL_REFERRAL_CARDS: CardData[] = [
     tabId: 'referrals',
     instructionSub: 'Open RoarMoney account and unlock instant cash bonus.',
   },
-  {
-    id: 'ref-cases-gg',
-    name: 'Cases.gg',
-    domain: 'cases.gg',
-    accentRgb: '249, 115, 22',
-    payout: '3 Free Cases',
-    payoutTag: 'FREE CASES',
-    tierClass: 'tier-free',
-    code: 'OHKNEE',
-    signupUrl: 'https://cases.gg/r/OHKNEE',
-    signupLabel: 'OPEN 3 CASES',
-    tabId: 'free-cards-cases',
-    instructionSub: 'Open 3 Free Cases! Challenge friends in case battles, open cases, upgrade your skins. Play Mines, Plinko and more on the top CS2 gambling site.',
-    orderNumber: 1,
-    rating: 5,
-  },
-  {
-    id: 'ref-triumph-rips',
-    name: 'Triumph Rips',
-    domain: 'rips.onelink.me',
-    accentRgb: '168, 85, 247',
-    payout: 'Free Card Pack',
-    payoutTag: 'FREE PACK',
-    tierClass: 'tier-free',
-    code: 'NQYCTUM',
-    signupUrl: 'https://rips.onelink.me/Wj0m/wi7qf68q?deep_link_sub1=xNLNfOEOuNOG9qmuGzbjKZqHtJD2',
-    signupLabel: 'GET FREE PACK',
-    tabId: 'free-cards-cases',
-    instructionSub: 'Use my referral link to win on Triumph Rips! Enter code NQYCTUM and get a card pack for free. Use my link to win on Rip Rush!',
-    orderNumber: 2,
-    rating: 5,
-  },
-  {
-    id: 'ref-rip-rush',
-    name: 'Rip Rush',
-    domain: 'riprush.onelink.me',
-    accentRgb: '59, 130, 246',
-    payout: 'Free Card Pack',
-    payoutTag: 'FREE PACK',
-    tierClass: 'tier-free',
-    code: 'UCLEKH6',
-    signupUrl: 'https://riprush.onelink.me/se7Y/t1tr9df3?deep_link_sub1=O9m5kGxxmsNtOM7n57QeBLOKIG43',
-    signupLabel: 'GET FREE PACK',
-    tabId: 'free-cards-cases',
-    instructionSub: 'Download the game using my link, then enter code UCLEKH6 when you register to get a card pack for free.',
-    orderNumber: 3,
-    rating: 5,
-  },
 ];
-
-export const INITIAL_CARD_DETAILS: Record<string, CardDetail> = {
-  'ref-cases-gg': {
-    note: 'Open 3 Free Cases! Challenge friends in case battles, open cases, upgrade your skins. Play Mines, Plinko and more on the top CS2 gambling site.',
-    images: [],
-    link2: 'https://cases.gg/r/OHKNEE',
-  },
-  'ref-triumph-rips': {
-    note: 'Use my referral link to win on Triumph Rips! Enter code NQYCTUM and get a card pack for free. Use my link to win on Rip Rush!',
-    images: [],
-    link2: 'https://riprush.onelink.me/se7Y/t1tr9df3?deep_link_sub1=O9m5kGxxmsNtOM7n57QeBLOKIG43',
-  },
-  'ref-rip-rush': {
-    note: 'Download the game using my link, then enter code UCLEKH6 when you register to get a card pack for free.',
-    images: [],
-    link2: 'https://play.google.com/store/apps/details?id=com.emeraldmyth.riprush.and&gl=us?code=UCLEKH6',
-  },
-};
-

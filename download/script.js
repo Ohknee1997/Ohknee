@@ -264,42 +264,6 @@
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
       note: 'Receive $100 free cash bonus after your first qualifying direct deposit of $200+ within 45 days.'
-    },
-    {
-      id: 'ref-cases-gg',
-      name: 'Cases.gg',
-      domain: 'cases.gg',
-      payout: '3 Free Cases',
-      payoutTag: 'FREE CASES',
-      code: 'OHKNEE',
-      signupUrl: 'https://cases.gg/r/OHKNEE',
-      signupLabel: 'OPEN 3 CASES',
-      tabId: 'free-cards-cases',
-      note: 'Open 3 Free Cases! Challenge friends in case battles, open cases, upgrade your skins. Play Mines, Plinko and more on the top CS2 gambling site.'
-    },
-    {
-      id: 'ref-triumph-rips',
-      name: 'Triumph Rips',
-      domain: 'rips.onelink.me',
-      payout: 'Free Card Pack',
-      payoutTag: 'FREE PACK',
-      code: 'NQYCTUM',
-      signupUrl: 'https://rips.onelink.me/Wj0m/wi7qf68q?deep_link_sub1=xNLNfOEOuNOG9qmuGzbjKZqHtJD2',
-      signupLabel: 'GET FREE PACK',
-      tabId: 'free-cards-cases',
-      note: 'Use my referral link to win on Triumph Rips! Enter code NQYCTUM and get a card pack for free. Use my link to win on Rip Rush!'
-    },
-    {
-      id: 'ref-rip-rush',
-      name: 'Rip Rush',
-      domain: 'riprush.onelink.me',
-      payout: 'Free Card Pack',
-      payoutTag: 'FREE PACK',
-      code: 'UCLEKH6',
-      signupUrl: 'https://riprush.onelink.me/se7Y/t1tr9df3?deep_link_sub1=O9m5kGxxmsNtOM7n57QeBLOKIG43',
-      signupLabel: 'GET FREE PACK',
-      tabId: 'free-cards-cases',
-      note: 'Download the game using my link, then enter code UCLEKH6 when you register to get a card pack for free.'
     }
   ];
 

@@ -14,7 +14,6 @@ export interface EnrichedOffer extends CardData {
     | 'sports-betting'
     | 'sports'
     | 'betting'
-    | 'free-cards-cases'
     | 'banking'
     | 'crypto'
     | 'finance'
@@ -119,25 +118,6 @@ export function enrichCard(card: CardData): EnrichedOffer {
     isFeatured = true;
     categories.push('featured');
     if (!badgeType) badgeType = 'HOT';
-  }
-
-  // 3b. FREE CARDS AND CASES
-  if (
-    tabId === 'free-cards-cases' ||
-    name.includes('cases') ||
-    name.includes('rip') ||
-    name.includes('triumph') ||
-    id.includes('cases') ||
-    id.includes('rip')
-  ) {
-    if (!categories.includes('free-cards-cases')) {
-      categories.push('free-cards-cases');
-    }
-    if (!categories.includes('play-to-earn')) {
-      categories.push('play-to-earn');
-    }
-    isFeatured = true;
-    if (!badgeType) badgeType = 'NEW';
   }
 
   // 4. BANKING APPS & SERVICES

@@ -6,7 +6,6 @@ import {
   INITIAL_CASINO_CARDS,
   INITIAL_FREE_MONEY_CARDS,
   INITIAL_REFERRAL_CARDS,
-  INITIAL_CARD_DETAILS,
 } from './data/offersData';
 import {
   getAllEnrichedOffers,
@@ -49,7 +48,6 @@ import {
   Gift,
   Sparkles,
   Trophy,
-  Package,
   BarChart2,
   Lock,
   User,
@@ -62,7 +60,6 @@ const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
 const ALL_CATEGORY_ROW_IDS = [
   'row-online-casinos',
   'row-sports-betting',
-  'row-free-cards-cases',
   'row-free-crypto',
   'row-featured',
   'row-fast-offers',
@@ -72,20 +69,16 @@ const ALL_CATEGORY_ROW_IDS = [
 export default function App() {
   // Master offer collection with data enrichment
   const [allOffers, setAllOffers] = useState<EnrichedOffer[]>(() => {
-    const defaultOffers = getAllEnrichedOffers();
     const savedCustomCards = getFromStorage<CardData[] | null>(STORE_CARDS, null);
     if (savedCustomCards && Array.isArray(savedCustomCards) && savedCustomCards.length > 0) {
-      const savedIds = new Set(savedCustomCards.map((c) => c.id));
-      const missingDefaults = defaultOffers.filter((o) => !savedIds.has(o.id));
-      return [...savedCustomCards.map(enrichCard), ...missingDefaults];
+      return savedCustomCards.map(enrichCard);
     }
-    return defaultOffers;
+    return getAllEnrichedOffers();
   });
 
   // Secret sauce details
   const [details, setDetails] = useState<Record<string, CardDetail>>(() => {
-    const saved = getFromStorage<Record<string, CardDetail>>(STORE_DETAIL, {});
-    return { ...INITIAL_CARD_DETAILS, ...saved };
+    return getFromStorage(STORE_DETAIL, {});
   });
 
   // User's saved / favorited offers
@@ -296,18 +289,6 @@ export default function App() {
       .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
   }, [filteredOffers]);
 
-  // 2b. FREE CARDS AND CASES
-  const freeCardsAndCasesOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('free-cards-cases') ||
-          o.tabId === 'free-cards-cases' ||
-          ['ref-cases-gg', 'ref-triumph-rips', 'ref-rip-rush'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
-
   // 3. FREE CRYPTO
   const cryptoOffers = useMemo(() => {
     return filteredOffers
@@ -458,21 +439,7 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 3. FREE CARDS AND CASES */}
-                <CategoryOfferRow
-                  id="row-free-cards-cases"
-                  title="Free cards and cases"
-                  subtitle="Open 3 free cases, battle friends, claim CS2 skins & unlock free card packs"
-                  icon={<Package size={20} className="stroke-[2.2] text-emerald-400" />}
-                  offers={freeCardsAndCasesOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-free-cards-cases')}
-                  onToggleOpen={() => handleToggleRow('row-free-cards-cases')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
-
-                {/* 4. FREE CRYPTO */}
+                {/* 3. FREE CRYPTO */}
                 <CategoryOfferRow
                   id="row-free-crypto"
                   title="Free Crypto"

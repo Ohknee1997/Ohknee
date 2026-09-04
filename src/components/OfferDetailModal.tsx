@@ -50,9 +50,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
 
   // Sync state when detail changes
   useEffect(() => {
-    setNote(detail.note || offer?.descriptionText || offer?.instructionSub || '');
+    setNote(detail.note || '');
     setLink2(detail.link2 || '');
-  }, [detail, offer]);
+  }, [detail]);
 
   // Close on escape
   useEffect(() => {
@@ -246,42 +246,6 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                 </button>
               </div>
             </div>
-
-            {/* Brief Description & Overview Box */}
-            {(offer.descriptionText || offer.instructionSub) && (
-              <div className="rounded-xl bg-slate-50 border border-slate-200/90 p-3.5">
-                <div className="flex items-start gap-2.5">
-                  <Sparkles size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                  <div className="space-y-1 text-xs">
-                    <p className="font-bold text-slate-900 uppercase tracking-wider text-[10px]">
-                      Offer Description & Referral Details
-                    </p>
-                    <p className="text-slate-700 leading-relaxed font-medium">
-                      {offer.descriptionText || offer.instructionSub}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Secondary / App Store Link (if provided) */}
-            {link2 && (
-              <div className="rounded-xl bg-purple-50/80 border border-purple-200/80 p-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 truncate text-xs">
-                  <ExternalLink size={14} className="text-purple-600 flex-shrink-0" />
-                  <span className="font-bold text-purple-950">Secondary Link:</span>
-                  <span className="text-slate-600 truncate font-mono text-[11px]">{link2}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => window.open(link2, '_blank', 'noopener,noreferrer')}
-                  className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0 shadow-xs"
-                >
-                  <span>Open</span>
-                  <ExternalLink size={12} />
-                </button>
-              </div>
-            )}
 
             {/* Promo Code Section (if present) */}
             {offer.code && (
