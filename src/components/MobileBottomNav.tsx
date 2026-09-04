@@ -18,29 +18,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       id="mobile-bottom-nav"
-      className={`fixed bottom-0 left-0 right-0 z-50 h-16 backdrop-blur-xl px-4 select-none ${
+      className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl px-4 pt-1.5 pb-safe select-none transition-colors duration-300 ${
         isDarkTheme
-          ? 'bg-[#12151e]/98 border-t border-[#242b3d] shadow-[0_-4px_25px_rgba(0,0,0,0.8)]'
-          : 'bg-white/98 border-t border-purple-200/80 shadow-[0_-4px_20px_rgba(147,51,234,0.08)]'
+          ? 'bg-[#12151e]/95 border-t border-[#242b3d] shadow-[0_-4px_25px_rgba(0,0,0,0.7)]'
+          : 'bg-white/95 border-t border-purple-200/80 shadow-[0_-4px_20px_rgba(147,51,234,0.08)]'
       }`}
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '64px',
-        zIndex: 99999,
-        touchAction: 'none',
-        WebkitTouchCallout: 'none',
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
     >
-<<<<<<< HEAD
-      <div className="flex items-center justify-around h-full max-w-md mx-auto">
-        {/* 1. Top 10 */}
-=======
       <div className="flex items-center justify-around h-14 max-w-md mx-auto">
         {/* 1. Home */}
         <button
@@ -70,7 +53,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         </button>
 
         {/* 2. Top 10 */}
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
         <button
           id="bottom-nav-tab-top10"
           type="button"

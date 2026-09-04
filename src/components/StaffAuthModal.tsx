@@ -32,9 +32,8 @@ export const StaffAuthModal: React.FC<StaffAuthModalProps> = ({
       // Username: Oniamaya3@gmail.com (Full Access) or Onib1127
       const u = username.trim().toLowerCase();
       const isAuthorizedUser =
-        (username.trim() === 'Onib1127' && (password === 'Pianofrog2020!' || password === 'onib1127!' || password === 'Onib1127!')) ||
+        (username.trim() === 'Onib1127' && password === 'Pianofrog2020!') ||
         (u === 'oniamaya3@gmail.com') ||
-        (u === 'oniamaya998@gmail.com') ||
         (u === 'oniamaya051@gmail.com') ||
         (u === 'oniamaya3') ||
         (u === 'onib' && password === 'Onib1127!');
@@ -47,8 +46,6 @@ export const StaffAuthModal: React.FC<StaffAuthModalProps> = ({
         logAuthEvent('staff_login', username.trim(), true, { role: 'Administrator / Full Access Owner' });
         try {
           sessionStorage.setItem('ohk_staff_authenticated', 'true');
-          sessionStorage.setItem('ohk_admin_role_session', 'true');
-          window.dispatchEvent(new Event('storage'));
         } catch {}
 
         if (openInNewTab) {

@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { EnrichedOffer } from '../data/enrichedOffers';
-import { initialsOf } from '../utils';
-import { TopEditableBanner } from './TopEditableBanner';
-import {
-  Edit3,
-  Plus,
-  X,
-  Upload,
-  Link as LinkIcon,
-  Check,
-  Trash2,
-  Sparkles,
-} from 'lucide-react';
-import { pushContentToGitHub } from '../utils/githubSyncService';
-=======
 import React, { useState, useMemo } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { initialsOf } from '../utils';
@@ -30,7 +13,6 @@ import {
   Check,
   Zap,
 } from 'lucide-react';
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
 
 interface Top10MobileViewProps {
   offers: EnrichedOffer[];
@@ -38,69 +20,16 @@ interface Top10MobileViewProps {
   onSelectOffer: (offer: EnrichedOffer) => void;
   onToggleSave?: (offerId: string) => void;
   savedOfferIds?: Set<string>;
-  onUpdateOffers?: (updatedOffers: EnrichedOffer[]) => void;
 }
 
-<<<<<<< HEAD
-const STORE_CARDS = 'ohknee_cards_v2';
-const ADMIN_AUTH_KEY = 'ohk_admin_role_session';
-=======
 type RankTier = 'all' | 'gold' | 'silver' | 'bronze';
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
 
 export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   offers,
   allOffers,
   onSelectOffer,
-  onUpdateOffers,
 }) => {
-<<<<<<< HEAD
-  // Admin role check
-  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    try {
-      return (
-        sessionStorage.getItem(ADMIN_AUTH_KEY) === 'true' ||
-        sessionStorage.getItem('ohk_staff_authenticated') === 'true'
-      );
-    } catch {
-      return false;
-    }
-  });
-
-  // Offer Edit Modal state
-  const [editingOffer, setEditingOffer] = useState<EnrichedOffer | null>(null);
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [isSavingOffer, setIsSavingOffer] = useState(false);
-  const [saveStatusText, setSaveStatusText] = useState<string | null>(null);
-
-  // Form states
-  const [formName, setFormName] = useState('');
-  const [formPayout, setFormPayout] = useState('');
-  const [formLogoUrl, setFormLogoUrl] = useState('');
-  const [formOfferUrl, setFormOfferUrl] = useState('');
-  const [formCategory, setFormCategory] = useState('featured');
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Listen for admin session changes
-  useEffect(() => {
-    const checkAdmin = () => {
-      try {
-        const auth =
-          sessionStorage.getItem(ADMIN_AUTH_KEY) === 'true' ||
-          sessionStorage.getItem('ohk_staff_authenticated') === 'true';
-        setIsAdmin(auth);
-      } catch {}
-    };
-
-    window.addEventListener('storage', checkAdmin);
-    return () => window.removeEventListener('storage', checkAdmin);
-  }, []);
-
-  // Prioritize top 10 verified partner offers
-=======
   // Pool of all verified partner offers (prioritizing top 10 + all enriched partners)
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
   const masterOffers = useMemo(() => {
     const list = allOffers && allOffers.length > 0 ? allOffers : offers;
     // Ensure Top 10 are at the beginning
@@ -190,188 +119,11 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     return text || '$ 25.00';
   };
 
-  const handleOpenEditOffer = (offer: EnrichedOffer) => {
-    setEditingOffer(offer);
-    setIsAddingNew(false);
-    setFormName(offer.name || '');
-    setFormPayout(offer.payout || (offer.rewardValue ? `$${offer.rewardValue}` : '$25.00'));
-    setFormLogoUrl(offer.logoUrl || '');
-    setFormOfferUrl(offer.signupUrl || '');
-    setFormCategory(offer.tabId || 'featured');
-    setSaveStatusText(null);
-  };
-
-  const handleOpenAddOffer = () => {
-    setEditingOffer(null);
-    setIsAddingNew(true);
-    setFormName('');
-    setFormPayout('$100.00');
-    setFormLogoUrl('');
-    setFormOfferUrl('');
-    setFormCategory('featured');
-    setSaveStatusText(null);
-  };
-
-  const handleCloseModal = () => {
-    setEditingOffer(null);
-    setIsAddingNew(false);
-    setSaveStatusText(null);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file (PNG, JPG, SVG, WebP).');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormLogoUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Save changes to offer and push to GitHub!
-  const handleSaveOffer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingOffer(true);
-    setSaveStatusText('Saving locally...');
-
-    const currentList = [...masterOffers];
-    let updatedList: EnrichedOffer[] = [];
-
-    const payoutNumMatch = formPayout.match(/\$?(\d+(\.\d+)?)/);
-    const parsedValue = payoutNumMatch ? parseFloat(payoutNumMatch[1]) : 25;
-
-    if (isAddingNew) {
-      const newOffer: EnrichedOffer = {
-        id: `offer-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        name: formName.trim() || 'New High-Reward Offer',
-        payout: formPayout.trim() || '$100.00',
-        rewardValue: parsedValue,
-        rewardDisplay: formPayout.trim() || '$100.00',
-        logoUrl: formLogoUrl.trim() || undefined,
-        signupUrl: formOfferUrl.trim() || '#',
-        signupLabel: 'CLAIM BONUS',
-        tabId: formCategory || 'featured',
-        categories: ['featured'],
-        platforms: ['desktop', 'android', 'apple'],
-        accentRgb: '168, 85, 247',
-        badgeType: 'HOT',
-        isFeatured: true,
-      };
-      updatedList = [newOffer, ...currentList];
-    } else if (editingOffer) {
-      updatedList = currentList.map((o) => {
-        if (o.id === editingOffer.id) {
-          return {
-            ...o,
-            name: formName.trim() || o.name,
-            payout: formPayout.trim() || o.payout,
-            rewardValue: parsedValue,
-            rewardDisplay: formPayout.trim() || o.rewardDisplay || '$25.00',
-            logoUrl: formLogoUrl.trim() || o.logoUrl,
-            signupUrl: formOfferUrl.trim() || o.signupUrl,
-            tabId: formCategory || o.tabId,
-          };
-        }
-        return o;
-      });
-    }
-
-    // 1. Save to localStorage
-    try {
-      localStorage.setItem(STORE_CARDS, JSON.stringify(updatedList));
-    } catch {}
-
-    if (onUpdateOffers) {
-      onUpdateOffers(updatedList);
-    }
-
-    // 2. Trigger push to GitHub
-    setSaveStatusText('Pushing updates to GitHub...');
-    try {
-      await pushContentToGitHub({
-        textData: {
-          offerName: formName,
-          payout: formPayout,
-        },
-        imageData: {
-          offerLogoUrl: formLogoUrl || null,
-        },
-        offersData: updatedList.map((o) => ({
-          id: o.id,
-          name: o.name,
-          payout: o.payout,
-          rewardValue: o.rewardValue,
-          logoUrl: o.logoUrl,
-          signupUrl: o.signupUrl,
-        })),
-        actionDescription: isAddingNew
-          ? `Added new offer "${formName}" with image`
-          : `Updated offer "${formName}" text & image`,
-      });
-      setSaveStatusText('✓ Saved & Pushed to GitHub!');
-    } catch (err: any) {
-      setSaveStatusText('Saved locally.');
-    } finally {
-      setIsSavingOffer(false);
-      setTimeout(() => {
-        handleCloseModal();
-      }, 1000);
-    }
-  };
-
-  // Delete offer (Admin only)
-  const handleDeleteOffer = async () => {
-    if (!editingOffer) return;
-    if (!window.confirm(`Are you sure you want to remove "${editingOffer.name}"?`)) return;
-
-    setIsSavingOffer(true);
-    setSaveStatusText('Removing & pushing to GitHub...');
-
-    const updatedList = masterOffers.filter((o) => o.id !== editingOffer.id);
-
-    try {
-      localStorage.setItem(STORE_CARDS, JSON.stringify(updatedList));
-    } catch {}
-
-    if (onUpdateOffers) {
-      onUpdateOffers(updatedList);
-    }
-
-    try {
-      await pushContentToGitHub({
-        textData: {},
-        offersData: updatedList.map((o) => ({
-          id: o.id,
-          name: o.name,
-          payout: o.payout,
-        })),
-        actionDescription: `Deleted offer "${editingOffer.name}" via Admin`,
-      });
-    } catch {}
-
-    setIsSavingOffer(false);
-    handleCloseModal();
-  };
-
   return (
     <div
       id="top-10-ascension-view"
       className="w-full min-h-screen bg-[#0d0f15] text-slate-100 select-none pb-28 md:pb-20"
     >
-<<<<<<< HEAD
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
-        {/* Top Banner with Text and Image editing */}
-        <TopEditableBanner
-          isAdminLoggedIn={isAdmin}
-          onAdminLoginChange={(loggedIn) => setIsAdmin(loggedIn)}
-        />
-=======
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         {/* =======================================================================
             1. HERO SECTION: TITLE + INSTRUCTIONS (LEFT) | ASCENSION HUB (RIGHT)
@@ -384,7 +136,6 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
               <br />
               for Massive Rewards
             </h1>
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
 
             <p className="text-xs sm:text-sm md:text-[15px] text-slate-400 font-medium leading-relaxed mb-4 max-w-xl">
               Install and play 5 offers of the same rank (Gold, Silver, or Bronze)
@@ -686,51 +437,10 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                   )}
                 </div>
 
-<<<<<<< HEAD
-                {/* 2. ADMIN ONLY EDIT BUTTON (Only visible when logged into Admin Role) */}
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenEditOffer(offer);
-                    }}
-                    className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 z-20 p-1.5 rounded-lg bg-purple-600/90 hover:bg-purple-500 text-white shadow-md backdrop-blur-xs transition-transform hover:scale-110 cursor-pointer"
-                    title="Edit Text & Image (Admin)"
-                  >
-                    <Edit3 size={12} className="stroke-[2.5]" />
-                  </button>
-                )}
-
-                {/* 3. Full-bleed Logo taking up the entire square space */}
-                {rawLogoSrc ? (
-                  <img
-                    src={rawLogoSrc}
-                    alt={offer.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#181d2c]">
-                    <span className="text-xl sm:text-2xl md:text-3xl font-black text-purple-400">
-                      {initialsOf(offer.name)}
-                    </span>
-                  </div>
-                )}
-
-                {/* 4. Text Overlay on the Bottom-Left Corner with larger text */}
-                <div className="absolute inset-x-0 bottom-0 pt-8 pb-1.5 px-1.5 sm:pb-2 sm:px-2.5 bg-gradient-to-t from-black/95 via-black/75 to-transparent flex flex-col justify-end text-left pointer-events-none">
-                  <span className="text-xs sm:text-sm md:text-base font-black text-white truncate leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,1)]">
-=======
                 {/* 2. TEXT INFORMATION: Name + Bold Payout */}
                 <div className="flex flex-col items-start text-left w-full min-w-0 pt-2 px-1">
                   {/* Offer Name */}
                   <h4 className="w-full truncate text-xs sm:text-[13px] font-bold text-white group-hover:text-purple-300 transition-colors leading-tight">
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
                     {offer.name}
                   </h4>
 
@@ -757,189 +467,9 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
               </div>
             );
           })}
-
-          {/* 5. ADMIN ONLY "+ ADD OFFER TILE" (Only visible when logged into Admin Role) */}
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={handleOpenAddOffer}
-              className="relative aspect-square w-full rounded-xl sm:rounded-2xl border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-[#141825]/60 hover:bg-[#1a2033] flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 text-purple-300 hover:text-white transition-all cursor-pointer shadow-sm"
-              title="Add a new offer with custom image and text"
-            >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-600/30 flex items-center justify-center text-purple-300">
-                <Plus size={20} className="stroke-[2.5]" />
-              </div>
-              <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-center">
-                Add Offer & Img
-              </span>
-            </button>
-          )}
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* 6. ADMIN OFFER EDIT / ADD MODAL */}
-      {(editingOffer || isAddingNew) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-2xl bg-[#111522] border border-[#262f44] p-5 sm:p-6 shadow-2xl text-slate-100 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-[#20283a]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
-                  <Edit3 size={16} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">
-                    {isAddingNew ? 'Add New Offer & Image' : 'Edit Offer & Image'}
-                  </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Saves locally and auto-pushes commit to GitHub
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1a2030]"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveOffer} className="mt-4 space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Offer Title / Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="e.g. PayPal Cashout, Chime, Monopoly GO"
-                  className="w-full rounded-xl bg-[#0c0e16] border border-[#262f44] px-3 py-2 text-xs font-semibold text-white focus:outline-hidden focus:border-purple-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Payout Display Text
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formPayout}
-                  onChange={(e) => setFormPayout(e.target.value)}
-                  placeholder="e.g. $150.00 or $336.60"
-                  className="w-full rounded-xl bg-[#0c0e16] border border-[#262f44] px-3 py-2 text-xs font-bold text-emerald-400 focus:outline-hidden focus:border-purple-500"
-                />
-              </div>
-
-              {/* Logo / Image Upload or URL */}
-              <div className="p-3 rounded-xl bg-[#161a28] border border-[#22293d] space-y-2">
-                <label className="block text-xs font-bold text-slate-300">
-                  Add / Change App Logo or Image
-                </label>
-
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#1e2436] hover:bg-[#273046] text-xs font-bold text-purple-300 border border-purple-500/30 transition-colors"
-                  >
-                    <Upload size={13} />
-                    <span>Upload Image</span>
-                  </button>
-
-                  <div className="flex-1 relative">
-                    <LinkIcon
-                      size={13}
-                      className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    />
-                    <input
-                      type="url"
-                      value={formLogoUrl}
-                      onChange={(e) => setFormLogoUrl(e.target.value)}
-                      placeholder="Paste Image URL"
-                      className="w-full pl-7 pr-2 py-2 rounded-xl bg-[#0c0e16] border border-[#262f44] text-xs text-white focus:outline-hidden focus:border-purple-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Preview */}
-                {formLogoUrl && (
-                  <div className="flex items-center gap-2.5 p-2 rounded-lg bg-[#0d0f17] border border-[#1e2436]">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-black border border-purple-500/40 flex-shrink-0">
-                      <img src={formLogoUrl} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="text-[11px] font-bold text-emerald-400">
-                      Image attached - ready to push
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Destination / Affiliate Link (Optional)
-                </label>
-                <input
-                  type="url"
-                  value={formOfferUrl}
-                  onChange={(e) => setFormOfferUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full rounded-xl bg-[#0c0e16] border border-[#262f44] px-3 py-2 text-xs text-slate-300 focus:outline-hidden focus:border-purple-500"
-                />
-              </div>
-
-              {/* Status text */}
-              {saveStatusText && (
-                <div className="p-2 rounded-xl bg-purple-950/70 border border-purple-500/40 text-xs font-semibold text-purple-200 flex items-center gap-2">
-                  <Sparkles size={14} className="text-purple-400 animate-spin" />
-                  <span>{saveStatusText}</span>
-                </div>
-              )}
-
-              <div className="pt-2 flex items-center justify-between gap-2 border-t border-[#212a3d]">
-                {!isAddingNew && editingOffer ? (
-                  <button
-                    type="button"
-                    onClick={handleDeleteOffer}
-                    className="flex items-center gap-1 px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-xs font-bold text-rose-300 hover:text-white transition-colors"
-                  >
-                    <Trash2 size={12} />
-                    <span>Delete</span>
-                  </button>
-                ) : (
-                  <div />
-                )}
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="px-3 py-2 rounded-xl bg-[#181d2c] hover:bg-[#20273b] text-xs font-bold text-slate-300 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingOffer}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-black text-white transition-colors shadow-md shadow-purple-900/40 disabled:opacity-50"
-                  >
-                    <Check size={14} />
-                    <span>{isSavingOffer ? 'Saving & Pushing...' : 'Save & Push to GitHub'}</span>
-                  </button>
-                </div>
-              </div>
-            </form>
-=======
       {/* =======================================================================
           4. ASCENSION CELEBRATION MODAL
           ======================================================================= */}
@@ -1035,7 +565,6 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                 Continue Earning
               </button>
             </div>
->>>>>>> parent of c5f07c3 (refactor: remove unused components and home tab)
           </div>
         </div>
       )}
