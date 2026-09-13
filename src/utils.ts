@@ -97,6 +97,95 @@ export function initialsOf(name: string): string {
     .join('');
 }
 
+export function getAppDeduplicationKey(offer: {
+  name?: string;
+  domain?: string;
+  id?: string;
+  code?: string;
+  link?: string;
+}): string {
+  const name = (offer.name || '').toLowerCase().trim();
+  const domain = (offer.domain || '')
+    .toLowerCase()
+    .replace(/^(https?:\/\/)?(www\.)?/, '')
+    .split('/')[0];
+  const id = (offer.id || '').toLowerCase();
+
+  // 1. Direct App Alias / Canonical Grouping
+  if (name.includes('stake') || domain.includes('stake') || id.includes('stake')) return 'stake';
+  if (name.includes('freecash') || domain.includes('freecash') || id.includes('freecash')) return 'freecash';
+  if (name.includes('gemsloot') || domain.includes('gemsloot') || id.includes('gemsloot')) return 'gemsloot';
+  if (name.includes('polymarket') || domain.includes('polymarket') || id.includes('polymarket')) return 'polymarket';
+  if (name.includes('draftking') || domain.includes('draftkings') || id.includes('draftkings')) return 'draftkings';
+  if (name.includes('tilt') || id.includes('tilt')) return 'tilt';
+  if (name.includes('rebet') || domain.includes('rebet') || id.includes('rebet')) return 'rebet';
+  if (name.includes('onyx') || domain.includes('onyx') || id.includes('onyx')) return 'onyx';
+  if (name.includes('rip rush') || name.includes('riprush') || id.includes('riprush')) return 'riprush';
+  if (name.includes('rip') || domain.includes('rips') || id.includes('rips')) return 'rips';
+  if (name.includes('kalshi') || domain.includes('kalshi') || id.includes('kalshi')) return 'kalshi';
+  if (name.includes('coinbase') || domain.includes('coinbase') || id.includes('coinbase')) return 'coinbase';
+  if (name.includes('crown coin') || name.includes('crowncoin') || domain.includes('crowncoins') || id.includes('crowncoins')) return 'crowncoins';
+  if (name.includes('lonestar') || name.includes('lone star') || domain.includes('lonestar') || id.includes('lonestar')) return 'lonestar';
+  if (name.includes('modo') || domain.includes('modo') || id.includes('modo')) return 'modo';
+  if (name.includes('myprize') || name.includes('my prize') || domain.includes('myprize') || id.includes('myprize')) return 'myprize';
+  if (name.includes('zula') || domain.includes('zula') || id.includes('zula')) return 'zula';
+  if (name.includes('coins back') || name.includes('coinsback') || name.includes('shopback') || domain.includes('shopback')) return 'coinsback';
+  if (name.includes('chumba') || domain.includes('chumba')) return 'chumba';
+  if (name.includes('luckyland') || domain.includes('luckyland')) return 'luckyland';
+  if (name.includes('pulsz') || domain.includes('pulsz')) return 'pulsz';
+  if (name.includes('wow vegas') || name.includes('wowvegas') || domain.includes('wowvegas')) return 'wowvegas';
+  if (name.includes('high 5') || name.includes('high5') || domain.includes('high5')) return 'high5';
+  if (name.includes('mcluck') || domain.includes('mcluck')) return 'mcluck';
+  if (name.includes('fortune coin') || name.includes('fortunecoin') || domain.includes('fortunecoin')) return 'fortunecoins';
+  if (name.includes('real prize') || name.includes('realprize') || domain.includes('realprize')) return 'realprize';
+  if (name.includes('chanced') || domain.includes('chanced')) return 'chanced';
+  if (name.includes('spree') || domain.includes('spree')) return 'spree';
+  if (name.includes('sportzino') || domain.includes('sportzino')) return 'sportzino';
+  if (name.includes('fliff') || domain.includes('fliff')) return 'fliff';
+  if (name.includes('sleeper') || domain.includes('sleeper')) return 'sleeper';
+  if (name.includes('dabble') || domain.includes('dabble')) return 'dabble';
+  if (name.includes('underdog') || domain.includes('underdog')) return 'underdog';
+  if (name.includes('prizepick') || domain.includes('prizepick')) return 'prizepicks';
+  if (name.includes('fanduel') || domain.includes('fanduel')) return 'fanduel';
+  if (name.includes('betmgm') || domain.includes('betmgm')) return 'betmgm';
+  if (name.includes('caesars') || domain.includes('caesars')) return 'caesars';
+  if (name.includes('kraken') || domain.includes('kraken')) return 'kraken';
+  if (name.includes('gemini') || domain.includes('gemini')) return 'gemini';
+  if (name.includes('robinhood') || domain.includes('robinhood')) return 'robinhood';
+  if (name.includes('webull') || domain.includes('webull')) return 'webull';
+  if (name.includes('sofi') || domain.includes('sofi')) return 'sofi';
+  if (name.includes('onepay') || name.includes('one pay') || name.includes('one finance') || domain.includes('one.app')) return 'onepay';
+  if (name.includes('koinly') || domain.includes('koinly')) return 'koinly';
+  if (name.includes('bydfi') || domain.includes('bydfi')) return 'bydfi';
+  if (name.includes('metawin') || domain.includes('metawin')) return 'metawin';
+  if (name.includes('fetch') || domain.includes('fetch')) return 'fetch';
+  if (name.includes('debbie') || domain.includes('debbie')) return 'debbie';
+  if (name.includes('joko') || domain.includes('joko')) return 'joko';
+  if (name.includes('snaplii') || domain.includes('snaplii')) return 'snaplii';
+  if (name.includes('franki') || domain.includes('franki')) return 'franki';
+  if (name.includes('myappfree') || domain.includes('myappfree')) return 'myappfree';
+  if (name.includes('aven') || domain.includes('aven')) return 'aven';
+  if (name.includes('sendwave') || domain.includes('sendwave')) return 'sendwave';
+  if (name.includes('moneylion') || domain.includes('moneylion')) return 'moneylion';
+  if (name.includes('swagbucks') || domain.includes('swagbucks')) return 'swagbucks';
+  if (name.includes('inboxdollar') || domain.includes('inboxdollars')) return 'inboxdollars';
+
+  // 2. Generic normalized key
+  if (domain && domain.length > 3) {
+    return domain.split('.')[0];
+  }
+
+  const cleaned = name
+    .replace(/^(the|join|play|get|download)\s+/i, '')
+    .replace(
+      /\s+(promo|code|bonus|referral|casino|crypto|app|betting|picks|sports|prediction|predictions|club|free spins|squad|cashback|cash back|finance)\b/gi,
+      ''
+    )
+    .replace(/[^a-z0-9]/g, '');
+
+  return cleaned || offer.id || 'unknown';
+}
+
 export function hexToRgbTriplet(hex: string): string | null {
   const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex || '');
   if (!m) return null;

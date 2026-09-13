@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Trophy, Sparkles } from 'lucide-react';
+import { Crown, Layers } from 'lucide-react';
 
 export type MobileTab = 'top-10' | 'earn' | 'hero';
 
@@ -21,7 +21,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl px-4 pt-1.5 pb-safe select-none transition-colors duration-300 ${
         isDarkTheme
           ? 'bg-[#12151e]/95 border-t border-[#242b3d] shadow-[0_-4px_25px_rgba(0,0,0,0.7)]'
-          : 'bg-white/95 border-t border-purple-200/80 shadow-[0_-4px_20px_rgba(147,51,234,0.08)]'
+          : 'bg-white/95 border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]'
       }`}
     >
       <div className="flex items-center justify-around h-14 max-w-sm mx-auto">
@@ -33,20 +33,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all cursor-pointer relative py-1 ${
             currentTab === 'top-10'
               ? isDarkTheme
-                ? 'text-emerald-400 font-black'
-                : 'text-emerald-600 font-black'
+                ? 'text-amber-400 font-black'
+                : 'text-amber-600 font-black'
               : isDarkTheme
               ? 'text-slate-400 hover:text-slate-200 font-medium'
               : 'text-slate-500 hover:text-slate-800 font-medium'
           }`}
           aria-label="Top 10"
         >
-          <Trophy size={22} className={currentTab === 'top-10' ? 'text-emerald-400' : ''} strokeWidth={currentTab === 'top-10' ? 2.5 : 2} />
+          <Crown size={22} className={currentTab === 'top-10' ? 'text-amber-400' : ''} strokeWidth={currentTab === 'top-10' ? 2.5 : 2} />
           <span className="text-xs tracking-tight whitespace-nowrap leading-none">Top 10</span>
           {currentTab === 'top-10' && (
             <span
               className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
-                isDarkTheme ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-emerald-600'
+                isDarkTheme ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-amber-600'
               }`}
             />
           )}
@@ -60,20 +60,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all cursor-pointer relative py-1 ${
             currentTab === 'earn'
               ? isDarkTheme
-                ? 'text-emerald-400 font-black'
-                : 'text-teal-700 font-black'
+                ? 'text-cyan-400 font-black'
+                : 'text-blue-600 font-black'
               : isDarkTheme
               ? 'text-slate-400 hover:text-slate-200 font-medium'
               : 'text-slate-500 hover:text-slate-800 font-medium'
           }`}
           aria-label="Earn"
         >
-          <Sparkles size={22} strokeWidth={currentTab === 'earn' ? 2.5 : 2} />
+          <Layers size={22} className={currentTab === 'earn' ? 'text-cyan-400' : ''} strokeWidth={currentTab === 'earn' ? 2.5 : 2} />
           <span className="text-xs tracking-tight whitespace-nowrap leading-none">Earn</span>
           {currentTab === 'earn' && (
             <span
               className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
-                isDarkTheme ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-teal-700'
+                isDarkTheme ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'bg-blue-600'
               }`}
             />
           )}

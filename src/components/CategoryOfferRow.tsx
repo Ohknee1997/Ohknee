@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { CompactOfferCard } from './CompactOfferCard';
 import { initialsOf } from '../utils';
@@ -17,6 +17,7 @@ interface CategoryOfferRowProps {
   title: string;
   icon?: React.ReactNode;
   subtitle?: string;
+  themeRgb?: string;
   offers: EnrichedOffer[];
   savedOfferIds: Set<string>;
   onSelectOffer: (offer: EnrichedOffer) => void;
@@ -33,6 +34,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
   title,
   icon,
   subtitle,
+  themeRgb,
   offers,
   savedOfferIds,
   onSelectOffer,
@@ -50,6 +52,37 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
   const [isFullGridView, setIsFullGridView] = useState(false);
 
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic category theme color based on average color of the apps in that folder
+  const catRgb = useMemo(() => {
+    if (themeRgb) return themeRgb;
+    if (!offers || offers.length === 0) return '99, 102, 241';
+    let tr = 0, tg = 0, tb = 0, count = 0;
+    for (const o of offers) {
+      if (o.accentRgb) {
+        const parts = o.accentRgb.split(',').map((s) => parseInt(s.trim(), 10));
+        if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+          tr += parts[0];
+          tg += parts[1];
+          tb += parts[2];
+          count++;
+        }
+      }
+    }
+    if (count === 0) return '99, 102, 241';
+    let r = Math.round(tr / count);
+    let g = Math.round(tg / count);
+    let b = Math.round(tb / count);
+
+    // Filter out plain green dominance per user instruction:
+    // "I don't like the color green on the second page on the earn tub go ahead and do some more color matching over there as well based on the average color of the apps that are in that folder category."
+    if (g > r && g > b) {
+      b = Math.min(255, Math.max(b, 190));
+      g = Math.min(150, g);
+      r = Math.max(r, 65);
+    }
+    return `${r}, ${g}, ${b}`;
+  }, [offers, themeRgb]);
 
   if (offers.length === 0) return null;
 
@@ -105,17 +138,19 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
           <button
             type="button"
             onClick={handleToggle}
-            className="flex items-center gap-1.5 text-white hover:text-emerald-300 transition-colors font-black tracking-tight text-sm sm:text-base cursor-pointer group"
+            className="flex items-center gap-1.5 text-white transition-colors font-black tracking-tight text-sm sm:text-base cursor-pointer group"
           >
-            <span className="text-emerald-400 group-hover:scale-110 transition-transform">
+            <span
+              style={{ color: `rgb(${catRgb})` }}
+              className="group-hover:scale-110 transition-transform"
+            >
               {icon}
             </span>
             <span className="tracking-tight">{title}</span>
             <ChevronDown
               size={16}
-              className={`text-emerald-400 group-hover:text-emerald-300 transition-transform ${
-                isOpen ? 'rotate-0' : '-rotate-90'
-              }`}
+              style={{ color: `rgb(${catRgb})` }}
+              className={`transition-transform ${isOpen ? 'rotate-0' : '-rotate-90'}`}
             />
           </button>
 
@@ -126,20 +161,24 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 type="button"
                 onClick={() => setShowSearch((s) => !s)}
                 title="Search this row"
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  showSearch || searchQuery
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400'
-                }`}
+                style={{
+                  backgroundColor: showSearch || searchQuery ? `rgb(${catRgb})` : `rgba(${catRgb}, 0.15)`,
+                  color: showSearch || searchQuery ? '#fff' : `rgb(${catRgb})`,
+                  borderColor: `rgba(${catRgb}, 0.3)`,
+                }}
+                className="p-1.5 rounded-lg border transition-colors cursor-pointer"
               >
-                <Search size={13} className="text-emerald-300" />
+                <Search size={13} />
               </button>
             </div>
           )}
 
           {/* Inline Search Input */}
           {isOpen && showSearch && (
-            <div className="flex items-center gap-1 bg-[#131622] border border-emerald-500/50 rounded-xl px-2 py-0.5 text-xs animate-in fade-in duration-150">
+            <div
+              style={{ borderColor: `rgba(${catRgb}, 0.6)` }}
+              className="flex items-center gap-1 bg-[#131622] border rounded-xl px-2 py-0.5 text-xs animate-in fade-in duration-150"
+            >
               <input
                 type="text"
                 value={searchQuery}
@@ -167,7 +206,8 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={scrollLeft}
-              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-emerald-400 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
+              style={{ color: `rgb(${catRgb})` }}
+              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
               title="Previous offers"
             >
               <ChevronLeft size={15} />
@@ -175,7 +215,8 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={scrollRight}
-              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center text-emerald-400 hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
+              style={{ color: `rgb(${catRgb})` }}
+              className="w-7 h-7 rounded-lg bg-[#151926] border border-[#23293b] flex items-center justify-center hover:text-white hover:bg-[#1e2436] transition-colors cursor-pointer"
               title="Next offers"
             >
               <ChevronRight size={15} />
@@ -183,7 +224,8 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
             <button
               type="button"
               onClick={handleToggle}
-              className="text-xs font-bold text-slate-400 hover:text-emerald-300 transition-colors ml-1 px-2 py-1 rounded-lg hover:bg-[#151926] cursor-pointer"
+              style={{ color: `rgb(${catRgb})` }}
+              className="text-xs font-bold transition-colors ml-1 px-2 py-1 rounded-lg hover:bg-[#151926] cursor-pointer"
             >
               Hide row
             </button>
@@ -203,7 +245,11 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
               handleToggle();
             }
           }}
-          className="w-full bg-[#131620] hover:bg-[#161a28] border border-[#22283a] hover:border-emerald-500/50 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group"
+          style={{
+            borderColor: `rgba(${catRgb}, 0.28)`,
+            backgroundColor: `rgba(${catRgb}, 0.05)`,
+          }}
+          className="w-full hover:bg-[#161a28] border rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer transition-all duration-200 shadow-sm group"
         >
           {/* Left: Overlapping real referral logos + hidden count */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -235,7 +281,10 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                         }}
                       />
                     ) : (
-                      <span className="text-[9px] font-black text-emerald-400">
+                      <span
+                        style={{ color: `rgb(${catRgb})` }}
+                        className="text-[9px] font-black"
+                      >
                         {initialsOf(offer.name)}
                       </span>
                     )}
@@ -251,7 +300,10 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
           </div>
 
           {/* Right: Show row button */}
-          <span className="text-xs sm:text-sm font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1">
+          <span
+            style={{ color: `rgb(${catRgb})` }}
+            className="text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 group-hover:brightness-125"
+          >
             Show row
           </span>
         </div>
@@ -268,7 +320,8 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsFullGridView(false)}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 font-bold cursor-pointer"
+                  style={{ color: `rgb(${catRgb})` }}
+                  className="text-xs font-bold cursor-pointer hover:underline"
                 >
                   Switch to Carousel ‹ ›
                 </button>
@@ -306,7 +359,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 </div>
               ))}
 
-              {/* Green "View More" Card (Gemsloot GUI) */}
+              {/* Theme-Matched "View More" Card (No Green!) */}
               <div
                 onClick={() => setIsFullGridView(true)}
                 role="button"
@@ -317,8 +370,13 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                     setIsFullGridView(true);
                   }
                 }}
-                style={{ scrollSnapAlign: 'start' }}
-                className={`group flex-shrink-0 cursor-pointer rounded-2xl bg-gradient-to-b from-[#059669] to-[#047857] border border-emerald-400/40 p-3 flex flex-col items-center justify-center text-center text-white shadow-lg shadow-emerald-950/50 hover:scale-[1.02] transition-transform select-none ${
+                style={{
+                  scrollSnapAlign: 'start',
+                  background: `linear-gradient(145deg, rgba(${catRgb}, 0.90) 0%, rgba(${catRgb}, 0.65) 100%)`,
+                  borderColor: `rgba(${catRgb}, 0.75)`,
+                  boxShadow: `0 8px 24px -4px rgba(${catRgb}, 0.4)`,
+                }}
+                className={`group flex-shrink-0 cursor-pointer rounded-2xl border p-3 flex flex-col items-center justify-center text-center text-white hover:scale-[1.02] transition-transform select-none ${
                   isSingleFrame
                     ? 'w-[150px] sm:w-[165px] h-[215px] sm:h-[225px]'
                     : 'w-[170px] sm:w-[185px] h-[245px] sm:h-[255px]'
@@ -330,7 +388,7 @@ export const CategoryOfferRow: React.FC<CategoryOfferRowProps> = ({
                 <span className="text-sm sm:text-base font-black tracking-tight leading-tight">
                   View More
                 </span>
-                <span className="text-[10.5px] font-bold text-emerald-100/90 mt-0.5">
+                <span className="text-[10.5px] font-bold text-white/90 mt-0.5">
                   +{offers.length} Offers
                 </span>
                 <div className="mt-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shadow-xs group-hover:bg-white/30 transition-colors">

@@ -156,6 +156,9 @@ export const CardItem: React.FC<CardItemProps> = ({
           '--accent': card.customColor
             ? card.accentRgb
             : card.accentRgb || '59, 130, 246',
+          backgroundColor: `rgba(${card.accentRgb || '59, 130, 246'}, 0.12)`,
+          borderColor: `rgba(${card.accentRgb || '59, 130, 246'}, 0.35)`,
+          boxShadow: `0 4px 14px -3px rgba(${card.accentRgb || '59, 130, 246'}, 0.25)`,
         } as React.CSSProperties
       }
       draggable={isEditing}

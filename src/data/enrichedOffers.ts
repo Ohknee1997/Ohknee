@@ -108,6 +108,8 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('sportzino') ||
     name.includes('fliff') ||
     name.includes('sleeper') ||
+    name.includes('rebet') ||
+    name.includes('onyx') ||
     name.includes('betting') ||
     name.includes('draftkings') ||
     name.includes('fanduel') ||
@@ -205,6 +207,7 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('prizepicks') ||
     name.includes('sportzino') ||
     name.includes('coin wizard') ||
+    name.includes('rip') ||
     name.includes('myappfree')
   ) {
     categories.push('play-to-earn');
@@ -221,7 +224,9 @@ export function enrichCard(card: CardData): EnrichedOffer {
 
   // Compute clean display reward
   let rewardDisplay = card.payout || '$25 Bonus';
-  if (card.payout?.includes('$')) {
+  if (card.payout === '100' || card.payout === '150' || card.payout?.toLowerCase().includes('free card')) {
+    rewardDisplay = card.payout;
+  } else if (card.payout?.includes('$')) {
     rewardDisplay = card.payout;
   } else if (card.payoutTag) {
     rewardDisplay = `${card.payoutTag} ${card.payout ? `• ${card.payout}` : ''}`;

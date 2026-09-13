@@ -18,6 +18,7 @@ import {
   saveToStorage,
   STORE_CARDS,
   STORE_DETAIL,
+  getAppDeduplicationKey,
 } from './utils';
 import { trackPageView, startPresenceTracking } from './utils/trafficTracker';
 
@@ -41,18 +42,17 @@ import { HowItWorksModal } from './components/HowItWorksModal';
 import { InboxModal } from './components/InboxModal';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
 
-// Icons
+// Original Icons - Replacing generic clichés
 import {
-  Zap,
-  Coins,
-  Gift,
-  Sparkles,
-  Trophy,
+  Dice5,
+  Swords,
+  Boxes,
+  Rocket,
+  Vault,
   BarChart2,
   Lock,
   User,
   Star,
-  Landmark,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -61,7 +61,6 @@ const ALL_CATEGORY_ROW_IDS = [
   'row-online-casinos',
   'row-sports-betting',
   'row-free-crypto',
-  'row-featured',
   'row-fast-offers',
   'row-finance',
 ];
@@ -273,6 +272,14 @@ export default function App() {
       o.id === 'fast-draftkings' || o.name.toLowerCase().includes('draftkings');
     const isTilt = (o: EnrichedOffer) =>
       o.id === 'fast-tilt' || o.id === 'ref-tilt' || o.name.toLowerCase() === 'tilt' || o.name.toLowerCase().includes('tilt');
+    const isReBet = (o: EnrichedOffer) =>
+      o.id === 'fast-rebet' || o.id === 'ref-rebet' || o.name.toLowerCase().includes('rebet');
+    const isOnyx = (o: EnrichedOffer) =>
+      o.id === 'fast-onyx' || o.id === 'ref-onyx' || o.name.toLowerCase().includes('onyx');
+    const isRips = (o: EnrichedOffer) =>
+      o.id === 'fast-rips' || o.id === 'ref-rips' || (o.name.toLowerCase().includes('rip') && !o.name.toLowerCase().includes('rush') && !o.id.includes('riprush'));
+    const isRipRush = (o: EnrichedOffer) =>
+      o.id === 'fast-riprush' || o.id === 'ref-riprush' || o.name.toLowerCase().includes('rip rush') || o.name.toLowerCase().includes('riprush');
     const isKalshi = (o: EnrichedOffer) =>
       o.id === 'fast-kalshi' || o.name.toLowerCase().includes('kalshi');
     const isCoinbase = (o: EnrichedOffer) =>
@@ -285,10 +292,8 @@ export default function App() {
       o.id === '13' || o.name.toLowerCase().includes('modo');
     const isMyPrize = (o: EnrichedOffer) =>
       o.id === '15' || o.name.toLowerCase().includes('myprize') || o.name.toLowerCase().includes('my prize');
-    const isZula = (o: EnrichedOffer) =>
-      o.id === '30' || o.name.toLowerCase().includes('zula');
-    const isCoinsBack = (o: EnrichedOffer) =>
-      o.id === 'cash-back-1' || o.name.toLowerCase().includes('coins back') || o.name.toLowerCase().includes('coinsback') || o.name.toLowerCase().includes('shopback');
+    const isRealPrize = (o: EnrichedOffer) =>
+      o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
 
     const orderedFinders = [
       isStake,        // 1
@@ -297,14 +302,17 @@ export default function App() {
       isPolymarket,   // 4
       isDraftKings,   // 5
       isTilt,         // 6
-      isKalshi,       // 7
-      isCoinbase,     // 8
-      isCrownCoins,   // 9
-      isLonestar,     // 10
-      isModo,         // 11
-      isMyPrize,      // 12
-      isZula,         // 13
-      isCoinsBack,    // 14
+      isReBet,        // 7
+      isOnyx,         // 8
+      isRips,         // 9
+      isRipRush,      // 10
+      isKalshi,       // 11
+      isCoinbase,     // 12
+      isCrownCoins,   // 13
+      isLonestar,     // 14
+      isModo,         // 15
+      isMyPrize,      // 16
+      isRealPrize,    // 17
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -318,93 +326,209 @@ export default function App() {
       }
     }
 
-    const remainingOffers = allOffers
-      .filter((o) => !usedIds.has(o.id))
-      .sort((a, b) => {
-        const orderA = a.orderNumber !== undefined ? a.orderNumber : 999;
-        const orderB = b.orderNumber !== undefined ? b.orderNumber : 999;
-        if (orderA !== orderB) return orderA - orderB;
+    const restList = allOffers.filter((o) => !usedIds.has(o.id));
 
-        const getVal = (p?: string, v?: number) => {
-          if (v && v > 0) return v;
-          const match = p?.match(/\$(\d+)/);
-          return match ? parseInt(match[1], 10) : 10;
-        };
-        return getVal(b.payout, b.rewardValue) - getVal(a.payout, a.rewardValue);
-      });
+    const isCasino = (o: EnrichedOffer) => {
+      if (o.tabId === 'casino-codes') return true;
+      const n = o.name.toLowerCase();
+      const d = (o.domain || '').toLowerCase();
+      const c = (o.categories || []).map((x) => x.toLowerCase());
+      if (c.includes('sweepstakes') || c.includes('bonuses-promos')) return true;
+      if (
+        n.includes('casino') ||
+        n.includes('slots') ||
+        n.includes('sweeps') ||
+        d.includes('casino') ||
+        d.includes('slots')
+      ) {
+        return true;
+      }
+      return false;
+    };
 
-    return [...orderedOffers, ...remainingOffers].slice(0, 13);
+    const nonCasinoPriorityFinders = [
+      (o: EnrichedOffer) => o.id === 'fast-onepay' || o.name.toLowerCase().includes('onepay') || o.name.toLowerCase().includes('one pay'),
+      (o: EnrichedOffer) => o.id === 'cash-back-1' || o.name.toLowerCase().includes('coins back') || o.name.toLowerCase().includes('coinsback') || o.name.toLowerCase().includes('shopback'),
+      (o: EnrichedOffer) => o.id === 'banking-1' || o.name.toLowerCase().includes('sofi'),
+      (o: EnrichedOffer) => o.id === 'banking-2' || o.name.toLowerCase().includes('aven'),
+      (o: EnrichedOffer) => o.id === 'banking-3' || o.name.toLowerCase().includes('sendwave'),
+      (o: EnrichedOffer) => o.id === 'banking-4' || o.name.toLowerCase().includes('self'),
+      (o: EnrichedOffer) => o.id === 'finance-robinhood' || o.name.toLowerCase().includes('robinhood'),
+      (o: EnrichedOffer) => o.id === 'finance-webull' || o.name.toLowerCase().includes('webull'),
+      (o: EnrichedOffer) => o.id === 'finance-moneylion' || o.name.toLowerCase().includes('moneylion'),
+      (o: EnrichedOffer) => o.id === 'finance-ava' || o.name.toLowerCase().includes('meetava') || o.name.toLowerCase() === 'ava',
+      (o: EnrichedOffer) => o.id === 'sports-dabble' || o.name.toLowerCase().includes('dabble'),
+      (o: EnrichedOffer) => o.id === 'sports-underdog' || o.name.toLowerCase().includes('underdog'),
+      (o: EnrichedOffer) => o.id === 'sports-prizepicks' || o.name.toLowerCase().includes('prizepicks'),
+      (o: EnrichedOffer) => o.id === 'sports-sportzino' || o.name.toLowerCase().includes('sportzino'),
+      (o: EnrichedOffer) => o.id === 'sports-fliff' || o.name.toLowerCase().includes('fliff'),
+      (o: EnrichedOffer) => o.id === 'sports-sleeper' || o.name.toLowerCase().includes('sleeper'),
+      (o: EnrichedOffer) => o.id === 'crypto-kraken' || o.name.toLowerCase().includes('kraken'),
+      (o: EnrichedOffer) => o.id === 'crypto-gemini' || o.name.toLowerCase().includes('gemini'),
+      (o: EnrichedOffer) => o.id === 'crypto-bydfi' || o.name.toLowerCase().includes('bydfi'),
+      (o: EnrichedOffer) => o.id === 'crypto-koinly' || o.name.toLowerCase().includes('koinly'),
+      (o: EnrichedOffer) => o.id === 'cash-back-fetch' || o.name.toLowerCase().includes('fetch'),
+      (o: EnrichedOffer) => o.id === 'cash-back-debbie' || o.name.toLowerCase().includes('debbie'),
+      (o: EnrichedOffer) => o.id === 'cash-back-joko' || o.name.toLowerCase().includes('joko'),
+      (o: EnrichedOffer) => o.id === 'cash-back-snaplii' || o.name.toLowerCase().includes('snaplii'),
+      (o: EnrichedOffer) => o.id === 'cash-back-franki' || o.name.toLowerCase().includes('franki'),
+      (o: EnrichedOffer) => o.id === 'cash-back-myappfree' || o.name.toLowerCase().includes('myappfree'),
+    ];
+
+    const nonCasinoPriorityOffers: EnrichedOffer[] = [];
+    for (const finder of nonCasinoPriorityFinders) {
+      const match = restList.find((o) => !usedIds.has(o.id) && finder(o));
+      if (match) {
+        nonCasinoPriorityOffers.push(match);
+        usedIds.add(match.id);
+      }
+    }
+
+    const remainingUnassigned = restList.filter((o) => !usedIds.has(o.id));
+    const remainingNonCasino: EnrichedOffer[] = [];
+    const remainingCasinos: EnrichedOffer[] = [];
+
+    for (const item of remainingUnassigned) {
+      if (isCasino(item)) {
+        remainingCasinos.push(item);
+      } else {
+        remainingNonCasino.push(item);
+      }
+    }
+
+    // User requested: "only one app on my top 10 page if there is a repeating app remove it starting from the bottom up so that they stay in the correct order that they are in at the moment."
+    const combined = [
+      ...orderedOffers,
+      ...nonCasinoPriorityOffers,
+      ...remainingNonCasino,
+      ...remainingCasinos,
+    ];
+    const deduplicatedTop: EnrichedOffer[] = [];
+    const seenTopKeys = new Set<string>();
+
+    for (const o of combined) {
+      const appKey = getAppDeduplicationKey(o);
+      if (!seenTopKeys.has(appKey)) {
+        seenTopKeys.add(appKey);
+        deduplicatedTop.push(o);
+      }
+    }
+
+    return deduplicatedTop;
   }, [allOffers]);
 
-  // 1. ONLINE CASINO FREE SPINS (formerly Sweepstakes)
-  const onlineCasinoOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('sweepstakes') ||
-          o.categories.includes('puzzles') ||
-          o.categories.includes('casino') ||
-          o.tabId === 'casino-codes' ||
-          ['casino-realprize', 'casino-chanced', 'casino-crowncoins', 'casino-spree', 'casino-high5', 'casino-pulsz', 'casino-mcluck', 'casino-fortunecoins'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
+  // User requested: "On the second page the earn tab I also do not want any repeating apps find a spot for it according to its name and description"
+  const {
+    onlineCasinoOffers,
+    sportsBettingOffers,
+    cryptoOffers,
+    fastOffers,
+    financeOffers,
+  } = useMemo(() => {
+    // 1. Gather all unique apps across filteredOffers using canonical app keys
+    const seenAppKeys = new Set<string>();
+    const uniqueList: EnrichedOffer[] = [];
 
-  // 2. SPORTS BETTING APPS
-  const sportsBettingOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('sports-betting') ||
-          o.categories.includes('sports') ||
-          o.categories.includes('betting') ||
-          ['ref-sportzino', 'ref-fliff', 'ref-sleeper', 'fast-kalshi', 'ref-dabble', 'fast-draftkings', 'ref-draftkings'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
+    for (const o of filteredOffers) {
+      const appKey = getAppDeduplicationKey(o);
+      if (!seenAppKeys.has(appKey)) {
+        seenAppKeys.add(appKey);
+        uniqueList.push(o);
+      }
+    }
 
-  // 3. FREE CRYPTO
-  const cryptoOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('crypto') ||
-          ['fast-coinbase', 'free-koinly', 'free-bydfi', 'free-kraken', 'ref-gemini', 'ref-webull', 'fast-polymarket', 'ref-polymarket'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
+    // 2. Classify each unique app into its single best category spot according to its name and description
+    function getCategoryForOffer(o: EnrichedOffer): 'casino' | 'sports' | 'crypto' | 'finance' | 'fast' {
+      const k = getAppDeduplicationKey(o);
+      const name = o.name.toLowerCase();
+      const desc = `${o.instructionSub || ''} ${o.descriptionText || ''} ${o.payoutTag || ''} ${o.payout || ''}`.toLowerCase();
+      const cats = o.categories.map((c) => c.toLowerCase());
 
-  // 4. FEATURED
-  const featuredOffers = useMemo(() => {
-    return filteredOffers.filter(
-      (o) =>
-        o.isFeatured ||
-        o.categories.includes('featured') ||
-        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-polymarket', 'fast-draftkings', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
-    );
-  }, [filteredOffers]);
+      // Sports Betting & Prediction Markets
+      if (
+        ['sportzino', 'fliff', 'sleeper', 'dabble', 'underdog', 'prizepicks', 'draftkings', 'kalshi', 'polymarket', 'rebet', 'onyx'].includes(k) ||
+        cats.includes('sports-betting') ||
+        cats.includes('sports') ||
+        cats.includes('betting') ||
+        desc.includes('sportsbook') ||
+        desc.includes('dfs') ||
+        desc.includes('event contract') ||
+        desc.includes('prediction market') ||
+        name.includes('sportsbook')
+      ) {
+        return 'sports';
+      }
 
-  // 5. FAST OFFERS
-  const fastOffers = useMemo(() => {
-    return filteredOffers
-      .filter(
-        (o) =>
-          o.categories.includes('fast-easy') ||
-          o.categories.includes('signup-trial') ||
-          o.tabId === 'fast-easy-money' ||
-          ['free-metawin', 'free-debbie', 'free-myappfree', 'free-fetch', 'free-joko', 'free-shopback', 'free-snaplii', 'free-franki'].includes(o.id)
-      )
-      .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
-  }, [filteredOffers]);
+      // Crypto Exchanges, Wallets & Web3
+      if (
+        ['coinbase', 'kraken', 'gemini', 'bydfi', 'koinly', 'metawin'].includes(k) ||
+        cats.includes('crypto') ||
+        name.includes('crypto') ||
+        desc.includes('bitcoin') ||
+        desc.includes('crypto exchange') ||
+        desc.includes('crypto debit') ||
+        desc.includes('airdrop')
+      ) {
+        return 'crypto';
+      }
 
-  // 6. FINANCE
-  const financeOffers = useMemo(() => {
-    return filteredOffers.filter(
-      (o) =>
-        o.categories.includes('finance') ||
-        o.categories.includes('banking') ||
-        ['free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion', 'fast-polymarket', 'ref-polymarket'].includes(o.id)
-    );
+      // Finance, Banking, Credit & Stocks
+      if (
+        ['sofi', 'robinhood', 'onepay', 'aven', 'sendwave', 'moneylion', 'self', 'meetava', 'webull'].includes(k) ||
+        cats.includes('banking') ||
+        cats.includes('finance') ||
+        name.includes('bank') ||
+        desc.includes('checking') ||
+        desc.includes('savings') ||
+        desc.includes('credit card') ||
+        desc.includes('credit line') ||
+        desc.includes('high-yield') ||
+        desc.includes('stocks')
+      ) {
+        return 'finance';
+      }
+
+      // Fast Tasks, Cashback, Receipts & Instant Rewards
+      if (
+        ['freecash', 'gemsloot', 'tilt', 'coinsback', 'fetch', 'debbie', 'joko', 'snaplii', 'franki', 'myappfree', 'rips', 'riprush'].includes(k) ||
+        cats.includes('fast-easy') ||
+        cats.includes('signup-trial') ||
+        o.tabId === 'fast-easy-money' ||
+        desc.includes('cashback') ||
+        desc.includes('cash back') ||
+        desc.includes('receipt') ||
+        desc.includes('tasks') ||
+        desc.includes('card pack')
+      ) {
+        return 'fast';
+      }
+
+      // Casino, Slots & Sweepstakes
+      return 'casino';
+    }
+
+    const casino: EnrichedOffer[] = [];
+    const sports: EnrichedOffer[] = [];
+    const crypto: EnrichedOffer[] = [];
+    const fast: EnrichedOffer[] = [];
+    const finance: EnrichedOffer[] = [];
+
+    for (const o of uniqueList) {
+      const cat = getCategoryForOffer(o);
+      if (cat === 'sports') sports.push(o);
+      else if (cat === 'crypto') crypto.push(o);
+      else if (cat === 'finance') finance.push(o);
+      else if (cat === 'fast') fast.push(o);
+      else casino.push(o);
+    }
+
+    return {
+      onlineCasinoOffers: casino,
+      sportsBettingOffers: sports,
+      cryptoOffers: crypto,
+      fastOffers: fast,
+      financeOffers: finance,
+    };
   }, [filteredOffers]);
 
   // Jump from mobile navigation
@@ -483,14 +607,15 @@ export default function App() {
               id="offers-explorer-section"
               className="flex-1 w-full bg-[#0d0f15] text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 select-none min-h-screen overflow-y-auto pb-28 md:pb-20"
             >
-              {/* THE 6 CATEGORY ROWS */}
+              {/* THE 5 DEDICATED CATEGORY ROWS (ZERO DUPLICATES - EVERY APP HAS ONE HOME) */}
               <div className="w-full space-y-3 sm:space-y-4">
-                {/* 1. ONLINE CASINO FREE SPINS (TOP ROW) */}
+                {/* 1. ONLINE CASINO FREE SPINS */}
                 <CategoryOfferRow
                   id="row-online-casinos"
                   title="ONLINE CASINO FREE SPINS"
                   subtitle="Daily free SC coins, free spins, sweepstakes casinos & prize wheels"
-                  icon={<Gift size={20} className="stroke-[2.2] text-emerald-400" />}
+                  icon={<Dice5 size={20} className="stroke-[2.2]" />}
+                  themeRgb="245, 158, 11"
                   offers={onlineCasinoOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-online-casinos')}
@@ -503,8 +628,9 @@ export default function App() {
                 <CategoryOfferRow
                   id="row-sports-betting"
                   title="Sports Betting Apps"
-                  subtitle="Top sportsbooks, DFS picks, match deposits & risk-free entries"
-                  icon={<Trophy size={20} className="stroke-[2.2] text-emerald-400" />}
+                  subtitle="Top sportsbooks, DFS picks, match deposits & risk-free prediction entries"
+                  icon={<Swords size={20} className="stroke-[2.2]" />}
+                  themeRgb="59, 130, 246"
                   offers={sportsBettingOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-sports-betting')}
@@ -518,7 +644,8 @@ export default function App() {
                   id="row-free-crypto"
                   title="Free Crypto"
                   subtitle="Free Bitcoin bonuses, exchange sign-ups, crypto debit cards & airdrops"
-                  icon={<Coins size={20} className="stroke-[2.2] text-emerald-400" />}
+                  icon={<Boxes size={20} className="stroke-[2.2]" />}
+                  themeRgb="147, 51, 234"
                   offers={cryptoOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-free-crypto')}
@@ -527,26 +654,13 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 4. FEATURED OFFERS */}
-                <CategoryOfferRow
-                  id="row-featured"
-                  title="Featured"
-                  subtitle="Top verified rewards with instant claim access"
-                  icon={<Sparkles size={20} className="stroke-[2.2] text-emerald-400" />}
-                  offers={featuredOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-featured')}
-                  onToggleOpen={() => handleToggleRow('row-featured')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
-
-                {/* 5. FAST OFFERS */}
+                {/* 4. FAST OFFERS */}
                 <CategoryOfferRow
                   id="row-fast-offers"
                   title="Fast Offers"
                   subtitle="$100 - $150 sequential easy cash & instant tasks"
-                  icon={<Zap size={20} className="stroke-[2.2] text-emerald-400" />}
+                  icon={<Rocket size={20} className="stroke-[2.2]" />}
+                  themeRgb="249, 115, 22"
                   offers={fastOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-fast-offers')}
@@ -555,12 +669,13 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 6. FINANCE */}
+                {/* 5. FINANCE */}
                 <CategoryOfferRow
                   id="row-finance"
                   title="Finance"
                   subtitle="Banking, high-yield accounts, and high-value credit booster rewards"
-                  icon={<Landmark size={20} className="stroke-[2.2] text-emerald-400" />}
+                  icon={<Vault size={20} className="stroke-[2.2]" />}
+                  themeRgb="14, 165, 233"
                   offers={financeOffers}
                   savedOfferIds={savedOfferIds}
                   isOpen={openRowIds.has('row-finance')}
