@@ -30,7 +30,7 @@
       id: 'fast-gemsloot',
       name: 'Gemsloot',
       domain: 'gemsloot.com',
-      payout: '24 Free Spins / Bonus',
+      payout: '$35 Bonus',
       payoutTag: 'FREE START',
       code: 'ohknee',
       signupUrl: 'https://gemsloot.com/?aff=ohknee',
@@ -61,15 +61,48 @@
       ]
     },
     {
+      id: 'fast-polymarket',
+      name: 'Polymarket',
+      domain: 'polymarket.com',
+      payout: '$60 Bonus',
+      payoutTag: 'TOP SQUAD',
+      code: 'MOPEYDINGO1343',
+      signupUrl: 'https://polymarket.us/squad/join/GHnKEKR4w2METrhVrP26?referrer=mopeydingo1343',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 4,
+      showStarsTopper: true,
+      note: 'Join my squad on Polymarket. Use code MOPEYDINGO1343 when signing up for $60.',
+      images: [
+        'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'fast-draftkings',
+      name: 'DraftKings',
+      domain: 'draftkings.com',
+      payout: '$200 Bonus',
+      payoutTag: 'POPULAR',
+      signupUrl: 'https://predictions.draftkings.com/r/pd/oh_knee/US-TX-SA/US-TX',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 5,
+      showStarsTopper: true,
+      note: 'Sign up and make predictions on sports & events with fast $200 bonus cashouts.',
+      images: [
+        'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
       id: 'fast-kalshi',
       name: 'Kalshi',
       domain: 'kalshi.com',
-      payout: '$25–$100 Fast',
+      payout: '$50 Bonus',
       payoutTag: 'TOP PICK',
       signupUrl: 'https://kalshi.com',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
-      orderNumber: 4,
+      orderNumber: 6,
       showStarsTopper: true,
       note: 'Regulated prediction marketplace. Sign up and fund $100 to receive instant trade credits. Trade high-probability contracts to lock in profit.',
       images: [
@@ -80,14 +113,14 @@
       id: 'fast-coinbase',
       name: 'Coinbase',
       domain: 'coinbase.com',
-      payout: '$30–$100 Crypto',
+      payout: '$10–$75 Crypto',
       payoutTag: 'EASY FAST',
       signupUrl: 'https://www.coinbase.com',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
-      orderNumber: 5,
+      orderNumber: 7,
       showStarsTopper: true,
-      note: 'Coinbase Learn & Earn quizzes give you $30–$50 in crypto within 15 minutes. Take each 1-minute quiz and convert all rewards into USDC or cash out instantly.',
+      note: 'Coinbase Learn & Earn quizzes give you $10–$75 in crypto within 15 minutes. Take each 1-minute quiz and convert all rewards into USDC or cash out instantly.',
       images: [
         'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop&q=80'
       ]
@@ -264,6 +297,29 @@
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
       note: 'Receive $100 free cash bonus after your first qualifying direct deposit of $200+ within 45 days.'
+    },
+    {
+      id: 'ref-polymarket',
+      name: 'Polymarket',
+      domain: 'polymarket.com',
+      payout: '$60 Bonus',
+      payoutTag: 'FREE START',
+      code: 'MOPEYDINGO1343',
+      signupUrl: 'https://polymarket.us/squad/join/GHnKEKR4w2METrhVrP26?referrer=mopeydingo1343',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Join my squad on Polymarket. Use code MOPEYDINGO1343 when signing up for $60.'
+    },
+    {
+      id: 'ref-draftkings',
+      name: 'DraftKings Predictions',
+      domain: 'draftkings.com',
+      payout: '$200 Bonus',
+      payoutTag: 'FREE START',
+      signupUrl: 'https://predictions.draftkings.com/r/pd/oh_knee/US-TX-SA/US-TX',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Sign up and make predictions on sports & events with fast $200 bonus cashouts.'
     }
   ];
 

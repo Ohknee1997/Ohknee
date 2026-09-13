@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { initialsOf } from '../utils';
+import { Copy, Check } from 'lucide-react';
 
 interface CompactOfferCardProps {
   offer: EnrichedOffer;
@@ -18,6 +19,15 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
   isCompact = false,
 }) => {
   const [imgError, setImgError] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!offer.code) return;
+    navigator.clipboard.writeText(offer.code).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Derive high-resolution logo source
   const rawLogoSrc =
@@ -28,9 +38,13 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
 
   const logoSrc = imgError ? undefined : rawLogoSrc;
 
-  // Format the payout number cleanly (e.g. $ 25.00 or $ 250.00)
+  // Format the payout number cleanly (e.g. $ 25.00 or $ 10–$ 75)
   const formatPayoutDisplay = (text?: string, value?: number) => {
     if (!text && !value) return { prefix: '$', amount: '25.00' };
+    const rangeMatch = text?.match(/\$?(\d+)\s*[-–]\s*\$?(\d+)/);
+    if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
+      return { prefix: '$', amount: `${rangeMatch[1]}–$${rangeMatch[2]}` };
+    }
     const numMatch = text?.match(/\$?(\d+(\.\d+)?)/);
     if (numMatch && numMatch[1]) {
       const num = parseFloat(numMatch[1]);
@@ -89,8 +103,43 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
         )}
       </div>
 
+      {/* Code button underneath image - fully visible & click-to-copy */}
+      {offer.code && (
+        <button
+          type="button"
+          onClick={handleCopyCode}
+          title="Click to copy promo code"
+          aria-label={`Copy code ${offer.code}`}
+          className={`mt-1.5 w-full flex items-center justify-between gap-1 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+            copied
+              ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+              : 'bg-[#0f121d] hover:bg-[#181e30] border-emerald-500/40 hover:border-emerald-400 text-emerald-300'
+          }`}
+        >
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider flex-shrink-0">
+              CODE:
+            </span>
+            <span className="text-[11px] sm:text-xs font-mono font-black tracking-wide text-white truncate">
+              {offer.code}
+            </span>
+          </div>
+          {copied ? (
+            <span className="flex items-center gap-0.5 text-[9px] font-extrabold text-emerald-400 flex-shrink-0 bg-emerald-950/80 px-1 py-0.5 rounded border border-emerald-500/50">
+              <Check size={10} />
+              COPIED
+            </span>
+          ) : (
+            <span className="flex items-center gap-0.5 text-[9px] font-bold text-slate-400 group-hover:text-emerald-300 flex-shrink-0">
+              <Copy size={10} />
+              COPY
+            </span>
+          )}
+        </button>
+      )}
+
       {/* 2. TEXT INFORMATION (Gemsloot layout) */}
-      <div className="flex flex-col items-start text-left w-full min-w-0 pt-2 px-1">
+      <div className="flex flex-col items-start text-left w-full min-w-0 pt-1.5 px-1">
         {/* Offer Name */}
         <h4 className="w-full truncate text-xs sm:text-[13px] font-bold text-white group-hover:text-emerald-300 transition-colors leading-tight">
           {offer.name}

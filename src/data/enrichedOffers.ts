@@ -146,18 +146,19 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('gemini') ||
     name.includes('webull') ||
     name.includes('crypto') ||
+    name.includes('polymarket') ||
     id.includes('crypto')
   ) {
     categories.push('crypto');
     categories.push('finance');
-    if (name.includes('coinbase')) {
+    if (name.includes('coinbase') || name.includes('polymarket')) {
       isFeatured = true;
       categories.push('featured');
       badgeType = 'TOP PICK';
     }
   }
 
-  // 6. FINANCE (Ava, MoneyLion, Debbie, Self, Robinhood, Kalshi, etc.)
+  // 6. FINANCE (Ava, MoneyLion, Debbie, Self, Robinhood, Kalshi, Polymarket, etc.)
   if (
     name.includes('ava') ||
     name.includes('moneylion') ||
@@ -165,12 +166,13 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('self') ||
     name.includes('robinhood') ||
     name.includes('kalshi') ||
+    name.includes('polymarket') ||
     id.includes('finance')
   ) {
     if (!categories.includes('finance')) {
       categories.push('finance');
     }
-    if (name.includes('kalshi') || name.includes('moneylion')) {
+    if (name.includes('kalshi') || name.includes('moneylion') || name.includes('polymarket')) {
       isFeatured = true;
       categories.push('featured');
       badgeType = 'HOT';

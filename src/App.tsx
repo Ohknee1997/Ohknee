@@ -70,10 +70,38 @@ export default function App() {
   // Master offer collection with data enrichment
   const [allOffers, setAllOffers] = useState<EnrichedOffer[]>(() => {
     const savedCustomCards = getFromStorage<CardData[] | null>(STORE_CARDS, null);
+    const initialOffers = getAllEnrichedOffers();
     if (savedCustomCards && Array.isArray(savedCustomCards) && savedCustomCards.length > 0) {
-      return savedCustomCards.map(enrichCard);
+      const initialMap = new Map(initialOffers.map((o) => [o.id, o]));
+      const existingIds = new Set(savedCustomCards.map((c) => c.id));
+      const missingOffers = initialOffers.filter((o) => !existingIds.has(o.id));
+      // For key partner offers, ensure latest payout & instructions take precedence over stale localStorage cache
+      const updatedIds = new Set([
+        'fast-gemsloot',
+        'fast-polymarket',
+        'fast-draftkings',
+        'fast-tilt',
+        'fast-kalshi',
+        'fast-coinbase',
+        '4', // Crown Coins
+        '10', // Lonestar
+        '13', // Modo
+        '15', // MyPrize
+        '30', // Zula
+        'cash-back-1', // CoinsBack / ShopBack
+        'ref-polymarket',
+        'ref-draftkings',
+      ]);
+      const merged = savedCustomCards.map((c) => {
+        const canonical = initialMap.get(c.id);
+        if (canonical && updatedIds.has(c.id)) {
+          return enrichCard({ ...c, payout: canonical.payout, instructionSub: canonical.instructionSub });
+        }
+        return enrichCard(c);
+      });
+      return [...merged, ...missingOffers];
     }
-    return getAllEnrichedOffers();
+    return initialOffers;
   });
 
   // Secret sauce details
@@ -229,23 +257,69 @@ export default function App() {
   }, [allOffers, searchQuery, selectedPlatform, selectedCategory, selectedSort]);
 
   const top10Offers = useMemo(() => {
-    // Strictly lock: #1 Stake, #2 Freecash, #3 Gemsloot
+    // Strictly lock top offers in requested exact order:
+    // #1 Stake, #2 Freecash, #3 Gemsloot, #4 Polymarket, #5 DraftKings
+    // #6 Kalshi, #7 Coinbase
+    // After Coinbase: Crown Coins, Lonestar, Modo, MyPrize, Zula, CoinsBack (ShopBack)
     const isStake = (o: EnrichedOffer) =>
       o.id === 'fast-stake' || (o.name.toLowerCase().includes('stake') && !o.name.toLowerCase().includes('pulsz'));
     const isFreecash = (o: EnrichedOffer) =>
       o.id === 'fast-freecash' || o.name.toLowerCase().includes('freecash');
     const isGemsloot = (o: EnrichedOffer) =>
       o.id === 'fast-gemsloot' || o.name.toLowerCase().includes('gemsloot') || o.name.toLowerCase().includes('gems loot');
+    const isPolymarket = (o: EnrichedOffer) =>
+      o.id === 'fast-polymarket' || o.name.toLowerCase().includes('polymarket');
+    const isDraftKings = (o: EnrichedOffer) =>
+      o.id === 'fast-draftkings' || o.name.toLowerCase().includes('draftkings');
+    const isTilt = (o: EnrichedOffer) =>
+      o.id === 'fast-tilt' || o.id === 'ref-tilt' || o.name.toLowerCase() === 'tilt' || o.name.toLowerCase().includes('tilt');
+    const isKalshi = (o: EnrichedOffer) =>
+      o.id === 'fast-kalshi' || o.name.toLowerCase().includes('kalshi');
+    const isCoinbase = (o: EnrichedOffer) =>
+      o.id === 'fast-coinbase' || o.name.toLowerCase().includes('coinbase');
+    const isCrownCoins = (o: EnrichedOffer) =>
+      o.id === '4' || o.name.toLowerCase().includes('crown coin');
+    const isLonestar = (o: EnrichedOffer) =>
+      o.id === '10' || o.name.toLowerCase().includes('lonestar') || o.name.toLowerCase().includes('lone star');
+    const isModo = (o: EnrichedOffer) =>
+      o.id === '13' || o.name.toLowerCase().includes('modo');
+    const isMyPrize = (o: EnrichedOffer) =>
+      o.id === '15' || o.name.toLowerCase().includes('myprize') || o.name.toLowerCase().includes('my prize');
+    const isZula = (o: EnrichedOffer) =>
+      o.id === '30' || o.name.toLowerCase().includes('zula');
+    const isCoinsBack = (o: EnrichedOffer) =>
+      o.id === 'cash-back-1' || o.name.toLowerCase().includes('coins back') || o.name.toLowerCase().includes('coinsback') || o.name.toLowerCase().includes('shopback');
 
-    const stakeOffer = allOffers.find(isStake);
-    const freecashOffer = allOffers.find(isFreecash);
-    const gemslootOffer = allOffers.find(isGemsloot);
+    const orderedFinders = [
+      isStake,        // 1
+      isFreecash,     // 2
+      isGemsloot,     // 3
+      isPolymarket,   // 4
+      isDraftKings,   // 5
+      isTilt,         // 6
+      isKalshi,       // 7
+      isCoinbase,     // 8
+      isCrownCoins,   // 9
+      isLonestar,     // 10
+      isModo,         // 11
+      isMyPrize,      // 12
+      isZula,         // 13
+      isCoinsBack,    // 14
+    ];
 
-    const lockedTop3 = [stakeOffer, freecashOffer, gemslootOffer].filter(Boolean) as EnrichedOffer[];
-    const lockedIds = new Set(lockedTop3.map((o) => o.id));
+    const orderedOffers: EnrichedOffer[] = [];
+    const usedIds = new Set<string>();
+
+    for (const finder of orderedFinders) {
+      const match = allOffers.find((o) => !usedIds.has(o.id) && finder(o));
+      if (match) {
+        orderedOffers.push(match);
+        usedIds.add(match.id);
+      }
+    }
 
     const remainingOffers = allOffers
-      .filter((o) => !lockedIds.has(o.id))
+      .filter((o) => !usedIds.has(o.id))
       .sort((a, b) => {
         const orderA = a.orderNumber !== undefined ? a.orderNumber : 999;
         const orderB = b.orderNumber !== undefined ? b.orderNumber : 999;
@@ -259,7 +333,7 @@ export default function App() {
         return getVal(b.payout, b.rewardValue) - getVal(a.payout, a.rewardValue);
       });
 
-    return [...lockedTop3, ...remainingOffers].slice(0, 10);
+    return [...orderedOffers, ...remainingOffers].slice(0, 13);
   }, [allOffers]);
 
   // 1. ONLINE CASINO FREE SPINS (formerly Sweepstakes)
@@ -284,7 +358,7 @@ export default function App() {
           o.categories.includes('sports-betting') ||
           o.categories.includes('sports') ||
           o.categories.includes('betting') ||
-          ['ref-sportzino', 'ref-fliff', 'ref-sleeper', 'fast-kalshi', 'ref-dabble'].includes(o.id)
+          ['ref-sportzino', 'ref-fliff', 'ref-sleeper', 'fast-kalshi', 'ref-dabble', 'fast-draftkings', 'ref-draftkings'].includes(o.id)
       )
       .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
   }, [filteredOffers]);
@@ -295,7 +369,7 @@ export default function App() {
       .filter(
         (o) =>
           o.categories.includes('crypto') ||
-          ['fast-coinbase', 'free-koinly', 'free-bydfi', 'free-kraken', 'ref-gemini', 'ref-webull'].includes(o.id)
+          ['fast-coinbase', 'free-koinly', 'free-bydfi', 'free-kraken', 'ref-gemini', 'ref-webull', 'fast-polymarket', 'ref-polymarket'].includes(o.id)
       )
       .sort((a, b) => (a.orderNumber || 99) - (b.orderNumber || 99));
   }, [filteredOffers]);
@@ -306,7 +380,7 @@ export default function App() {
       (o) =>
         o.isFeatured ||
         o.categories.includes('featured') ||
-        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
+        ['fast-stake', 'fast-gemsloot', 'fast-freecash', 'fast-polymarket', 'fast-draftkings', 'fast-kalshi', 'fast-coinbase', 'fast-onepay', '30', '19', '13', '4', '9', '1'].includes(o.id)
     );
   }, [filteredOffers]);
 
@@ -329,7 +403,7 @@ export default function App() {
       (o) =>
         o.categories.includes('finance') ||
         o.categories.includes('banking') ||
-        ['free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion'].includes(o.id)
+        ['free-sofi', 'ref-robinhood', 'ref-onepay', 'ref-sofibank', 'ref-aven', 'ref-sendwave', 'ref-self', 'ref-ava', 'ref-moneylion', 'fast-polymarket', 'ref-polymarket'].includes(o.id)
     );
   }, [filteredOffers]);
 
