@@ -6,6 +6,10 @@ import {
   GlobalTrafficMetrics,
   TrafficEvent,
 } from '../utils/trafficTracker';
+import {
+  getAllDeviceVisitors,
+  DeviceVisitorRecord,
+} from '../utils/deviceAnalytics';
 import { CardData, TabConfig } from '../types';
 import {
   BarChart3,
@@ -28,6 +32,8 @@ import {
   Activity,
   Filter,
   ShieldCheck,
+  MousePointerClick,
+  BookOpen,
 } from 'lucide-react';
 
 interface OwnerAnalyticsModalProps {
@@ -59,8 +65,11 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
   // Dashboard Data State
   const [metrics, setMetrics] = useState<GlobalTrafficMetrics | null>(null);
   const [events, setEvents] = useState<TrafficEvent[]>([]);
+  const [deviceVisitors, setDeviceVisitors] = useState<Record<string, DeviceVisitorRecord>>({});
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [deviceSearch, setDeviceSearch] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'leaderboard' | 'activity' | 'audience' | 'export'>('leaderboard');
+  const [activeTab, setActiveTab] = useState<'leaderboard' | 'activity' | 'audience' | 'devices' | 'export'>('leaderboard');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [eventFilter, setEventFilter] = useState<'all' | 'clip_code' | 'click_link' | 'page_view'>('all');
@@ -76,6 +85,7 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
       ]);
       setMetrics(fetchedMetrics);
       setEvents(fetchedEvents);
+      setDeviceVisitors(getAllDeviceVisitors());
     } catch (err) {
       console.error('Error loading analytics:', err);
     } finally {
@@ -168,6 +178,38 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
     const a = document.createElement('a');
     a.href = url;
     a.download = `ohknee_analytics_data_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportDevicesCSV = () => {
+    const list = Object.values(deviceVisitors);
+    let csv = 'Device ID,Device Type,Browser,Screen,First Seen,Last Seen,Total Clicks,Signed Guestbook Slot,Signed Initials,Recent Clicks Log\n';
+    list.forEach((d) => {
+      const clicksSummary = (d.clicks || [])
+        .map((c) => `[${c.timestamp.slice(11, 19)}] ${c.text || c.target}`)
+        .join('; ')
+        .replace(/"/g, '""');
+      const row = [
+        `"${d.deviceId}"`,
+        `"${d.deviceType}"`,
+        `"${d.browser}"`,
+        `"${d.screenResolution}"`,
+        `"${d.firstSeen}"`,
+        `"${d.lastSeen}"`,
+        d.totalClicks || 0,
+        d.guestbookSignature?.slot || 'None',
+        `"${d.guestbookSignature?.name || ''}"`,
+        `"${clicksSummary}"`,
+      ].join(',');
+      csv += row + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ohknee_unique_devices_and_clicks_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -454,7 +496,20 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
                   }`}
                 >
                   <Monitor className="h-3.5 w-3.5" />
-                  <span>Devices & Categories</span>
+                  <span>Traffic & Categories</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('devices')}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    activeTab === 'devices'
+                      ? 'bg-amber-500 text-slate-950 shadow'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  }`}
+                >
+                  <MousePointerClick className="h-3.5 w-3.5" />
+                  <span>Unique Devices & Clicks</span>
                 </button>
 
                 <button
@@ -853,6 +908,240 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
               </div>
             )}
 
+            {/* Tab: Individual Unique Devices & What They Clicked */}
+            {activeTab === 'devices' && (
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {(() => {
+                  const devicesList = Object.values(deviceVisitors);
+                  const totalDevices = devicesList.length;
+                  const signedDevices = devicesList.filter((d) => d.guestbookSignature);
+                  const totalClicksAcrossDevices = devicesList.reduce((sum, d) => sum + (d.totalClicks || 0), 0);
+
+                  const filteredDevices = devicesList.filter((d) => {
+                    if (!deviceSearch) return true;
+                    const q = deviceSearch.toLowerCase();
+                    return (
+                      d.deviceId.toLowerCase().includes(q) ||
+                      d.browser.toLowerCase().includes(q) ||
+                      d.deviceType.toLowerCase().includes(q) ||
+                      (d.guestbookSignature?.name && d.guestbookSignature.name.toLowerCase().includes(q)) ||
+                      (d.guestbookSignature?.slot && String(d.guestbookSignature.slot).includes(q))
+                    );
+                  });
+
+                  const activeSelectedDevice =
+                    (selectedDeviceId && deviceVisitors[selectedDeviceId]) ||
+                    filteredDevices[0] ||
+                    null;
+
+                  return (
+                    <div className="space-y-6">
+                      {/* Summary Metrics */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                          <div className="flex items-center justify-between text-xs text-slate-400">
+                            <span>Unique Devices Visited</span>
+                            <Smartphone className="h-4 w-4 text-sky-400" />
+                          </div>
+                          <div className="mt-2 text-2xl font-black text-white">{totalDevices}</div>
+                          <div className="text-[11px] text-slate-500">Tracked hardware fingerprints</div>
+                        </div>
+
+                        <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4">
+                          <div className="flex items-center justify-between text-xs text-amber-300 font-medium">
+                            <span>Guestbook Signatures</span>
+                            <BookOpen className="h-4 w-4 text-amber-400" />
+                          </div>
+                          <div className="mt-2 text-2xl font-black text-amber-300">
+                            {signedDevices.length}{' '}
+                            <span className="text-xs font-normal text-amber-400/80">/ 1,000 slots</span>
+                          </div>
+                          <div className="text-[11px] text-amber-400/80">Signed the founding 1,000 register</div>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                          <div className="flex items-center justify-between text-xs text-slate-400">
+                            <span>Total Clicks Logged</span>
+                            <MousePointerClick className="h-4 w-4 text-emerald-400" />
+                          </div>
+                          <div className="mt-2 text-2xl font-black text-emerald-400">
+                            {totalClicksAcrossDevices.toLocaleString()}
+                          </div>
+                          <div className="text-[11px] text-emerald-400/70">Across buttons, links & apps</div>
+                        </div>
+                      </div>
+
+                      {/* Device Search bar */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="relative w-full sm:w-80">
+                          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                          <input
+                            type="text"
+                            value={deviceSearch}
+                            onChange={(e) => setDeviceSearch(e.target.value)}
+                            placeholder="Filter by device ID, initials, browser..."
+                            className="w-full rounded-xl border border-slate-800 bg-slate-900/80 pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+                          />
+                        </div>
+                        <span className="text-xs text-slate-400">
+                          Showing {filteredDevices.length} of {totalDevices} unique devices
+                        </span>
+                      </div>
+
+                      {/* Two-column layout: Devices on Left, Click History on Right */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[460px]">
+                        {/* Device List */}
+                        <div className="lg:col-span-5 rounded-xl border border-slate-800 bg-slate-900/50 p-3 space-y-2 overflow-y-auto max-h-[520px]">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">
+                            Unique Device Sessions
+                          </div>
+
+                          {filteredDevices.length === 0 ? (
+                            <div className="p-6 text-center text-xs text-slate-500">
+                              No devices match search.
+                            </div>
+                          ) : (
+                            filteredDevices.map((d) => {
+                              const isSelected = activeSelectedDevice?.deviceId === d.deviceId;
+                              return (
+                                <button
+                                  key={d.deviceId}
+                                  type="button"
+                                  onClick={() => setSelectedDeviceId(d.deviceId)}
+                                  className={`w-full text-left rounded-xl p-3 border transition cursor-pointer ${
+                                    isSelected
+                                      ? 'border-amber-500/60 bg-amber-500/10 shadow'
+                                      : 'border-slate-800 bg-slate-900/80 hover:border-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      {d.deviceType === 'mobile' ? (
+                                        <Smartphone className="h-4 w-4 text-amber-400" />
+                                      ) : d.deviceType === 'tablet' ? (
+                                        <Tablet className="h-4 w-4 text-emerald-400" />
+                                      ) : (
+                                        <Monitor className="h-4 w-4 text-sky-400" />
+                                      )}
+                                      <span className="font-mono text-xs font-bold text-white truncate max-w-[140px]">
+                                        {d.deviceId.slice(0, 14)}...
+                                      </span>
+                                    </div>
+
+                                    <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                                      {d.totalClicks || 0} clicks
+                                    </span>
+                                  </div>
+
+                                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+                                    <span>{d.browser} • {d.screenResolution}</span>
+                                    <span className="capitalize">{d.deviceType}</span>
+                                  </div>
+
+                                  {/* Guestbook status badge */}
+                                  <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+                                    {d.guestbookSignature ? (
+                                      <span className="text-amber-300 font-semibold flex items-center gap-1">
+                                        <BookOpen className="h-3 w-3" /> Signed Line #{d.guestbookSignature.slot}: "{d.guestbookSignature.name}"
+                                      </span>
+                                    ) : (
+                                      <span className="text-slate-500">Has not signed register</span>
+                                    )}
+                                    <span className="text-[10px] text-slate-500">
+                                      {new Date(d.lastSeen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+
+                        {/* Selected Device Click Activity Stream */}
+                        <div className="lg:col-span-7 rounded-xl border border-slate-800 bg-slate-900/50 p-4 flex flex-col max-h-[520px] overflow-hidden">
+                          {activeSelectedDevice ? (
+                            <>
+                              <div className="border-b border-slate-800 pb-3 mb-3">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-bold text-white">Device Details</span>
+                                      <span className="font-mono text-xs text-amber-400">
+                                        {activeSelectedDevice.deviceId}
+                                      </span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                      {activeSelectedDevice.browser} on {activeSelectedDevice.platform} ({activeSelectedDevice.screenResolution}) • First seen {new Date(activeSelectedDevice.firstSeen).toLocaleDateString()}
+                                    </p>
+                                  </div>
+
+                                  {activeSelectedDevice.guestbookSignature && (
+                                    <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 text-right">
+                                      <div className="text-[10px] uppercase font-bold text-amber-400">Founding Signer</div>
+                                      <div className="text-xs font-bold text-white">
+                                        Line #{activeSelectedDevice.guestbookSignature.slot}: {activeSelectedDevice.guestbookSignature.name}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                  <MousePointerClick className="h-3.5 w-3.5 text-emerald-400" />
+                                  What This Device Clicked ({activeSelectedDevice.clicks?.length || 0} recorded events)
+                                </span>
+                              </div>
+
+                              {/* Chronological click list */}
+                              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                                {activeSelectedDevice.clicks && activeSelectedDevice.clicks.length > 0 ? (
+                                  activeSelectedDevice.clicks.map((clk, idx) => (
+                                    <div
+                                      key={`${clk.timestamp}-${idx}`}
+                                      className="rounded-lg border border-slate-800/90 bg-slate-950/60 px-3 py-2 text-xs flex items-center justify-between hover:border-slate-700 transition"
+                                    >
+                                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
+                                        <div className="min-w-0 flex-1">
+                                          <div className="font-medium text-white truncate">
+                                            {clk.text ? `Clicked "${clk.text}"` : `Clicked <${clk.tag}>`}
+                                          </div>
+                                          <div className="font-mono text-[10px] text-slate-400 truncate">
+                                            target: {clk.target} {clk.context ? `• ${clk.context}` : ''}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <span className="text-[10px] text-slate-500 font-mono flex-shrink-0 ml-3">
+                                        {new Date(clk.timestamp).toLocaleTimeString([], {
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                          second: '2-digit',
+                                        })}
+                                      </span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="p-8 text-center text-xs text-slate-500">
+                                    No click interactions recorded yet on this device.
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex-1 flex items-center justify-center text-xs text-slate-500">
+                              Select a device on the left to inspect its click history.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
             {/* Tab 4: Export & Maintenance Tools */}
             {activeTab === 'export' && (
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -879,6 +1168,15 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
                     >
                       <Download className="h-4 w-4" />
                       <span>Export Full Raw Data (JSON)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleExportDevicesCSV}
+                      className="flex items-center gap-2 rounded-xl border border-emerald-700/60 bg-emerald-950/40 px-4 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-900/60 transition"
+                    >
+                      <Download className="h-4 w-4 text-emerald-400" />
+                      <span>Export Unique Devices & Clicks (CSV)</span>
                     </button>
                   </div>
                 </div>

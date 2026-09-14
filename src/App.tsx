@@ -42,6 +42,8 @@ import { HowItWorksModal } from './components/HowItWorksModal';
 import { InboxModal } from './components/InboxModal';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
 import { SkillIssueSnakeGame } from './components/SkillIssueSnakeGame';
+import { SocialsPhoneView } from './components/SocialsPhoneView';
+import { GuestbookNotebookView } from './components/GuestbookNotebookView';
 
 // Original Icons - Replacing generic clichés
 import {
@@ -54,6 +56,7 @@ import {
   User,
   Star,
   BarChart2,
+  Layers,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -553,13 +556,24 @@ export default function App() {
     };
   }, [filteredOffers]);
 
+  // Track previous tab before opening snake game so clicking snake icon again returns back smoothly
+  const previousNonSnakeTabRef = useRef<MobileTab>('hero');
+
   // Jump from mobile navigation
   const handleSelectMobileTab = (tab: MobileTab) => {
+    if (mobileTab !== 'blank' && mobileTab !== 'snake' && mobileTab !== 'guestbook') {
+      previousNonSnakeTabRef.current = mobileTab;
+    }
+
     const tabOrderMap: Record<MobileTab, number> = {
       hero: 0,
-      earn: 1,      // Casual (far left)
-      'top-10': 2,  // Ranked (middle)
-      blank: 3,     // Skill Issue (far right)
+      earn: 1,      // Categories (left of middle)
+      'top-10': 2,  // Start Here (middle)
+      socials: 3,   // Socials (right of middle)
+      tab: 4,       // Tab (right of middle)
+      blank: 5,     // Snake game
+      snake: 5,     // Snake game
+      guestbook: 6, // Notebook paper guestbook (1-1000)
     };
     const newDir = tabOrderMap[tab] >= tabOrderMap[mobileTab] ? 1 : -1;
     setSlideDirection(newDir);
@@ -588,9 +602,9 @@ export default function App() {
     setMobileTab('top-10');
   };
 
-  // Prevent scrolling when on the first page (hero view)
+  // Prevent scrolling when on the first page (hero view) or socials view
   useEffect(() => {
-    if (mobileTab === 'hero') {
+    if (mobileTab === 'hero' || mobileTab === 'socials') {
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
       window.scrollTo(0, 0);
@@ -607,7 +621,7 @@ export default function App() {
   return (
     <div
       className={`bg-black text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black ${
-        mobileTab === 'hero'
+        mobileTab === 'hero' || mobileTab === 'socials'
           ? 'h-screen h-[100dvh] max-h-[100dvh] overflow-hidden overscroll-none'
           : 'min-h-screen'
       }`}
@@ -620,12 +634,28 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenAnalytics={() => setIsOwnerAnalyticsOpen(true)}
+        onSelectSnake={() => {
+          if (mobileTab === 'blank' || mobileTab === 'snake') {
+            handleSelectMobileTab(previousNonSnakeTabRef.current || 'hero');
+          } else {
+            handleSelectMobileTab('blank');
+          }
+        }}
+        isSnakeActive={mobileTab === 'blank' || mobileTab === 'snake'}
+        onSelectGuestbook={() => {
+          if (mobileTab === 'guestbook') {
+            handleSelectMobileTab(previousNonSnakeTabRef.current || 'hero');
+          } else {
+            handleSelectMobileTab('guestbook');
+          }
+        }}
+        isGuestbookActive={mobileTab === 'guestbook'}
       />
 
       {/* Main Content Area */}
       <div
         className={`flex-1 flex flex-col w-full ${
-          mobileTab === 'hero' ? 'h-full overflow-hidden' : ''
+          mobileTab === 'hero' ? 'min-h-0 overflow-y-auto' : ''
         }`}
       >
         {mobileTab === 'top-10' ? (
@@ -655,8 +685,33 @@ export default function App() {
                   onEarnClick={() => handleSelectMobileTab('earn')}
                 />
               </div>
-            ) : mobileTab === 'blank' ? (
-              /* THIRD TAB: SKILL ISSUE NOKIA SNAKE GAME WITH REVERSED CONTROLS */
+            ) : mobileTab === 'guestbook' ? (
+              /* NOTEBOOK PAPER GUESTBOOK (FIRST 1,000 VISITORS REGISTER) */
+              <main
+                id="guestbook-register-view"
+                className="flex-1 w-full bg-black flex flex-col items-center justify-start py-2 sm:py-4 px-2"
+              >
+                <GuestbookNotebookView />
+              </main>
+            ) : mobileTab === 'socials' ? (
+              /* SOCIALS VIEW: SIMPLE OPAQUE CARDS */
+              <SocialsPhoneView />
+            ) : mobileTab === 'tab' ? (
+              /* PLACEHOLDER TAB VIEW */
+              <main
+                id="custom-tab-screen"
+                className="flex-1 w-full min-h-[calc(100dvh-130px)] bg-black flex flex-col items-center justify-center p-6 text-center select-none animate-in fade-in duration-200"
+              >
+                <div className="p-8 rounded-2xl border border-neutral-800 bg-neutral-900/60 backdrop-blur-md max-w-sm w-full flex flex-col items-center justify-center gap-3 shadow-2xl">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+                    <Layers size={28} />
+                  </div>
+                  <h2 className="text-xl font-bold text-white tracking-wide">Tab</h2>
+                  <p className="text-xs text-slate-400">Reserved for upcoming features.</p>
+                </div>
+              </main>
+            ) : mobileTab === 'blank' || mobileTab === 'snake' ? (
+              /* RETRO NOKIA SNAKE GAME WITH NORMAL CONTROLS */
               <main
                 id="skill-issue-game-view"
                 className="flex-1 w-full min-h-[85vh] bg-black flex flex-col items-center justify-center p-3 select-none"

@@ -98,7 +98,11 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
   return (
     <div
       className={`relative w-full flex-1 flex flex-col ${
-        currentTab === 'top-10' ? 'overflow-visible' : currentTab === 'hero' ? 'h-full overflow-hidden' : 'overflow-hidden'
+        currentTab === 'top-10'
+          ? 'overflow-visible'
+          : currentTab === 'hero' || currentTab === 'socials'
+          ? 'h-full overflow-hidden'
+          : 'overflow-x-hidden'
       }`}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -113,7 +117,7 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
           className={`w-full flex-1 flex flex-col ${
             currentTab === 'top-10'
               ? `overflow-visible ${!isTransitioning ? 'top-10-no-transform' : ''}`
-              : currentTab === 'hero'
+              : currentTab === 'hero' || currentTab === 'socials'
               ? 'h-full overflow-hidden'
               : ''
           }`}
