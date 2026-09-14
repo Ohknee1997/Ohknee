@@ -16,12 +16,16 @@ interface Top10MobileViewProps {
   onSelectOffer: (offer: EnrichedOffer) => void;
   onToggleSave?: (offerId: string) => void;
   savedOfferIds?: Set<string>;
+  selectedOffer?: EnrichedOffer | null;
+  onCloseOffer?: () => void;
 }
 
 export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   offers,
   allOffers,
   onSelectOffer,
+  selectedOffer,
+  onCloseOffer,
 }) => {
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
 
@@ -39,6 +43,15 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   const descScrollRef = useRef<HTMLDivElement>(null);
   const isAutoScrollingDesc = useRef<boolean>(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // When exiting out of the briefing modal, close the tab in the description box above as well
+  const prevSelectedOfferRef = useRef<EnrichedOffer | null>(selectedOffer || null);
+  useEffect(() => {
+    if (prevSelectedOfferRef.current && !selectedOffer) {
+      setExpandedTipAppIdx(null);
+    }
+    prevSelectedOfferRef.current = selectedOffer || null;
+  }, [selectedOffer]);
 
   const toggleTipIndex = (idx: number) => {
     setExpandedTipIndices((prev) => {
@@ -107,26 +120,27 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     const isRealPrize = (o: EnrichedOffer) =>
       o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
 
-    // 1-18 exact order as requested by user
+    // 1-18 exact order as requested by user:
+    // 1: Stake, 2: Polymarket, 3: Coinbase, 4: Tilt, 5: Ero, 6: Rips, followed by other verified partners
     const orderedFinders = [
-      isStake,        // 1
-      isFreecash,     // 2
-      isGemsloot,     // 3
-      isPolymarket,   // 4
-      isDraftKings,   // 5
-      isEro,          // 6
-      isTilt,         // 7
-      isReBet,        // 8
-      isOnyx,         // 9
-      isRips,         // 10
-      isRipRush,      // 11
-      isKalshi,       // 12
-      isCoinbase,     // 13
-      isCrownCoins,   // 14
-      isLonestar,     // 15
-      isModo,         // 16
-      isMyPrize,      // 17
-      isRealPrize,    // 18
+      isStake,        // 1: Stake.us
+      isPolymarket,   // 2: Polymarket
+      isCoinbase,     // 3: Coinbase (moved to #3)
+      isTilt,         // 4: Tilt (moved to #4)
+      isEro,          // 5: Ero (moved to #5)
+      isRips,         // 6: Rips (moved to #6)
+      isKalshi,       // 7: Kalshi
+      isFreecash,     // 8: Freecash
+      isGemsloot,     // 9: Gems Loot
+      isDraftKings,   // 10: DraftKings
+      isReBet,        // 11: ReBet
+      isOnyx,         // 12: Onyx Odds
+      isRipRush,      // 13: Rip Rush
+      isCrownCoins,   // 14: Crown Coins
+      isLonestar,     // 15: Lone Star
+      isModo,         // 16: Modo
+      isMyPrize,      // 17: MyPrize
+      isRealPrize,    // 18: Real Prize
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -272,8 +286,9 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   // Curated brief and detail descriptions for top apps without prices
   const curatedTipsByAppKey: Record<string, { brief: string; detail: string }> = {
     stake: {
-      brief: 'Easiest bonus claim you will ever get, keeping #1 weekly. Check your email to claim your bonus!',
-      detail: 'Stake.us is the easiest bonus you will ever claim, keeping the number one position week after week. Make sure to check your email for the bonus — I see a lot of you guys signing up but not claiming your bonus.',
+      brief: 'Easiest $25 you will ever get: just sign up, verify, and check your email!',
+      detail:
+        'This is absolutely the easiest $25 you will ever get: just sign up and verify your ID, and then you will get an email. Make sure you check your email — I have so many people signing up and not claiming their bonuses!',
     },
     freecash: {
       brief: 'Play one game for a few minutes before registering your bonus.',
@@ -284,8 +299,10 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
       detail: 'Gems Loot allows you to test PC games and use their Ascend tab that lets you download five games that you can complete three times!',
     },
     polymarket: {
-      brief: 'Join our squad with code MOPEYDINGO1343 to trade event & crypto predictions.',
-      detail: 'Join our squad on Polymarket with code MOPEYDINGO1343. Trade predictions on events, culture, and crypto with instant settlement.',
+      brief:
+        'Link Discord for $5 free to unlock your $25 reward without a deposit!',
+      detail:
+        'Join our squad on Polymarket to trade event and crypto predictions. If you cannot afford to make a deposit, once you verify your ID, go to the bottom right, tap "Rewards", and find the "Link Discord" button — that gives you $5 instantly! Then make a trade with that free $5, and you will get your full $25 bonus.',
     },
     draftkings: {
       brief: 'Top picks and predictions on sports and pop culture with fast cashouts.',
@@ -316,8 +333,10 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
       detail: 'Use my link to win on Rip Rush! Download the game using my link, then enter code UCLEKH6 when you register to get a card pack for free. https://riprush.onelink.me/se7Y/t1tr9df3?deep_link_sub1=O9m5kGxxmsNtOM7n57QeBLOKIG43',
     },
     kalshi: {
-      brief: 'Trade real-world event contracts on economic, political, and cultural predictions.',
-      detail: 'Kalshi allows you to trade regulated event contracts on real-world news, inflation, and entertainment.',
+      brief:
+        'Similar to Polymarket: trade $25 (even with just $1, buy & sell 25 times) for $50 each!',
+      detail:
+        'Kalshi allows you to trade regulated event contracts on real-world news and markets. Kalshi is pretty similar to Polymarket: you just need to make a trade for $25. Even if you only deposit $1, you can just buy and sell a $1 offer 25 times, and then do the same thing in predictions, and we will both get $50 each!',
     },
     coinbase: {
       brief: 'Crypto exchange signup with instant learning tasks and trading reward credits.',
@@ -534,6 +553,9 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         setExpandedTipAppIdx(null);
+                        if (onCloseOffer) {
+                          onCloseOffer();
+                        }
                       }}
                       className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 active:scale-90 border-2 border-red-500 flex items-center justify-center text-red-600 hover:text-red-700 transition-all cursor-pointer shadow-md z-30"
                       title="Close description"
@@ -550,7 +572,7 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                           borderColor: `rgb(${item.accentRgb})`,
                           color: `rgb(${item.accentRgb})`,
                         }}
-                        className="px-2 py-0.5 rounded-md text-xs font-black border flex-shrink-0"
+                        className="px-2.5 py-1 rounded-md text-sm font-black border flex-shrink-0"
                       >
                         #{item.num}
                       </span>
@@ -666,7 +688,7 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                               borderColor: `rgba(${item.accentRgb}, 0.45)`,
                               color: `rgb(${item.accentRgb})`,
                             }}
-                            className="w-4.5 h-4.5 rounded text-[10px] sm:text-[11px] font-bold flex items-center justify-center flex-shrink-0 border"
+                            className="w-6 h-6 rounded-md text-xs sm:text-sm font-black flex items-center justify-center flex-shrink-0 border"
                           >
                             {item.num}
                           </span>
@@ -776,41 +798,47 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                 {/* 1. TOP ARTWORK / LOGO CONTAINER (Themed inner container) */}
                 <div
                   style={innerArtBgStyle}
-                  className={`w-full h-18 sm:h-22 md:h-24 rounded-lg border relative flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0 transition-colors ${
+                  className={`w-full h-18 sm:h-22 md:h-24 rounded-lg border relative flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors ${
                     isCurrentActive ? 'border-2 border-red-500 shadow-inner' : 'border'
                   }`}
                 >
-                  {/* Top-left: Sequential App Number (1 - 10000) */}
+                  {/* Top-left: Sequential App Number (1 - 1000) - Tightly in corner, 1px border, off the logo */}
                   <div
-                    style={{ borderColor: isCurrentActive ? '#ef4444' : `rgba(${accentRgb}, 0.7)` }}
-                    className={`absolute top-1 left-1 z-10 px-1.5 py-0.2 rounded-full border text-white text-[9px] sm:text-[10px] font-black shadow-xs flex items-center gap-0.5 backdrop-blur-xs ${
-                      isCurrentActive ? 'bg-red-950/95 text-red-200 border-red-500' : 'bg-[#181d2c]/95'
+                    style={{
+                      borderColor: isCurrentActive ? '#ef4444' : `rgba(${accentRgb}, 0.5)`,
+                    }}
+                    className={`absolute top-0 left-0 z-20 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-tl-[7px] rounded-br-lg border-r border-b text-white text-xs sm:text-sm font-black shadow-xs flex items-center gap-0.5 backdrop-blur-md ${
+                      isCurrentActive
+                        ? 'bg-red-950/95 text-red-100'
+                        : 'bg-[#0a0d17]/95'
                     }`}
                     title={`Rank #${rankNumber}`}
                   >
-                    <span style={accentTextStyle} className="text-[8px]">#</span>
-                    <span>{rankNumber}</span>
+                    <span style={accentTextStyle} className="text-[10px] sm:text-xs font-black leading-none opacity-90">#</span>
+                    <span className="font-mono tracking-tight leading-none">{rankNumber}</span>
                   </div>
 
-                  {/* High-Resolution Referral Partner Logo */}
-                  {rawLogoSrc ? (
-                    <img
-                      src={rawLogoSrc}
-                      alt={offer.name}
-                      className="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center">
-                      <span style={accentTextStyle} className="text-base sm:text-lg font-black tracking-wider">
-                        {initialsOf(offer.name)}
-                      </span>
-                    </div>
-                  )}
+                  {/* High-Resolution Referral Partner Logo - Padded and sized to never touch/overlap the corner badge */}
+                  <div className="w-full h-full flex items-center justify-center p-1.5 pt-3.5 sm:pt-4">
+                    {rawLogoSrc ? (
+                      <img
+                        src={rawLogoSrc}
+                        alt={offer.name}
+                        className="max-h-[88%] max-w-[76%] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center">
+                        <span style={accentTextStyle} className="text-base sm:text-lg font-black tracking-wider">
+                          {initialsOf(offer.name)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* PROMO CODE DISPLAY UNDERNEATH IMAGE - CLEARLY VISIBLE & CLICK-TO-COPY */}
@@ -858,48 +886,18 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                   </button>
                 )}
 
-                {/* 2. TEXT INFORMATION: Name + Bold Payout
-                    User requested: "If there's a code that you can copy I want the text to be centered directly under it 
-                    if there is no code for you to copy I want it to be placed on the bottom left of the square" */}
-                <div
-                  className={`flex flex-col w-full min-w-0 pt-2 pb-0.5 px-0.5 ${
-                    hasCode
-                      ? 'items-center text-center justify-center'
-                      : 'items-start text-left justify-end mt-auto'
-                  }`}
-                >
-                  {/* Offer Name - Made slightly bigger as requested */}
-                  <h4
-                    className={`w-full truncate text-xs sm:text-[13px] md:text-sm font-bold text-white group-hover:underline transition-colors leading-tight ${
-                      hasCode ? 'text-center' : 'text-left'
-                    }`}
-                  >
+                {/* 2. TEXT INFORMATION: Name + Bold Payout (Completely uniform & centered across all squares) */}
+                <div className="flex flex-col w-full min-w-0 pt-2 pb-0.5 px-0.5 items-center text-center justify-center mt-auto">
+                  {/* Offer Name */}
+                  <h4 className="w-full truncate text-xs sm:text-[13px] md:text-sm font-bold text-white group-hover:underline transition-colors leading-tight text-center">
                     {offer.name}
                   </h4>
 
-                  {/* Bold Payout ($ 336.60 style) - Made numbers and text bigger as requested */}
-                  <div
-                    className={`w-full flex items-center gap-1.5 mt-1 ${
-                      hasCode ? 'justify-center text-center' : 'justify-start text-left'
-                    }`}
-                  >
-                    <span className="text-sm sm:text-base md:text-[17px] font-black text-white tracking-tight leading-none truncate">
+                  {/* Bold Payout ($ 336.60 style) - Centered and completely uniform */}
+                  <div className="w-full flex items-center justify-center mt-1">
+                    <span className="text-sm sm:text-base md:text-[17px] font-black text-white tracking-tight leading-none truncate text-center">
                       {formatPayoutDisplay(offer.payout, offer.rewardValue)}
                     </span>
-
-                    {/* Quick Action Icon: Details trigger with accent styling */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectOffer(offer);
-                      }}
-                      style={accentTextStyle}
-                      className="p-0.5 hover:bg-white/10 rounded transition-colors flex-shrink-0"
-                      title="View Offer Details & Promo Link"
-                    >
-                      <ExternalLink size={12} />
-                    </button>
                   </div>
                 </div>
               </div>

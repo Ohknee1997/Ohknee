@@ -97,7 +97,21 @@ export default function App() {
       const merged = savedCustomCards.map((c) => {
         const canonical = initialMap.get(c.id);
         if (canonical && updatedIds.has(c.id)) {
-          return enrichCard({ ...c, payout: canonical.payout, instructionSub: canonical.instructionSub });
+          const updated = {
+            ...c,
+            payout: canonical.payout,
+            instructionSub: canonical.instructionSub,
+            code: canonical.code,
+          };
+          if (!canonical.code) {
+            delete updated.code;
+          }
+          return enrichCard(updated);
+        }
+        if (c.id === 'fast-polymarket' || c.id === 'ref-polymarket' || c.name.toLowerCase().includes('polymarket')) {
+          const copy = { ...c };
+          delete copy.code;
+          return enrichCard(copy);
         }
         return enrichCard(c);
       });
@@ -300,25 +314,27 @@ export default function App() {
     const isRealPrize = (o: EnrichedOffer) =>
       o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
 
+    // 1-18 exact order as requested by user:
+    // 1: Stake, 2: Polymarket, 3: Coinbase, 4: Tilt, 5: Ero, 6: Rips, followed by other verified partners
     const orderedFinders = [
-      isStake,        // 1
-      isFreecash,     // 2
-      isGemsloot,     // 3
-      isPolymarket,   // 4
-      isDraftKings,   // 5
-      isEro,          // 6
-      isTilt,         // 7
-      isReBet,        // 8
-      isOnyx,         // 9
-      isRips,         // 10
-      isRipRush,      // 11
-      isKalshi,       // 12
-      isCoinbase,     // 13
-      isCrownCoins,   // 14
-      isLonestar,     // 15
-      isModo,         // 16
-      isMyPrize,      // 17
-      isRealPrize,    // 18
+      isStake,        // 1: Stake.us
+      isPolymarket,   // 2: Polymarket
+      isCoinbase,     // 3: Coinbase (moved to #3)
+      isTilt,         // 4: Tilt (moved to #4)
+      isEro,          // 5: Ero (moved to #5)
+      isRips,         // 6: Rips (moved to #6)
+      isKalshi,       // 7: Kalshi
+      isFreecash,     // 8: Freecash
+      isGemsloot,     // 9: Gems Loot
+      isDraftKings,   // 10: DraftKings
+      isReBet,        // 11: ReBet
+      isOnyx,         // 12: Onyx Odds
+      isRipRush,      // 13: Rip Rush
+      isCrownCoins,   // 14: Crown Coins
+      isLonestar,     // 15: Lone Star
+      isModo,         // 16: Modo
+      isMyPrize,      // 17: MyPrize
+      isRealPrize,    // 18: Real Prize
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -618,6 +634,8 @@ export default function App() {
             <Top10MobileView
               offers={top10Offers}
               allOffers={allOffers}
+              selectedOffer={selectedOffer}
+              onCloseOffer={() => setSelectedOffer(null)}
               onSelectOffer={setSelectedOffer}
               onToggleSave={handleToggleSaveOffer}
               savedOfferIds={savedOfferIds}
@@ -646,102 +664,103 @@ export default function App() {
                 <SkillIssueSnakeGame />
               </main>
             ) : (
-              /* OFFERS EXPLORER SECTION (EARN) - ALL TABS CLOSED ON OPEN, STARTS IMMEDIATELY WITH FEATURED ROW */
+              /* OFFERS EXPLORER SECTION (EARN) - ALL 5 CATEGORIES FIT ON ONE PAGE */
               <main
                 id="offers-explorer-section"
-              className="flex-1 w-full bg-black text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 select-none min-h-screen overflow-y-auto pb-28 md:pb-20"
-            >
-              {/* THE 5 DEDICATED CATEGORY ROWS (ZERO DUPLICATES - EVERY APP HAS ONE HOME) */}
-              <div className="w-full space-y-3 sm:space-y-4">
-                {/* 1. CASINO */}
-                <CategoryOfferRow
-                  id="row-online-casinos"
-                  title="Casino"
-                  subtitle="Daily free SC coins, free spins, sweepstakes casinos & prize wheels"
-                  icon={<Dice5 size={20} className="stroke-[2.2]" />}
-                  themeRgb="245, 158, 11"
-                  offers={onlineCasinoOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-online-casinos')}
-                  onToggleOpen={() => handleToggleRow('row-online-casinos')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
+                className="w-full bg-black text-slate-100 max-w-5xl mx-auto px-3 sm:px-6 py-3 select-none flex flex-col justify-between min-h-[calc(100dvh-130px)] sm:min-h-[calc(100vh-140px)] pb-24 md:pb-16"
+              >
+                {/* THE 5 DEDICATED CATEGORY ROWS (SPACED OUT EVENLY TO AVOID BLANK BLACK SPACE) */}
+                <div className="w-full flex-1 flex flex-col justify-evenly gap-3 sm:gap-4 md:gap-5 my-auto py-2 sm:py-3">
+                  {/* 1. CASINO */}
+                  <CategoryOfferRow
+                    id="row-online-casinos"
+                    title="Casino"
+                    subtitle="Daily free SC coins, free spins, sweepstakes casinos & prize wheels"
+                    icon={<Dice5 size={20} className="stroke-[2.2]" />}
+                    themeRgb="245, 158, 11"
+                    offers={onlineCasinoOffers}
+                    savedOfferIds={savedOfferIds}
+                    isOpen={openRowIds.has('row-online-casinos')}
+                    onToggleOpen={() => handleToggleRow('row-online-casinos')}
+                    onSelectOffer={setSelectedOffer}
+                    onToggleSave={handleToggleSaveOffer}
+                  />
 
-                {/* 2. SPORTS */}
-                <CategoryOfferRow
-                  id="row-sports-betting"
-                  title="Sports"
-                  subtitle="Top sportsbooks, DFS picks, match deposits & risk-free prediction entries"
-                  icon={<Swords size={20} className="stroke-[2.2]" />}
-                  themeRgb="59, 130, 246"
-                  offers={sportsBettingOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-sports-betting')}
-                  onToggleOpen={() => handleToggleRow('row-sports-betting')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
+                  {/* 2. SPORTS */}
+                  <CategoryOfferRow
+                    id="row-sports-betting"
+                    title="Sports"
+                    subtitle="Top sportsbooks, DFS picks, match deposits & risk-free prediction entries"
+                    icon={<Swords size={20} className="stroke-[2.2]" />}
+                    themeRgb="59, 130, 246"
+                    offers={sportsBettingOffers}
+                    savedOfferIds={savedOfferIds}
+                    isOpen={openRowIds.has('row-sports-betting')}
+                    onToggleOpen={() => handleToggleRow('row-sports-betting')}
+                    onSelectOffer={setSelectedOffer}
+                    onToggleSave={handleToggleSaveOffer}
+                  />
 
-                {/* 3. CRYPTO */}
-                <CategoryOfferRow
-                  id="row-free-crypto"
-                  title="Crypto"
-                  subtitle="Free Bitcoin bonuses, exchange sign-ups, crypto debit cards & airdrops"
-                  icon={<Boxes size={20} className="stroke-[2.2]" />}
-                  themeRgb="147, 51, 234"
-                  offers={cryptoOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-free-crypto')}
-                  onToggleOpen={() => handleToggleRow('row-free-crypto')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
+                  {/* 3. CRYPTO */}
+                  <CategoryOfferRow
+                    id="row-free-crypto"
+                    title="Crypto"
+                    subtitle="Free Bitcoin bonuses, exchange sign-ups, crypto debit cards & airdrops"
+                    icon={<Boxes size={20} className="stroke-[2.2]" />}
+                    themeRgb="147, 51, 234"
+                    offers={cryptoOffers}
+                    savedOfferIds={savedOfferIds}
+                    isOpen={openRowIds.has('row-free-crypto')}
+                    onToggleOpen={() => handleToggleRow('row-free-crypto')}
+                    onSelectOffer={setSelectedOffer}
+                    onToggleSave={handleToggleSaveOffer}
+                  />
 
-                {/* 4. INSTANT GRATIFICATION */}
-                <CategoryOfferRow
-                  id="row-fast-offers"
-                  title="Instant Gratification"
-                  subtitle="$100 - $150 sequential easy cash & instant tasks"
-                  icon={<Rocket size={20} className="stroke-[2.2]" />}
-                  themeRgb="249, 115, 22"
-                  offers={fastOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-fast-offers')}
-                  onToggleOpen={() => handleToggleRow('row-fast-offers')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
+                  {/* 4. INSTANT GRATIFICATION */}
+                  <CategoryOfferRow
+                    id="row-fast-offers"
+                    title="Instant Gratification"
+                    subtitle="$100 - $150 sequential easy cash & instant tasks"
+                    icon={<Rocket size={20} className="stroke-[2.2]" />}
+                    themeRgb="249, 115, 22"
+                    offers={fastOffers}
+                    savedOfferIds={savedOfferIds}
+                    isOpen={openRowIds.has('row-fast-offers')}
+                    onToggleOpen={() => handleToggleRow('row-fast-offers')}
+                    onSelectOffer={setSelectedOffer}
+                    onToggleSave={handleToggleSaveOffer}
+                  />
 
-                {/* 5. TAKES MONEY TO MAKE MONEY 💰 */}
-                <CategoryOfferRow
-                  id="row-finance"
-                  title="Takes Money to Make Money 💰"
-                  subtitle="Banking, high-yield accounts, and high-value credit booster rewards"
-                  icon={<Vault size={20} className="stroke-[2.2]" />}
-                  themeRgb="14, 165, 233"
-                  offers={financeOffers}
-                  savedOfferIds={savedOfferIds}
-                  isOpen={openRowIds.has('row-finance')}
-                  onToggleOpen={() => handleToggleRow('row-finance')}
-                  onSelectOffer={setSelectedOffer}
-                  onToggleSave={handleToggleSaveOffer}
-                />
-              </div>
+                  {/* 5. TAKES MONEY TO MAKE MONEY 💰 */}
+                  <CategoryOfferRow
+                    id="row-finance"
+                    title="Takes Money to Make Money 💰"
+                    subtitle="Banking, high-yield accounts, and high-value credit booster rewards"
+                    icon={<Vault size={20} className="stroke-[2.2]" />}
+                    themeRgb="14, 165, 233"
+                    offers={financeOffers}
+                    savedOfferIds={savedOfferIds}
+                    isOpen={openRowIds.has('row-finance')}
+                    onToggleOpen={() => handleToggleRow('row-finance')}
+                    onSelectOffer={setSelectedOffer}
+                    onToggleSave={handleToggleSaveOffer}
+                  />
+                </div>
 
-              {/* Footer Disclaimer */}
-              <footer className="mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-2.5 max-w-2xl mx-auto px-4">
-                <p className="leading-relaxed">
-                  Copyright 2026 OHKNEE.COM (only.com) partner incentives are strictly scrutinized, aggressively vetted, and monitored around the clock by our highly caffeinated analyst.
-                </p>
-                <p className="text-[11px] text-slate-600">
-                  Please participate responsibly. Terms apply.
-                </p>
-                <p className="font-bold text-slate-200 text-xs sm:text-sm tracking-tight">
-                  We know they work, because we tested them on ourselves first.
-                </p>
-              </footer>
-            </main>
+                {/* Standard Website Footer - Placed at the very bottom, normal readable text */}
+                <footer className="mt-auto pt-6 pb-2 border-t border-slate-800/80 text-center space-y-1.5 max-w-2xl mx-auto px-4 select-none">
+                  <p className="text-xs sm:text-[13px] leading-relaxed text-slate-400 font-normal">
+                    © 2026 OHKNEE.COM — Partner incentives are strictly scrutinized, aggressively vetted, and monitored around the clock.
+                  </p>
+                  <div className="flex items-center justify-center flex-wrap gap-x-3 gap-y-1 text-[11px] sm:text-xs text-slate-500 font-medium">
+                    <span>Please participate responsibly</span>
+                    <span>•</span>
+                    <span>Terms apply</span>
+                    <span>•</span>
+                    <span>We know they work, because we tested them on ourselves first</span>
+                  </div>
+                </footer>
+              </main>
           )}
         </PageTransitionWrapper>
         )}

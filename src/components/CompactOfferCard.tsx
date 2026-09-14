@@ -99,17 +99,17 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
         }
       }}
       style={cardBgStyle}
-      className={`group relative flex flex-col justify-between flex-shrink-0 select-none cursor-pointer rounded-2xl border p-2.5 transition-all duration-200 hover:-translate-y-1 hover:brightness-110 shadow-md ${
+      className={`group relative flex flex-col justify-between flex-shrink-0 select-none cursor-pointer rounded-2xl border p-3.5 transition-all duration-200 hover:-translate-y-1.5 hover:brightness-110 shadow-lg ${
         isCompact
-          ? 'w-[150px] sm:w-[165px] h-[215px] sm:h-[225px]'
-          : 'w-[170px] sm:w-[185px] h-[245px] sm:h-[255px]'
+          ? 'w-[195px] sm:w-[215px] h-[280px] sm:h-[300px]'
+          : 'w-[230px] sm:w-[255px] md:w-[275px] h-[325px] sm:h-[350px] md:h-[370px]'
       } ${className}`}
     >
       {/* 1. TOP ARTWORK / LOGO CONTAINER */}
       <div
         style={innerArtBgStyle}
-        className={`w-full rounded-xl border relative flex items-center justify-center p-2.5 overflow-hidden flex-shrink-0 transition-colors ${
-          isCompact ? 'h-[110px] sm:h-[118px]' : 'h-[130px] sm:h-[140px]'
+        className={`w-full rounded-xl border relative flex items-center justify-center p-3 overflow-hidden flex-shrink-0 transition-colors ${
+          isCompact ? 'h-[140px] sm:h-[155px]' : 'h-[170px] sm:h-[190px] md:h-[205px]'
         }`}
       >
         {/* High-resolution logo centered */}
@@ -117,13 +117,13 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
           <img
             src={logoSrc}
             alt={offer.name}
-            className="max-h-full max-w-full w-auto h-auto object-contain rounded-md drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+            className="max-h-full max-w-full w-auto h-auto object-contain rounded-md drop-shadow-md group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <span style={accentTextStyle} className="text-xl sm:text-2xl font-black tracking-wider">
+            <span style={accentTextStyle} className="text-2xl sm:text-3xl md:text-4xl font-black tracking-wider">
               {initialsOf(offer.name)}
             </span>
           </div>
@@ -138,84 +138,64 @@ export const CompactOfferCard: React.FC<CompactOfferCardProps> = ({
           title="Click to copy promo code"
           aria-label={`Copy code ${offer.code}`}
           style={{
-            borderColor: `rgba(${accentRgb}, 0.4)`,
-            backgroundColor: copied ? `rgba(${accentRgb}, 0.25)` : `rgba(15, 18, 29, 0.75)`,
+            borderColor: `rgba(${accentRgb}, 0.45)`,
+            backgroundColor: copied ? `rgba(${accentRgb}, 0.28)` : `rgba(15, 18, 29, 0.85)`,
           }}
-          className="mt-1.5 w-full flex items-center justify-between gap-1 px-2 py-1 rounded-lg border transition-all cursor-pointer text-white"
+          className="mt-2 w-full flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer text-white"
         >
-          <div className="flex items-center gap-1 min-w-0">
-            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-wider flex-shrink-0">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 uppercase tracking-wider flex-shrink-0">
               CODE:
             </span>
-            <span className="text-[11px] sm:text-xs font-mono font-black tracking-wide text-white truncate">
+            <span className="text-xs sm:text-sm font-mono font-black tracking-wide text-white truncate">
               {offer.code}
             </span>
           </div>
           {copied ? (
             <span
               style={{
-                backgroundColor: `rgba(${accentRgb}, 0.3)`,
-                borderColor: `rgba(${accentRgb}, 0.6)`,
+                backgroundColor: `rgba(${accentRgb}, 0.35)`,
+                borderColor: `rgba(${accentRgb}, 0.65)`,
                 color: '#fff',
               }}
-              className="flex items-center gap-0.5 text-[9px] font-extrabold flex-shrink-0 px-1 py-0.5 rounded border"
+              className="flex items-center gap-1 text-[10px] font-extrabold flex-shrink-0 px-1.5 py-0.5 rounded-lg border"
             >
-              <Check size={10} />
+              <Check size={11} />
               COPIED
             </span>
           ) : (
             <span
               style={accentTextStyle}
-              className="flex items-center gap-0.5 text-[9px] font-bold flex-shrink-0"
+              className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold flex-shrink-0"
             >
-              <Copy size={10} />
+              <Copy size={11} />
               COPY
             </span>
           )}
         </button>
       )}
 
-      {/* 2. TEXT INFORMATION
-          User requested: "If there's a code that you can copy I want the text to be centered directly under it 
-          if there is no code for you to copy I want it to be placed on the bottom left of the square" */}
-      <div
-        className={`flex flex-col w-full min-w-0 pt-2 px-1 ${
-          hasCode
-            ? 'items-center text-center justify-center'
-            : 'items-start text-left justify-end mt-auto'
-        }`}
-      >
+      {/* 2. TEXT INFORMATION: Centered and uniform */}
+      <div className="flex flex-col w-full min-w-0 pt-2.5 px-1 items-center text-center justify-center mt-auto">
         {/* Offer Name */}
-        <h4
-          className={`w-full truncate text-xs sm:text-sm font-bold text-white group-hover:underline transition-colors leading-tight ${
-            hasCode ? 'text-center' : 'text-left'
-          }`}
-        >
+        <h4 className="w-full truncate text-sm sm:text-base md:text-lg font-black text-white group-hover:underline transition-colors leading-tight text-center">
           {offer.name}
         </h4>
 
-        {/* Payout Display (e.g. $ 25.00 matching Gemsloot $ 632.35) - Made bigger as requested */}
-        <div
-          className={`w-full flex items-center gap-1 mt-1 truncate ${
-            hasCode ? 'justify-center text-center' : 'justify-start text-left'
-          }`}
-        >
+        {/* Payout Display - Centered */}
+        <div className="w-full flex items-center justify-center gap-1 mt-1.5 truncate text-center">
           {payout.prefix && (
-            <span style={accentTextStyle} className="text-sm sm:text-base font-black">
+            <span style={accentTextStyle} className="text-base sm:text-lg md:text-xl font-black">
               {payout.prefix}
             </span>
           )}
-          <span className="text-base sm:text-lg font-black text-white tracking-tight leading-none">
+          <span className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-none">
             {payout.amount}
           </span>
         </div>
 
         {/* Secondary Info (Code or instruction) */}
-        <p
-          className={`w-full truncate text-[10px] sm:text-[11px] font-semibold text-slate-300 mt-1 ${
-            hasCode ? 'text-center' : 'text-left'
-          }`}
-        >
+        <p className="w-full truncate text-xs sm:text-sm font-semibold text-slate-300 mt-1.5 text-center">
           {offer.code ? `Code: ${offer.code}` : offer.payoutTag || 'Verified Instant'}
         </p>
       </div>
