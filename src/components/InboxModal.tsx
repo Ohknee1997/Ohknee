@@ -21,7 +21,7 @@ const INITIAL_MESSAGES: InboxMessage[] = [
   {
     id: 'msg-welcome-bonus',
     title: 'Welcome Bonus Stack Available',
-    body: 'Your starter stack worth up to $150 in verified instant bonuses and zero-fee cashouts is ready to claim in Fast Offers.',
+    body: 'Your starter stack worth up to $150 in verified instant bonuses and zero-fee cashouts is ready to claim in Instant Gratification.',
     time: '12m ago',
     isRead: false,
     type: 'bonus',

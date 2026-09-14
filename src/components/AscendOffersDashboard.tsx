@@ -672,12 +672,12 @@ export const AscendOffersDashboard: React.FC<AscendOffersDashboardProps> = ({
             </div>
           </div>
 
-          {/* Secondary Rows: Fast Offers, Finance, Sign Up Trial, Puzzles (as in screenshot) */}
+          {/* Secondary Rows: Instant Gratification, Takes Money to Make Money, Sign Up Trial, Puzzles */}
           <div className="space-y-2 pt-2">
             {[
               { title: 'My Offers', count: '208 hidden' },
-              { title: 'Fast Offers', count: '14 hidden' },
-              { title: 'Finance', count: '26 hidden' },
+              { title: 'Instant Gratification', count: '14 hidden' },
+              { title: 'Takes Money to Make Money 💰', count: '26 hidden' },
               { title: 'Sign Up Trial', count: '28 hidden' },
               { title: 'Puzzles', count: '20 hidden' },
             ].map((row, idx) => (

@@ -41,6 +41,7 @@ import { ScammerMemeModal } from './components/ScammerMemeModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { InboxModal } from './components/InboxModal';
 import { PageTransitionWrapper } from './components/PageTransitionWrapper';
+import { SkillIssueSnakeGame } from './components/SkillIssueSnakeGame';
 
 // Original Icons - Replacing generic clichés
 import {
@@ -535,8 +536,9 @@ export default function App() {
   const handleSelectMobileTab = (tab: MobileTab) => {
     const tabOrderMap: Record<MobileTab, number> = {
       hero: 0,
-      'top-10': 1,
-      earn: 2,
+      earn: 1,      // Casual (far left)
+      'top-10': 2,  // Ranked (middle)
+      blank: 3,     // Skill Issue (far right)
     };
     const newDir = tabOrderMap[tab] >= tabOrderMap[mobileTab] ? 1 : -1;
     setSlideDirection(newDir);
@@ -566,9 +568,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f15] text-slate-100 flex flex-col selection:bg-purple-600 selection:text-white">
-      {/* 1. CLEAN TOP APPLICATION BRANDING (OHKNEE.COM) */}
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black">
+      {/* 1. CLEAN TOP APPLICATION BRANDING (OHKNEE) */}
       <Navbar
+        isSticky={mobileTab !== 'top-10'}
         onGoHome={() => {
           handleSelectMobileTab('hero');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -576,43 +579,52 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full transition-all overflow-hidden">
-        <PageTransitionWrapper
-          currentTab={mobileTab}
-          isInitialBreakaway={isInitialBreakaway}
-          slideDirection={slideDirection}
-        >
-          {mobileTab === 'hero' ? (
-            /* HERO PICTURE VIEW WITH DESCRIPTION (First opened & when clicking logo) */
-            <div className="flex-1 w-full overflow-y-auto flex flex-col justify-center items-center py-6 sm:py-10 pb-28 md:pb-20">
-              <HomepageHero
-                onExploreClick={() => handleSelectMobileTab('top-10')}
-                onEarnClick={() => handleSelectMobileTab('earn')}
-              />
-            </div>
-          ) : mobileTab === 'top-10' ? (
-            /* DEDICATED TOP 10 VIEW NUMBERED 1-10000 */
-            <div className="flex-1 w-full overflow-y-auto">
-              <Top10MobileView
-                offers={top10Offers}
-                allOffers={allOffers}
-                onSelectOffer={setSelectedOffer}
-                onToggleSave={handleToggleSaveOffer}
-                savedOfferIds={savedOfferIds}
-              />
-            </div>
-          ) : (
-            /* OFFERS EXPLORER SECTION (EARN) - ALL TABS CLOSED ON OPEN, STARTS IMMEDIATELY WITH FEATURED ROW */
-            <main
-              id="offers-explorer-section"
-              className="flex-1 w-full bg-[#0d0f15] text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 select-none min-h-screen overflow-y-auto pb-28 md:pb-20"
+      <div className="flex-1 flex flex-col w-full">
+        {mobileTab === 'top-10' ? (
+          /* DEDICATED TOP 10 VIEW NUMBERED 1-10000 (Pure native sticky without any transform wrappers) */
+          <div className="flex-1 w-full">
+            <Top10MobileView
+              offers={top10Offers}
+              allOffers={allOffers}
+              onSelectOffer={setSelectedOffer}
+              onToggleSave={handleToggleSaveOffer}
+              savedOfferIds={savedOfferIds}
+            />
+          </div>
+        ) : (
+          <PageTransitionWrapper
+            currentTab={mobileTab}
+            isInitialBreakaway={isInitialBreakaway}
+            slideDirection={slideDirection}
+          >
+            {mobileTab === 'hero' ? (
+              /* HERO PICTURE VIEW WITH DESCRIPTION (First opened & when clicking logo) */
+              <div className="flex-1 w-full overflow-y-auto flex flex-col justify-center items-center py-6 sm:py-10 pb-28 md:pb-20">
+                <HomepageHero
+                  onExploreClick={() => handleSelectMobileTab('top-10')}
+                  onEarnClick={() => handleSelectMobileTab('earn')}
+                />
+              </div>
+            ) : mobileTab === 'blank' ? (
+              /* THIRD TAB: SKILL ISSUE NOKIA SNAKE GAME WITH REVERSED CONTROLS */
+              <main
+                id="skill-issue-game-view"
+                className="flex-1 w-full min-h-[85vh] bg-black flex flex-col items-center justify-center p-3 select-none"
+              >
+                <SkillIssueSnakeGame />
+              </main>
+            ) : (
+              /* OFFERS EXPLORER SECTION (EARN) - ALL TABS CLOSED ON OPEN, STARTS IMMEDIATELY WITH FEATURED ROW */
+              <main
+                id="offers-explorer-section"
+              className="flex-1 w-full bg-black text-slate-100 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5 select-none min-h-screen overflow-y-auto pb-28 md:pb-20"
             >
               {/* THE 5 DEDICATED CATEGORY ROWS (ZERO DUPLICATES - EVERY APP HAS ONE HOME) */}
               <div className="w-full space-y-3 sm:space-y-4">
-                {/* 1. ONLINE CASINO FREE SPINS */}
+                {/* 1. CASINO */}
                 <CategoryOfferRow
                   id="row-online-casinos"
-                  title="ONLINE CASINO FREE SPINS"
+                  title="Casino"
                   subtitle="Daily free SC coins, free spins, sweepstakes casinos & prize wheels"
                   icon={<Dice5 size={20} className="stroke-[2.2]" />}
                   themeRgb="245, 158, 11"
@@ -624,10 +636,10 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 2. SPORTS BETTING APPS */}
+                {/* 2. SPORTS */}
                 <CategoryOfferRow
                   id="row-sports-betting"
-                  title="Sports Betting Apps"
+                  title="Sports"
                   subtitle="Top sportsbooks, DFS picks, match deposits & risk-free prediction entries"
                   icon={<Swords size={20} className="stroke-[2.2]" />}
                   themeRgb="59, 130, 246"
@@ -639,10 +651,10 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 3. FREE CRYPTO */}
+                {/* 3. CRYPTO */}
                 <CategoryOfferRow
                   id="row-free-crypto"
-                  title="Free Crypto"
+                  title="Crypto"
                   subtitle="Free Bitcoin bonuses, exchange sign-ups, crypto debit cards & airdrops"
                   icon={<Boxes size={20} className="stroke-[2.2]" />}
                   themeRgb="147, 51, 234"
@@ -654,10 +666,10 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 4. FAST OFFERS */}
+                {/* 4. INSTANT GRATIFICATION */}
                 <CategoryOfferRow
                   id="row-fast-offers"
-                  title="Fast Offers"
+                  title="Instant Gratification"
                   subtitle="$100 - $150 sequential easy cash & instant tasks"
                   icon={<Rocket size={20} className="stroke-[2.2]" />}
                   themeRgb="249, 115, 22"
@@ -669,10 +681,10 @@ export default function App() {
                   onToggleSave={handleToggleSaveOffer}
                 />
 
-                {/* 5. FINANCE */}
+                {/* 5. TAKES MONEY TO MAKE MONEY 💰 */}
                 <CategoryOfferRow
                   id="row-finance"
-                  title="Finance"
+                  title="Takes Money to Make Money 💰"
                   subtitle="Banking, high-yield accounts, and high-value credit booster rewards"
                   icon={<Vault size={20} className="stroke-[2.2]" />}
                   themeRgb="14, 165, 233"
@@ -686,17 +698,21 @@ export default function App() {
               </div>
 
               {/* Footer Disclaimer */}
-              <footer className="mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-2">
-                <p>
-                  © {new Date().getFullYear()} OHKNEE.COM. All partner bonuses and promo codes verified.
+              <footer className="mt-12 pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 space-y-2.5 max-w-2xl mx-auto px-4">
+                <p className="leading-relaxed">
+                  Copyright 2026 OHKNEE.COM (only.com) partner incentives are strictly scrutinized, aggressively vetted, and monitored around the clock by our highly caffeinated analyst.
                 </p>
-                <p className="text-[11px] text-slate-600 max-w-xl mx-auto">
-                  Please participate responsibly. Offers subject to individual terms and regional availability.
+                <p className="text-[11px] text-slate-600">
+                  Please participate responsibly. Terms apply.
+                </p>
+                <p className="font-bold text-slate-200 text-xs sm:text-sm tracking-tight">
+                  We know they work, because we tested them on ourselves first.
                 </p>
               </footer>
             </main>
           )}
         </PageTransitionWrapper>
+        )}
       </div>
 
       {/* Subtle Bottom-Right Owner & Staff Controls */}

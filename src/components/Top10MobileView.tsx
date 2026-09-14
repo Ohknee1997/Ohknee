@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { EnrichedOffer } from '../data/enrichedOffers';
 import { initialsOf, getAppDeduplicationKey } from '../utils';
 import {
@@ -7,9 +7,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  X,
-  ChevronsUpDown,
-  Sparkles,
 } from 'lucide-react';
 
 interface Top10MobileViewProps {
@@ -31,6 +28,14 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   const [isBannerClosed, setIsBannerClosed] = useState<boolean>(false);
   const [isBannerExpanded, setIsBannerExpanded] = useState<boolean>(false);
   const [expandedTipIndices, setExpandedTipIndices] = useState<Set<number>>(new Set());
+
+  // Sticky description box & square cards scroll synchronization
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
+  const activeCardIndexRef = useRef<number>(0);
+  const stickyHeaderRef = useRef<HTMLDivElement>(null);
+  const descScrollRef = useRef<HTMLDivElement>(null);
+  const isAutoScrollingDesc = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleTipIndex = (idx: number) => {
     setExpandedTipIndices((prev) => {
@@ -390,101 +395,147 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     });
   }, [masterOffers]);
 
+  // Synchronize scrolling: instantaneously switch description box and highlight active card below
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        let bestIdx = 0;
+        const screenCenterX = window.innerWidth / 2;
+        const screenCenterY = window.innerHeight / 2;
+
+        // Focus on the card closest to the center of the screen (the one in the center viewport)
+        const hitCard = (
+          document.elementFromPoint(screenCenterX, screenCenterY) ||
+          document.elementFromPoint(screenCenterX - 40, screenCenterY) ||
+          document.elementFromPoint(screenCenterX + 40, screenCenterY) ||
+          document.elementFromPoint(screenCenterX, screenCenterY - 30) ||
+          document.elementFromPoint(screenCenterX, screenCenterY + 30)
+        )?.closest('[id^="card-square-"]');
+
+        if (hitCard) {
+          const parsed = parseInt(hitCard.id.replace('card-square-', ''), 10);
+          if (!isNaN(parsed) && parsed >= 0 && parsed < masterOffers.length) {
+            bestIdx = parsed;
+          }
+        } else {
+          // Robust fallback checking which card is closest to the screen center
+          let minDistance = Infinity;
+          for (let i = 0; i < masterOffers.length; i++) {
+            const cardEl = document.getElementById(`card-square-${i}`);
+            if (cardEl) {
+              const rect = cardEl.getBoundingClientRect();
+              if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
+
+              const cardCenterX = rect.left + rect.width / 2;
+              const cardCenterY = rect.top + rect.height / 2;
+              const dist = Math.hypot(cardCenterX - screenCenterX, cardCenterY - screenCenterY);
+              if (dist < minDistance) {
+                minDistance = dist;
+                bestIdx = i;
+              }
+            }
+          }
+        }
+
+        // Only update state & trigger instant snap if the active index actually changed!
+        if (bestIdx !== activeCardIndexRef.current) {
+          activeCardIndexRef.current = bestIdx;
+          setActiveCardIndex(bestIdx);
+
+          // Instantaneous clicky switch in description box - zero lag
+          if (!isAutoScrollingDesc.current && descScrollRef.current) {
+            const container = descScrollRef.current;
+            let targetScrollTop = 0;
+            if (bestIdx >= 2) {
+              const slot1El = document.getElementById(`desc-item-${bestIdx - 2}`);
+              if (slot1El) {
+                targetScrollTop = slot1El.offsetTop - container.offsetTop;
+              }
+            }
+            container.scrollTop = targetScrollTop;
+          }
+        }
+
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, [masterOffers]);
+
   return (
     <div
       id="top-10-ascension-view"
-      className="w-full min-h-screen bg-[#0d0f15] text-slate-100 select-none pb-24 md:pb-16"
+      className="w-full min-h-screen bg-black text-slate-100 select-none pb-24 md:pb-16"
     >
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-1 sm:pt-2 pb-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-0 pb-4">
         {/* =======================================================================
-            TOP APP BREAKDOWN: COMPACT 1-ACROSS BANNER
-            Title: Skinny letters, not bold, centered, in bright red
+            TOP APP BREAKDOWN: STICKY 1-ACROSS BANNER
+            Slides up to top: 0, covers header/logo, and stops as red border touches top!
             ======================================================================= */}
-        {isBannerClosed ? (
-          /* Sleek Re-open Pill when Closed */
-          <div className="mb-2 flex items-center justify-between gap-2 p-1.5 sm:p-2 rounded-xl bg-[#131724] border border-red-500/40 hover:border-red-500 transition-colors">
-            <div className="w-10" />
-            <button
-              type="button"
-              onClick={() => setIsBannerClosed(false)}
-              className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold tracking-wider uppercase text-red-500 hover:text-red-400 cursor-pointer transition-colors font-['Righteous',sans-serif]"
-            >
-              <Sparkles size={13} className="text-red-500" />
-              <span>HEY DUMBASS READ THIS!</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsBannerClosed(false)}
-              className="px-2 py-0.5 rounded bg-[#0d101a] text-slate-300 hover:text-red-400 transition-colors cursor-pointer text-xs flex items-center gap-0.5 border border-slate-700"
-            >
-              <span>Open</span>
-              <ChevronDown size={13} />
-            </button>
-          </div>
-        ) : (
-          /* Active Compact 1-Across Banner */
+        <div
+          ref={stickyHeaderRef}
+          id="sticky-top-description-wrapper"
+          className="sticky top-0 z-45 pt-0 pb-1.5 bg-black transition-shadow"
+        >
+          {/* Active Compact 1-Across Banner */}
           <div
             id="top3-announcement-banner"
-            className="mb-2 sm:mb-2.5 w-full rounded-xl bg-[#131724] border border-red-500/60 p-2 sm:p-2.5 shadow-md shadow-black/50 transition-all"
+            className="mb-1 w-full rounded-xl bg-[#131724] border-2 border-red-500 p-2 shadow-md shadow-black/50 transition-all"
           >
-            {/* Banner Header: Title Centered, Bold Unique Font, Bright Red ALL CAPS */}
-            <div className="relative flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800/80">
-              {/* Left spacer to keep center alignment accurate */}
-              <div className="w-16 hidden sm:block" />
-
-              {/* Centered Bold Red Unique Font Title */}
-              <div className="flex-1 text-center">
-                <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-red-500 drop-shadow-[0_0_12px_rgba(239,68,68,0.45)] font-['Righteous',sans-serif]">
-                  HEY DUMBASS READ THIS!
-                </span>
-              </div>
-
-              {/* Header controls: details expand & close */}
-              <div className="flex items-center gap-1">
-                {/* Compress / Expand Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsBannerExpanded(!isBannerExpanded)}
-                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#0d101a] border border-slate-700 hover:border-red-500/60 text-slate-300 hover:text-red-400 text-[10px] sm:text-[11px] font-normal transition-all cursor-pointer"
-                  title={isBannerExpanded ? 'Collapse descriptions' : 'Expand full tips'}
-                >
-                  <ChevronsUpDown size={11} />
-                  <span>{isBannerExpanded ? 'Less' : 'Details'}</span>
-                </button>
-
-                {/* Close (X) Button to dismiss banner */}
-                <button
-                  type="button"
-                  onClick={() => setIsBannerClosed(true)}
-                  className="p-1 rounded-md bg-[#0d101a] border border-slate-700 hover:border-red-500 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
-                  title="Dismiss banner"
-                  aria-label="Close descriptions"
-                >
-                  <X size={12} />
-                </button>
-              </div>
+            {/* Banner Header: Title Centered in Very Middle, Nice Radiant Amber Color, Far Right Blank */}
+            <div className="flex items-center justify-center pb-1.5 mb-1.5 border-b border-slate-800/80 text-center w-full">
+              <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.45)] font-['Righteous',sans-serif]">
+                GUIDE FOR DUMMIES
+              </span>
             </div>
 
-            {/* 1 ACROSS ROWS: Name of app in matching style color + text description (No prices) + Expand Arrow */}
-            {/* User requested: "I would like the description area up top to be able to scroll and I would like it to continue after 6:00 and go on through every single app giving a brief description and color coordinating the title with the color of the logo as well but I don't want that to scroll down the entire page I wanted to stay inside of the boxed area up top where my boxes below don't move at all" */}
-            <div className="flex flex-col gap-1 w-full max-h-[148px] sm:max-h-[164px] overflow-y-auto pr-1 select-text scroll-smooth [scrollbar-width:thin] [scrollbar-color:#334155_transparent]">
+            {/* 1 ACROSS ROWS: Description items sized so it perfectly fits 5 instead of 6 */}
+            <div
+              ref={descScrollRef}
+              id="description-scroll-container"
+              className="flex flex-col gap-1 w-full h-[178px] sm:h-[188px] max-h-[178px] sm:max-h-[188px] overflow-y-auto pr-1 select-text [scrollbar-width:thin] [scrollbar-color:#334155_transparent]"
+            >
               {allTipsData.map((item, idx) => {
                 const isItemExpanded = isBannerExpanded || expandedTipIndices.has(idx);
+                const isCurrentActive = idx === activeCardIndex;
 
                 return (
                   <div
+                    id={`desc-item-${idx}`}
                     key={`${item.num}-${item.name}`}
-                    onClick={() => toggleTipIndex(idx)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTipIndex(idx);
+                    }}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
+                        e.stopPropagation();
                         toggleTipIndex(idx);
                       }
                     }}
-                    className={`w-full flex flex-col p-1.5 rounded-lg bg-[#0e111a] border border-slate-800/80 hover:border-slate-700 transition-colors cursor-pointer text-left ${
-                      isItemExpanded ? 'bg-[#151a28]' : ''
+                    className={`w-full flex flex-col px-2 py-1.5 min-h-[32px] rounded-lg border transition-all cursor-pointer text-left ${
+                      isItemExpanded
+                        ? 'bg-[#151a28] border-slate-700'
+                        : isCurrentActive
+                        ? 'bg-[#1b1526] border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.25)]'
+                        : 'bg-[#0e111a] border-slate-800/80 hover:border-slate-700'
                     }`}
                   >
                     {/* Single Row Layout: #Badge + App Name in brand color + brief description + Chevron */}
@@ -497,7 +548,7 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                             borderColor: `rgba(${item.accentRgb}, 0.45)`,
                             color: `rgb(${item.accentRgb})`,
                           }}
-                          className="w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center flex-shrink-0 border"
+                          className="w-4.5 h-4.5 rounded text-[10px] sm:text-[11px] font-bold flex items-center justify-center flex-shrink-0 border"
                         >
                           {item.num}
                         </span>
@@ -505,26 +556,26 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                         {/* App Name in color matching style */}
                         <span
                           style={{ color: `rgb(${item.accentRgb})` }}
-                          className="text-[11px] sm:text-xs font-bold flex-shrink-0"
+                          className="text-xs sm:text-[13px] font-bold flex-shrink-0"
                         >
                           {item.name}:
                         </span>
 
-                        {/* Brief text description right after the logo words, no prices */}
-                        <span className="text-[10px] sm:text-[11px] text-slate-300 truncate font-normal leading-tight">
+                        {/* Brief text description - larger, brighter, easier to read on mobile */}
+                        <span className="text-[11.5px] sm:text-xs text-slate-100 truncate font-medium leading-tight">
                           {item.brief}
                         </span>
                       </div>
 
                       {/* Expand / Collapse Indicator Arrow */}
                       <span className="text-slate-400 hover:text-slate-200 flex-shrink-0 p-0.5">
-                        {isItemExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        {isItemExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                       </span>
                     </div>
 
-                    {/* Extended detail visible on expand */}
+                    {/* Extended detail visible on expand - full description visible without page shifting */}
                     {isItemExpanded && (
-                      <p className="mt-1 pt-1 border-t border-slate-800 text-[11px] text-slate-200 leading-relaxed font-normal animate-in fade-in duration-150">
+                      <p className="mt-1.5 pt-1.5 border-t border-slate-800 text-xs sm:text-[13px] text-slate-100 leading-relaxed font-normal animate-in fade-in duration-150 select-text">
                         {item.detail}
                       </p>
                     )}
@@ -533,7 +584,7 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
               })}
             </div>
           </div>
-        )}
+        </div>
 
         {/* =======================================================================
             OFFERS GRID: NUMBERED SEQUENTIALLY 1 - 10000
@@ -550,23 +601,44 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
 
             // Theme-matched custom color styles for the box background and borders
             const accentRgb = offer.accentRgb || '34, 197, 94';
-            const cardBgStyle = {
-              backgroundColor: `rgba(${accentRgb}, 0.12)`,
-              borderColor: `rgba(${accentRgb}, 0.35)`,
-              boxShadow: `0 4px 14px -3px rgba(${accentRgb}, 0.25)`,
-            };
-            const innerArtBgStyle = {
-              backgroundColor: `rgba(${accentRgb}, 0.16)`,
-              borderColor: `rgba(${accentRgb}, 0.40)`,
-            };
-            const accentTextStyle = {
-              color: `rgb(${accentRgb})`,
-            };
+            const isCurrentActive = idx === activeCardIndex;
+
+            // When active, highlight the square and icon with matching opaque red border & glowing accent
+            const cardBgStyle = isCurrentActive
+              ? {
+                  backgroundColor: 'rgba(239, 68, 68, 0.16)',
+                  borderColor: '#ef4444',
+                  boxShadow: '0 0 16px 2px rgba(239, 68, 68, 0.42), 0 4px 14px -3px rgba(239, 68, 68, 0.3)',
+                }
+              : {
+                  backgroundColor: `rgba(${accentRgb}, 0.12)`,
+                  borderColor: `rgba(${accentRgb}, 0.35)`,
+                  boxShadow: `0 4px 14px -3px rgba(${accentRgb}, 0.25)`,
+                };
+
+            const innerArtBgStyle = isCurrentActive
+              ? {
+                  backgroundColor: 'rgba(239, 68, 68, 0.22)',
+                  borderColor: '#ef4444',
+                }
+              : {
+                  backgroundColor: `rgba(${accentRgb}, 0.16)`,
+                  borderColor: `rgba(${accentRgb}, 0.40)`,
+                };
+
+            const accentTextStyle = isCurrentActive
+              ? {
+                  color: '#ef4444',
+                }
+              : {
+                  color: `rgb(${accentRgb})`,
+                };
 
             const hasCode = Boolean(offer.code && offer.code.trim().length > 0);
 
             return (
               <div
+                id={`card-square-${idx}`}
                 key={offer.id}
                 onClick={() => onSelectOffer(offer)}
                 role="button"
@@ -578,17 +650,25 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
                   }
                 }}
                 style={cardBgStyle}
-                className="group relative flex flex-col justify-between select-none cursor-pointer rounded-xl p-2 sm:p-2.5 min-h-[162px] sm:min-h-[176px] md:min-h-[188px] transition-all duration-150 hover:-translate-y-0.5 hover:brightness-110 border"
+                className={`group relative flex flex-col justify-between select-none cursor-pointer rounded-xl p-2 sm:p-2.5 min-h-[162px] sm:min-h-[176px] md:min-h-[188px] transition-colors duration-75 border ${
+                  isCurrentActive
+                    ? 'border-2 border-red-500 ring-1 ring-red-500/60 brightness-110 z-10'
+                    : 'border hover:-translate-y-0.5 hover:brightness-110'
+                }`}
               >
                 {/* 1. TOP ARTWORK / LOGO CONTAINER (Themed inner container) */}
                 <div
                   style={innerArtBgStyle}
-                  className="w-full h-18 sm:h-22 md:h-24 rounded-lg border relative flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0 transition-colors backdrop-blur-xs"
+                  className={`w-full h-18 sm:h-22 md:h-24 rounded-lg border relative flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0 transition-colors ${
+                    isCurrentActive ? 'border-2 border-red-500 shadow-inner' : 'border'
+                  }`}
                 >
                   {/* Top-left: Sequential App Number (1 - 10000) */}
                   <div
-                    style={{ borderColor: `rgba(${accentRgb}, 0.7)` }}
-                    className="absolute top-1 left-1 z-10 px-1.5 py-0.2 rounded-full bg-[#181d2c]/95 border text-white text-[9px] sm:text-[10px] font-black shadow-xs flex items-center gap-0.5 backdrop-blur-xs"
+                    style={{ borderColor: isCurrentActive ? '#ef4444' : `rgba(${accentRgb}, 0.7)` }}
+                    className={`absolute top-1 left-1 z-10 px-1.5 py-0.2 rounded-full border text-white text-[9px] sm:text-[10px] font-black shadow-xs flex items-center gap-0.5 backdrop-blur-xs ${
+                      isCurrentActive ? 'bg-red-950/95 text-red-200 border-red-500' : 'bg-[#181d2c]/95'
+                    }`}
                     title={`Rank #${rankNumber}`}
                   >
                     <span style={accentTextStyle} className="text-[8px]">#</span>

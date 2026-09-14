@@ -3,9 +3,10 @@ import { OhkneeLogo } from './OhkneeLogo';
 
 interface NavbarProps {
   onGoHome?: () => void;
+  isSticky?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onGoHome }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onGoHome, isSticky = true }) => {
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (onGoHome) {
@@ -16,7 +17,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onGoHome }) => {
   return (
     <header
       id="main-brand-header"
-      className="sticky top-0 z-40 w-full bg-[#0e111a] border-b border-[#22293c] shadow-md select-none"
+      className={`${
+        isSticky ? 'sticky top-0' : 'relative'
+      } z-20 w-full bg-black border-b border-neutral-800/80 shadow-lg select-none`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="h-16 sm:h-20 flex items-center justify-between gap-3">

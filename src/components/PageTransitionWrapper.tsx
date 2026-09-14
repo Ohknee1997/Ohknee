@@ -15,6 +15,12 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
   slideDirection = 1,
   children,
 }) => {
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsTransitioning(true);
+  }, [currentTab]);
+
   // If this is the one-time initial entry breakaway animation
   const getVariants = () => {
     if (isInitialBreakaway) {
@@ -90,7 +96,11 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
   const variants = getVariants();
 
   return (
-    <div className="relative w-full flex-1 flex flex-col overflow-hidden">
+    <div
+      className={`relative w-full flex-1 flex flex-col ${
+        currentTab === 'top-10' ? 'overflow-visible' : 'overflow-hidden'
+      }`}
+    >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={currentTab}
@@ -98,7 +108,13 @@ export const PageTransitionWrapper: React.FC<PageTransitionWrapperProps> = ({
           animate={variants.animate}
           exit={variants.exit}
           transition={variants.transition}
-          className="w-full flex-1 flex flex-col"
+          onAnimationComplete={() => setIsTransitioning(false)}
+          style={!isTransitioning && currentTab === 'top-10' ? { transform: 'none' } : undefined}
+          className={`w-full flex-1 flex flex-col ${
+            currentTab === 'top-10'
+              ? `overflow-visible ${!isTransitioning ? 'top-10-no-transform' : ''}`
+              : ''
+          }`}
         >
           {children}
         </motion.div>
