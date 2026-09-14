@@ -117,6 +117,7 @@ export function getAppDeduplicationKey(offer: {
   if (name.includes('gemsloot') || domain.includes('gemsloot') || id.includes('gemsloot')) return 'gemsloot';
   if (name.includes('polymarket') || domain.includes('polymarket') || id.includes('polymarket')) return 'polymarket';
   if (name.includes('draftking') || domain.includes('draftkings') || id.includes('draftkings')) return 'draftkings';
+  if (name.includes('ero') || domain.includes('ero.app') || id.includes('ero')) return 'ero';
   if (name.includes('tilt') || id.includes('tilt')) return 'tilt';
   if (name.includes('rebet') || domain.includes('rebet') || id.includes('rebet')) return 'rebet';
   if (name.includes('onyx') || domain.includes('onyx') || id.includes('onyx')) return 'onyx';

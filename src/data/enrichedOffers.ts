@@ -208,10 +208,12 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('sportzino') ||
     name.includes('coin wizard') ||
     name.includes('rip') ||
-    name.includes('myappfree')
+    name.includes('myappfree') ||
+    name.includes('ero') ||
+    id.includes('ero')
   ) {
     categories.push('play-to-earn');
-    if (name.includes('freecash') || name.includes('gems loot')) {
+    if (name.includes('freecash') || name.includes('gems loot') || name.includes('ero') || id.includes('ero')) {
       isFeatured = true;
       badgeType = 'HOT';
     }

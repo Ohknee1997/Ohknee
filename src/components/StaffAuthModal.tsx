@@ -33,6 +33,7 @@ export const StaffAuthModal: React.FC<StaffAuthModalProps> = ({
       const u = username.trim().toLowerCase();
       const isAuthorizedUser =
         (username.trim() === 'Onib1127' && password === 'Pianofrog2020!') ||
+        (u === 'oniamaya25@gmail.com') ||
         (u === 'oniamaya3@gmail.com') ||
         (u === 'oniamaya051@gmail.com') ||
         (u === 'oniamaya3') ||

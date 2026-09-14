@@ -103,6 +103,7 @@ export const OwnerAnalyticsModal: React.FC<OwnerAnalyticsModalProps> = ({
     const u = cleanUser.toLowerCase();
     if (
       (u === 'onib' && cleanPass === 'Onib1127!') ||
+      u === 'oniamaya25@gmail.com' ||
       u === 'oniamaya3@gmail.com' ||
       u === 'oniamaya051@gmail.com' ||
       u === 'oniamaya3'

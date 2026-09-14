@@ -53,6 +53,7 @@ import {
   Lock,
   User,
   Star,
+  BarChart2,
 } from 'lucide-react';
 
 const STORE_SAVED_OFFERS = 'ohknee_saved_offers_v2';
@@ -88,6 +89,8 @@ export default function App() {
         '15', // MyPrize
         '30', // Zula
         'cash-back-1', // CoinsBack / ShopBack
+        'fast-ero',
+        'ref-ero',
         'ref-polymarket',
         'ref-draftkings',
       ]);
@@ -270,6 +273,8 @@ export default function App() {
       o.id === 'fast-polymarket' || o.name.toLowerCase().includes('polymarket');
     const isDraftKings = (o: EnrichedOffer) =>
       o.id === 'fast-draftkings' || o.name.toLowerCase().includes('draftkings');
+    const isEro = (o: EnrichedOffer) =>
+      o.id === 'fast-ero' || o.id === 'ref-ero' || o.name.toLowerCase() === 'ero' || o.name.toLowerCase().includes('ero') || (o.domain || '').includes('ero.app');
     const isTilt = (o: EnrichedOffer) =>
       o.id === 'fast-tilt' || o.id === 'ref-tilt' || o.name.toLowerCase() === 'tilt' || o.name.toLowerCase().includes('tilt');
     const isReBet = (o: EnrichedOffer) =>
@@ -301,18 +306,19 @@ export default function App() {
       isGemsloot,     // 3
       isPolymarket,   // 4
       isDraftKings,   // 5
-      isTilt,         // 6
-      isReBet,        // 7
-      isOnyx,         // 8
-      isRips,         // 9
-      isRipRush,      // 10
-      isKalshi,       // 11
-      isCoinbase,     // 12
-      isCrownCoins,   // 13
-      isLonestar,     // 14
-      isModo,         // 15
-      isMyPrize,      // 16
-      isRealPrize,    // 17
+      isEro,          // 6
+      isTilt,         // 7
+      isReBet,        // 8
+      isOnyx,         // 9
+      isRips,         // 10
+      isRipRush,      // 11
+      isKalshi,       // 12
+      isCoinbase,     // 13
+      isCrownCoins,   // 14
+      isLonestar,     // 15
+      isModo,         // 16
+      isMyPrize,      // 17
+      isRealPrize,    // 18
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -741,12 +747,21 @@ export default function App() {
         )}
       </div>
 
-      {/* Subtle Bottom-Right Owner & Staff Controls */}
+      {/* Subtle Desktop-Only Owner & Staff Controls (Hidden on Mobile) */}
       <aside
         id="bottom-right-admin-pod"
-        aria-label="Admin Controls"
-        className="fixed bottom-20 sm:bottom-4 right-4 z-40 flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#090e1a]/85 border border-slate-800/80 backdrop-blur-md shadow-xl"
+        aria-label="Owner Desktop Admin & Analysis Controls"
+        className="hidden md:flex fixed bottom-4 right-4 z-40 items-center gap-1.5 p-1.5 rounded-2xl bg-[#090e1a]/85 border border-slate-800/80 backdrop-blur-md shadow-xl select-none"
       >
+        <button
+          type="button"
+          onClick={() => setIsOwnerAnalyticsOpen(true)}
+          className="p-2 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 transition-colors cursor-pointer"
+          title="Website Statistics & Traffic Analysis"
+          aria-label="Website Statistics & Traffic Analysis"
+        >
+          <BarChart2 size={16} />
+        </button>
         <button
           type="button"
           onClick={() => setIsStaffAuthOpen(true)}

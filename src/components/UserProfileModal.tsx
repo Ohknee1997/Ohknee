@@ -34,6 +34,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const currentAvatar = getAvatarById(userProfile.avatarId);
   const account = getAccountByUsername(userProfile.username);
 
+  const isOwner =
+    userProfile.username?.toLowerCase() === 'onib1127' ||
+    userProfile.username?.toLowerCase() === 'onib' ||
+    userProfile.email?.toLowerCase() === 'oniamaya25@gmail.com' ||
+    userProfile.email?.toLowerCase() === 'oniamaya3@gmail.com' ||
+    (typeof window !== 'undefined' &&
+      (sessionStorage.getItem('ohknee_owner_auth') === 'true' ||
+        sessionStorage.getItem('ohk_staff_authenticated') === 'true'));
+
   const handleSaveUsername = () => {
     const clean = newUsernameInput.trim();
     if (!clean || clean.length < 3) return;
@@ -171,61 +180,63 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               </div>
             </div>
 
-            {/* Custom Avatar / Photo */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-300">Profile Picture Customization</span>
-                {userProfile.customPfpUrl && (
+            {/* Custom Avatar / Photo (Owner only) */}
+            {isOwner && (
+              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-300">Profile Picture Customization</span>
+                  {userProfile.customPfpUrl && (
+                    <button
+                      type="button"
+                      onClick={handleResetToWiiAvatar}
+                      className="text-[11px] text-cyan-400 hover:underline cursor-pointer"
+                    >
+                      Reset to Assigned Avatar
+                    </button>
+                  )}
+                </div>
+
+                {!showPfpInput ? (
                   <button
                     type="button"
-                    onClick={handleResetToWiiAvatar}
-                    className="text-[11px] text-cyan-400 hover:underline cursor-pointer"
+                    onClick={() => {
+                      setCustomPfpInput(userProfile.customPfpUrl || '');
+                      setShowPfpInput(true);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition cursor-pointer border border-slate-700 flex items-center justify-center gap-2"
                   >
-                    Reset to Assigned Avatar
+                    <span>🖼️</span>
+                    <span>Set Custom Image URL</span>
                   </button>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="url"
+                      placeholder="https://example.com/my-photo.jpg"
+                      value={customPfpInput}
+                      onChange={(e) => setCustomPfpInput(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-cyan-500/50 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveCustomPfp}
+                        className="flex-1 py-1.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition cursor-pointer"
+                      >
+                        Save Picture
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowPfpInput(false)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              {!showPfpInput ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCustomPfpInput(userProfile.customPfpUrl || '');
-                    setShowPfpInput(true);
-                  }}
-                  className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition cursor-pointer border border-slate-700 flex items-center justify-center gap-2"
-                >
-                  <span>🖼️</span>
-                  <span>Set Custom Image URL</span>
-                </button>
-              ) : (
-                <div className="space-y-2">
-                  <input
-                    type="url"
-                    placeholder="https://example.com/my-photo.jpg"
-                    value={customPfpInput}
-                    onChange={(e) => setCustomPfpInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-cyan-500/50 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                  />
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSaveCustomPfp}
-                      className="flex-1 py-1.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition cursor-pointer"
-                    >
-                      Save Picture
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowPfpInput(false)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white transition cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             {/* Username display / Edit */}
             <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80">

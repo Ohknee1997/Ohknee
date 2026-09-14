@@ -80,6 +80,8 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
       o.id === 'fast-polymarket' || o.name.toLowerCase().includes('polymarket');
     const isDraftKings = (o: EnrichedOffer) =>
       o.id === 'fast-draftkings' || o.name.toLowerCase().includes('draftkings');
+    const isEro = (o: EnrichedOffer) =>
+      o.id === 'fast-ero' || o.id === 'ref-ero' || o.name.toLowerCase() === 'ero' || o.name.toLowerCase().includes('ero') || (o.domain || '').includes('ero.app');
     const isTilt = (o: EnrichedOffer) =>
       o.id === 'fast-tilt' || o.id === 'ref-tilt' || o.name.toLowerCase() === 'tilt' || o.name.toLowerCase().includes('tilt');
     const isReBet = (o: EnrichedOffer) =>
@@ -105,25 +107,26 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     const isRealPrize = (o: EnrichedOffer) =>
       o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
 
-    // 1-17 exact order as requested by user ("Leave the rest up top exactly in the order that I had them")
+    // 1-18 exact order as requested by user
     const orderedFinders = [
       isStake,        // 1
       isFreecash,     // 2
       isGemsloot,     // 3
       isPolymarket,   // 4
       isDraftKings,   // 5
-      isTilt,         // 6
-      isReBet,        // 7
-      isOnyx,         // 8
-      isRips,         // 9
-      isRipRush,      // 10
-      isKalshi,       // 11
-      isCoinbase,     // 12
-      isCrownCoins,   // 13
-      isLonestar,     // 14
-      isModo,         // 15
-      isMyPrize,      // 16
-      isRealPrize,    // 17
+      isEro,          // 6
+      isTilt,         // 7
+      isReBet,        // 8
+      isOnyx,         // 9
+      isRips,         // 10
+      isRipRush,      // 11
+      isKalshi,       // 12
+      isCoinbase,     // 13
+      isCrownCoins,   // 14
+      isLonestar,     // 15
+      isModo,         // 16
+      isMyPrize,      // 17
+      isRealPrize,    // 18
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -287,6 +290,10 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     draftkings: {
       brief: 'Top picks and predictions on sports and pop culture with fast cashouts.',
       detail: 'Top picks and predictions on sports and pop culture with fast bonus cashouts. Verified referral bonus for new signups.',
+    },
+    ero: {
+      brief: 'Earn real cash completing brand missions and app tasks with an instant 50% day-one boost.',
+      detail: 'Ero (by EarnOS) rewards you in real cash for completing quick brand missions, connecting apps, and playing games. Cash out instantly to your free ero Visa card or direct to your bank. Use code uoj7nba2x5 for an extra 50% earnings boost on your first day! https://ero.app/r/uoj7nba2x5?link=u63qfmappxxh (Referral Code: uoj7nba2x5)',
     },
     tilt: {
       brief: 'Referral rewards with code M0LGX1. Easy signup and instant referral tracking.',

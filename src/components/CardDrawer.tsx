@@ -22,19 +22,27 @@ export const CardDrawer: React.FC<CardDrawerProps> = ({
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isOwner =
+    typeof window !== 'undefined' &&
+    (sessionStorage.getItem('ohknee_owner_auth') === 'true' ||
+      sessionStorage.getItem('ohk_staff_authenticated') === 'true');
+
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!isOwner) return;
     const val = e.target.value;
     setNote(val);
     onUpdateDetail({ ...detail, note: val });
   };
 
   const handleLink2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isOwner) return;
     const val = e.target.value.trim();
     setLink2(val);
     onUpdateDetail({ ...detail, link2: val });
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isOwner) return;
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
@@ -49,6 +57,7 @@ export const CardDrawer: React.FC<CardDrawerProps> = ({
 
   const handleRemoveImage = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
+    if (!isOwner) return;
     const updatedImages = (detail.images || []).filter((_, i) => i !== index);
     onUpdateDetail({ ...detail, images: updatedImages });
   };
@@ -92,9 +101,10 @@ export const CardDrawer: React.FC<CardDrawerProps> = ({
             </label>
             <textarea
               id={`drawer-note-input-${card.id}`}
-              className="ohk-drawer-note"
+              className={`ohk-drawer-note ${!isOwner ? 'cursor-default opacity-90' : ''}`}
               placeholder="Steps to complete the offer exactly — login used, deposit amount, promo code, wagering terms, quick cashout guide…"
               value={note}
+              readOnly={!isOwner}
               onChange={handleNoteChange}
             />
           </div>
@@ -131,35 +141,39 @@ export const CardDrawer: React.FC<CardDrawerProps> = ({
                     </span>
                   </div>
 
-                  {/* Remove Button */}
-                  <button
-                    type="button"
-                    id={`drawer-img-remove-${card.id}-${i}`}
-                    className="ohk-drawer-img-remove z-20"
-                    title="Remove photo"
-                    aria-label="Remove photo"
-                    onClick={(e) => handleRemoveImage(e, i)}
-                  >
-                    ✕
-                  </button>
+                  {/* Remove Button (Owner only) */}
+                  {isOwner && (
+                    <button
+                      type="button"
+                      id={`drawer-img-remove-${card.id}-${i}`}
+                      className="ohk-drawer-img-remove z-20"
+                      title="Remove photo"
+                      aria-label="Remove photo"
+                      onClick={(e) => handleRemoveImage(e, i)}
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               ))}
 
-              <label className="ohk-drawer-add" id={`drawer-add-photo-label-${card.id}`}>
-                <div className="flex flex-col items-center gap-1">
-                  <Upload size={18} className="text-amber-400" />
-                  <span>+ Photo</span>
-                  <span className="text-[10px] text-slate-400 font-normal">PNG / JPG</span>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  id={`drawer-file-input-${card.id}`}
-                  onChange={handleFileUpload}
-                />
-              </label>
+              {isOwner && (
+                <label className="ohk-drawer-add" id={`drawer-add-photo-label-${card.id}`}>
+                  <div className="flex flex-col items-center gap-1">
+                    <Upload size={18} className="text-amber-400" />
+                    <span>+ Photo</span>
+                    <span className="text-[10px] text-slate-400 font-normal">PNG / JPG</span>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    id={`drawer-file-input-${card.id}`}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              )}
             </div>
           </div>
 
