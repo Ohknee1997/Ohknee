@@ -50,7 +50,6 @@ import {
   Boxes,
   Rocket,
   Vault,
-  BarChart2,
   Lock,
   User,
   Star,
@@ -567,8 +566,30 @@ export default function App() {
     setMobileTab('top-10');
   };
 
+  // Prevent scrolling when on the first page (hero view)
+  useEffect(() => {
+    if (mobileTab === 'hero') {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [mobileTab]);
+
   return (
-    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black">
+    <div
+      className={`bg-black text-slate-100 flex flex-col selection:bg-amber-500 selection:text-black ${
+        mobileTab === 'hero'
+          ? 'h-screen h-[100dvh] max-h-[100dvh] overflow-hidden overscroll-none'
+          : 'min-h-screen'
+      }`}
+    >
       {/* 1. CLEAN TOP APPLICATION BRANDING (OHKNEE) */}
       <Navbar
         isSticky={mobileTab !== 'top-10'}
@@ -576,10 +597,15 @@ export default function App() {
           handleSelectMobileTab('hero');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+        onOpenAnalytics={() => setIsOwnerAnalyticsOpen(true)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full">
+      <div
+        className={`flex-1 flex flex-col w-full ${
+          mobileTab === 'hero' ? 'h-full overflow-hidden' : ''
+        }`}
+      >
         {mobileTab === 'top-10' ? (
           /* DEDICATED TOP 10 VIEW NUMBERED 1-10000 (Pure native sticky without any transform wrappers) */
           <div className="flex-1 w-full">
@@ -598,8 +624,8 @@ export default function App() {
             slideDirection={slideDirection}
           >
             {mobileTab === 'hero' ? (
-              /* HERO PICTURE VIEW WITH DESCRIPTION (First opened & when clicking logo) */
-              <div className="flex-1 w-full overflow-y-auto flex flex-col justify-center items-center py-6 sm:py-10 pb-28 md:pb-20">
+              /* HERO PICTURE VIEW WITH DESCRIPTION (First opened & when clicking logo) - NO SCROLL */
+              <div className="flex-1 w-full h-full overflow-hidden flex flex-col justify-center items-center pb-16 sm:pb-20">
                 <HomepageHero
                   onExploreClick={() => handleSelectMobileTab('top-10')}
                   onEarnClick={() => handleSelectMobileTab('earn')}
@@ -721,15 +747,6 @@ export default function App() {
         aria-label="Admin Controls"
         className="fixed bottom-20 sm:bottom-4 right-4 z-40 flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#090e1a]/85 border border-slate-800/80 backdrop-blur-md shadow-xl"
       >
-        <button
-          type="button"
-          onClick={() => setIsOwnerAnalyticsOpen(true)}
-          className="p-2 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-slate-800/80 transition-colors cursor-pointer"
-          title="Owner Analytics"
-          aria-label="Owner Analytics"
-        >
-          <BarChart2 size={16} />
-        </button>
         <button
           type="button"
           onClick={() => setIsStaffAuthOpen(true)}

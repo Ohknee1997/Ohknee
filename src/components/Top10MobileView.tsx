@@ -7,6 +7,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  X,
 } from 'lucide-react';
 
 interface Top10MobileViewProps {
@@ -28,6 +29,8 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
   const [isBannerClosed, setIsBannerClosed] = useState<boolean>(false);
   const [isBannerExpanded, setIsBannerExpanded] = useState<boolean>(false);
   const [expandedTipIndices, setExpandedTipIndices] = useState<Set<number>>(new Set());
+  // Expanded full-box view inside the red border for the selected app
+  const [expandedTipAppIdx, setExpandedTipAppIdx] = useState<number | null>(null);
 
   // Sticky description box & square cards scroll synchronization
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
@@ -381,16 +384,23 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
         fallbackBrief = fallbackBrief.slice(0, 87) + '...';
       }
 
+      const detailText = curated
+        ? curated.detail
+        : (offer.instructionSub
+            ? `${offer.instructionSub} ${offer.descriptionText || ''}`
+            : offer.descriptionText || `Complete registration on ${offer.name} to claim your verified rewards.`);
+
+      const extractedUrlMatch = detailText.match(/https?:\/\/[^\s]+/);
+      const referralUrl = extractedUrlMatch ? extractedUrlMatch[0] : (offer.signupUrl || '');
+
       return {
         num: idx + 1,
         name: offer.name,
         accentRgb,
         brief: curated ? curated.brief : fallbackBrief,
-        detail: curated
-          ? curated.detail
-          : (offer.instructionSub
-              ? `${offer.instructionSub} ${offer.descriptionText || ''}`
-              : offer.descriptionText || `Complete registration on ${offer.name} to claim your verified rewards.`),
+        detail: detailText,
+        offer,
+        referralUrl,
       };
     });
   }, [masterOffers]);
@@ -494,95 +504,191 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
           {/* Active Compact 1-Across Banner */}
           <div
             id="top3-announcement-banner"
-            className="mb-1 w-full rounded-xl bg-[#131724] border-2 border-red-500 p-2 shadow-md shadow-black/50 transition-all"
+            className="mb-1 w-full rounded-xl bg-[#131724] border-2 border-red-500 p-2 shadow-md shadow-black/50 transition-all relative overflow-hidden"
           >
-            {/* Banner Header: Title Centered in Very Middle, Nice Radiant Amber Color, Far Right Blank */}
-            <div className="flex items-center justify-center pb-1.5 mb-1.5 border-b border-slate-800/80 text-center w-full">
-              <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.45)] font-['Righteous',sans-serif]">
-                GUIDE FOR DUMMIES
-              </span>
-            </div>
-
-            {/* 1 ACROSS ROWS: Description items sized so it perfectly fits 5 instead of 6 */}
-            <div
-              ref={descScrollRef}
-              id="description-scroll-container"
-              className="flex flex-col gap-1 w-full h-[178px] sm:h-[188px] max-h-[178px] sm:max-h-[188px] overflow-y-auto pr-1 select-text [scrollbar-width:thin] [scrollbar-color:#334155_transparent]"
-            >
-              {allTipsData.map((item, idx) => {
-                const isItemExpanded = isBannerExpanded || expandedTipIndices.has(idx);
-                const isCurrentActive = idx === activeCardIndex;
+            {/* When a tab/app is selected, expand to take up the full size of the description box in opaque white style */}
+            {expandedTipAppIdx !== null && allTipsData[expandedTipAppIdx] ? (
+              (() => {
+                const item = allTipsData[expandedTipAppIdx];
+                const offer = item.offer;
+                const referralUrl = item.referralUrl || offer?.signupUrl || '#';
+                const hasCode = Boolean(offer?.code && offer.code.trim().length > 0);
+                const cleanDetail = item.detail.replace(/https?:\/\/[^\s]+/g, '').trim();
 
                 return (
                   <div
-                    id={`desc-item-${idx}`}
-                    key={`${item.num}-${item.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleTipIndex(idx);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleTipIndex(idx);
-                      }
-                    }}
-                    className={`w-full flex flex-col px-2 py-1.5 min-h-[32px] rounded-lg border transition-all cursor-pointer text-left ${
-                      isItemExpanded
-                        ? 'bg-[#151a28] border-slate-700'
-                        : isCurrentActive
-                        ? 'bg-[#1b1526] border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.25)]'
-                        : 'bg-[#0e111a] border-slate-800/80 hover:border-slate-700'
-                    }`}
+                    id="expanded-description-box"
+                    className="w-full min-h-[195px] sm:min-h-[210px] rounded-lg bg-white text-zinc-900 p-3 sm:p-4 shadow-xl flex flex-col justify-between relative select-text animate-in fade-in zoom-in-95 duration-150"
                   >
-                    {/* Single Row Layout: #Badge + App Name in brand color + brief description + Chevron */}
-                    <div className="flex items-center justify-between gap-2 w-full">
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                        {/* Number badge color coordinated with app logo */}
-                        <span
-                          style={{
-                            backgroundColor: `rgba(${item.accentRgb}, 0.16)`,
-                            borderColor: `rgba(${item.accentRgb}, 0.45)`,
-                            color: `rgb(${item.accentRgb})`,
-                          }}
-                          className="w-4.5 h-4.5 rounded text-[10px] sm:text-[11px] font-bold flex items-center justify-center flex-shrink-0 border"
-                        >
-                          {item.num}
-                        </span>
+                    {/* Big Red X in Top Right so they can exit out once done */}
+                    <button
+                      type="button"
+                      id="close-description-detail-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedTipAppIdx(null);
+                      }}
+                      className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 active:scale-90 border-2 border-red-500 flex items-center justify-center text-red-600 hover:text-red-700 transition-all cursor-pointer shadow-md z-30"
+                      title="Close description"
+                      aria-label="Close description"
+                    >
+                      <X size={20} strokeWidth={3.5} />
+                    </button>
 
-                        {/* App Name in color matching style */}
-                        <span
-                          style={{ color: `rgb(${item.accentRgb})` }}
-                          className="text-xs sm:text-[13px] font-bold flex-shrink-0"
-                        >
-                          {item.name}:
-                        </span>
-
-                        {/* Brief text description - larger, brighter, easier to read on mobile */}
-                        <span className="text-[11.5px] sm:text-xs text-slate-100 truncate font-medium leading-tight">
-                          {item.brief}
-                        </span>
-                      </div>
-
-                      {/* Expand / Collapse Indicator Arrow */}
-                      <span className="text-slate-400 hover:text-slate-200 flex-shrink-0 p-0.5">
-                        {isItemExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                    {/* Header: Badge, App Name in brand color, and Promo Code */}
+                    <div className="flex items-center gap-2 pr-11 border-b border-zinc-200 pb-2 mb-2">
+                      <span
+                        style={{
+                          backgroundColor: `rgba(${item.accentRgb}, 0.18)`,
+                          borderColor: `rgb(${item.accentRgb})`,
+                          color: `rgb(${item.accentRgb})`,
+                        }}
+                        className="px-2 py-0.5 rounded-md text-xs font-black border flex-shrink-0"
+                      >
+                        #{item.num}
                       </span>
+                      <h3
+                        style={{ color: `rgb(${item.accentRgb})` }}
+                        className="text-base sm:text-lg font-black tracking-tight truncate leading-none"
+                      >
+                        {item.name}
+                      </h3>
+                      {hasCode && (
+                        <span className="hidden xs:inline-flex ml-auto text-[10px] sm:text-xs font-mono font-bold bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-300">
+                          CODE: {offer.code}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Extended detail visible on expand - full description visible without page shifting */}
-                    {isItemExpanded && (
-                      <p className="mt-1.5 pt-1.5 border-t border-slate-800 text-xs sm:text-[13px] text-slate-100 leading-relaxed font-normal animate-in fade-in duration-150 select-text">
-                        {item.detail}
+                    {/* Body: Clean Brief and Detailed Information */}
+                    <div className="flex-1 overflow-y-auto max-h-[115px] sm:max-h-[135px] pr-1 space-y-1.5 [scrollbar-width:thin]">
+                      <p className="text-xs sm:text-[13px] font-bold text-zinc-950 leading-snug">
+                        {item.brief}
                       </p>
-                    )}
+                      {cleanDetail && (
+                        <p className="text-xs sm:text-[12.5px] text-zinc-700 font-normal leading-relaxed">
+                          {cleanDetail}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Bottom: Obvious Referral Link Button & Promo Code Copy */}
+                    <div className="pt-2.5 mt-2 border-t border-zinc-200 flex items-center gap-2">
+                      <a
+                        id={`proceed-referral-btn-${item.num}`}
+                        href={referralUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-red-600 hover:bg-red-700 active:scale-[0.99] text-white font-black text-xs sm:text-sm tracking-wide shadow-md hover:shadow-lg transition-all text-center cursor-pointer"
+                      >
+                        <span>PROCEED TO {item.name.toUpperCase()} (REFERRAL LINK)</span>
+                        <ExternalLink size={14} />
+                      </a>
+
+                      {hasCode && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleCopyPromoCode(e, offer)}
+                          className="py-2 px-3 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-800 text-xs font-bold border border-zinc-300 flex items-center gap-1 cursor-pointer transition-colors flex-shrink-0"
+                          title="Copy promo code"
+                        >
+                          {copiedCodeId === offer.id ? (
+                            <>
+                              <Check size={13} className="text-emerald-600 stroke-[3]" />
+                              <span className="text-emerald-700 font-black">COPIED</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={13} />
+                              <span>{offer.code}</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
-              })}
-            </div>
+              })()
+            ) : (
+              <>
+                {/* Banner Header: Title Centered in Very Middle, Nice Radiant Amber Color, Far Right Blank */}
+                <div className="flex items-center justify-center pb-1.5 mb-1.5 border-b border-slate-800/80 text-center w-full">
+                  <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.45)] font-['Righteous',sans-serif]">
+                    GUIDE FOR DUMMIES
+                  </span>
+                </div>
+
+                {/* 1 ACROSS ROWS: Clicking any row expands to take up the entire description box */}
+                <div
+                  ref={descScrollRef}
+                  id="description-scroll-container"
+                  className="flex flex-col gap-1 w-full h-[178px] sm:h-[188px] max-h-[178px] sm:max-h-[188px] overflow-y-auto pr-1 select-text [scrollbar-width:thin] [scrollbar-color:#334155_transparent]"
+                >
+                  {allTipsData.map((item, idx) => {
+                    const isCurrentActive = idx === activeCardIndex;
+
+                    return (
+                      <div
+                        id={`desc-item-${idx}`}
+                        key={`${item.num}-${item.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedTipAppIdx(idx);
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setExpandedTipAppIdx(idx);
+                          }
+                        }}
+                        className={`w-full flex items-center justify-between px-2.5 py-2 min-h-[34px] rounded-lg border transition-all cursor-pointer text-left ${
+                          isCurrentActive
+                            ? 'bg-[#1b1526] border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.25)]'
+                            : 'bg-[#0e111a] border-slate-800/80 hover:border-slate-700 hover:bg-[#151a28]'
+                        }`}
+                      >
+                        {/* Single Row Layout: #Badge + App Name in brand color + brief description */}
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                          {/* Number badge color coordinated with app logo */}
+                          <span
+                            style={{
+                              backgroundColor: `rgba(${item.accentRgb}, 0.16)`,
+                              borderColor: `rgba(${item.accentRgb}, 0.45)`,
+                              color: `rgb(${item.accentRgb})`,
+                            }}
+                            className="w-4.5 h-4.5 rounded text-[10px] sm:text-[11px] font-bold flex items-center justify-center flex-shrink-0 border"
+                          >
+                            {item.num}
+                          </span>
+
+                          {/* App Name in color matching style */}
+                          <span
+                            style={{ color: `rgb(${item.accentRgb})` }}
+                            className="text-xs sm:text-[13px] font-bold flex-shrink-0"
+                          >
+                            {item.name}:
+                          </span>
+
+                          {/* Brief text description */}
+                          <span className="text-[11.5px] sm:text-xs text-slate-100 truncate font-medium leading-tight">
+                            {item.brief}
+                          </span>
+                        </div>
+
+                        {/* Visual prompt showing it expands */}
+                        <span className="text-slate-400 hover:text-white text-[10px] font-bold flex items-center gap-1 flex-shrink-0 ml-1.5 px-1.5 py-0.5 rounded bg-slate-800/60 border border-slate-700/50">
+                          <span>READ</span>
+                          <ChevronDown size={12} />
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -640,13 +746,17 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
               <div
                 id={`card-square-${idx}`}
                 key={offer.id}
-                onClick={() => onSelectOffer(offer)}
+                onClick={() => {
+                  onSelectOffer(offer);
+                  setExpandedTipAppIdx(idx);
+                }}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     onSelectOffer(offer);
+                    setExpandedTipAppIdx(idx);
                   }
                 }}
                 style={cardBgStyle}
