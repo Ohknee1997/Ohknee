@@ -104,33 +104,25 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             id="bottom-nav-tab-start-here"
             type="button"
             onClick={() => onSelectTab('top-10')}
-            className={`group relative flex items-center justify-center gap-1.5 sm:gap-2 w-[124px] sm:w-[150px] h-10 px-2 sm:px-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer select-none active:scale-95 ${
+            className={`group relative flex items-center justify-center gap-1.5 sm:gap-2 w-[128px] sm:w-[155px] h-10 px-2 sm:px-3.5 rounded-xl cursor-pointer select-none active:scale-95 start-here-glowing-red transition-all duration-200 ${
               currentTab === 'top-10'
-                ? 'border-[#00ff88] bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-white shadow-[0_0_24px_rgba(0,255,136,0.7),inset_0_0_12px_rgba(0,255,136,0.35)] scale-105 ring-2 ring-[#00ff88]/50'
-                : 'border-[#10b981] bg-gradient-to-r from-emerald-950/90 via-emerald-900/70 to-emerald-950/90 text-emerald-200 shadow-[0_0_18px_rgba(16,185,129,0.55),inset_0_0_10px_rgba(16,185,129,0.25)] hover:border-[#34d399] hover:shadow-[0_0_22px_rgba(52,211,153,0.75)]'
+                ? 'scale-105 ring-2 ring-red-400/80 shadow-[0_0_24px_rgba(239,68,68,0.9)]'
+                : 'hover:scale-105 shadow-[0_0_18px_rgba(239,68,68,0.65)]'
             }`}
             aria-label="Start Here"
           >
-            {/* Pulsing ambient neon halo */}
-            <span className="absolute -inset-0.5 rounded-xl bg-emerald-400/25 blur-sm pointer-events-none group-hover:bg-emerald-300/35 transition-all duration-300 animate-pulse" />
+            {/* Pulsing ambient red neon halo */}
+            <span className="absolute -inset-1 rounded-xl bg-red-600/40 blur-md pointer-events-none start-here-red-halo" />
 
             {/* Sparkle icon */}
             <Sparkles
-              size={14}
-              className={`relative z-10 transition-transform duration-200 group-hover:rotate-12 ${
-                currentTab === 'top-10'
-                  ? 'text-[#00ff88] drop-shadow-[0_0_8px_rgba(0,255,136,1)]'
-                  : 'text-[#34d399] drop-shadow-[0_0_6px_rgba(52,211,153,0.85)]'
-              }`}
+              size={15}
+              className="relative z-10 text-red-200 drop-shadow-[0_0_10px_rgba(255,255,255,0.95)] transition-transform duration-200 group-hover:rotate-12 animate-pulse"
             />
 
             {/* Neon Text Label */}
             <span
-              className={`relative z-10 font-black text-[11px] sm:text-[12px] tracking-wider uppercase whitespace-nowrap leading-none transition-all duration-200 ${
-                currentTab === 'top-10'
-                  ? 'text-white drop-shadow-[0_0_10px_rgba(0,255,136,1)]'
-                  : 'text-emerald-100 drop-shadow-[0_0_8px_rgba(52,211,153,0.9)]'
-              }`}
+              className="relative z-10 font-black text-[12px] sm:text-[13px] tracking-wider uppercase whitespace-nowrap leading-none text-white drop-shadow-[0_0_12px_rgba(239,68,68,1)]"
             >
               Start Here
             </span>
