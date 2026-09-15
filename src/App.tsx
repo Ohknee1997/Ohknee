@@ -118,6 +118,7 @@ export default function App() {
             payout: canonical.payout,
             instructionSub: canonical.instructionSub,
             code: canonical.code,
+            logoUrl: canonical.logoUrl || c.logoUrl,
             // CRITICAL: Always use canonical referral URL to prevent generic link leakage
             signupUrl: canonical.signupUrl,
             orderNumber: canonical.orderNumber !== undefined ? canonical.orderNumber : c.orderNumber,
@@ -334,28 +335,40 @@ export default function App() {
       o.id === '15' || o.name.toLowerCase().includes('myprize') || o.name.toLowerCase().includes('my prize');
     const isRealPrize = (o: EnrichedOffer) =>
       o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
+    const isFanDuel = (o: EnrichedOffer) =>
+      o.id === 'fast-fanduel' || o.id === 'sports-fanduel' || o.name.toLowerCase().includes('fanduel');
+    const isPrizePicks = (o: EnrichedOffer) =>
+      o.id === 'fast-prizepicks' || o.id === 'sports-2' || o.id === 'sports-prizepicks' || o.name.toLowerCase().includes('prizepick');
+    const isBabaCasino = (o: EnrichedOffer) =>
+      o.id === '3' || o.id.includes('baba') || o.name.toLowerCase().includes('baba');
+    const isVinted = (o: EnrichedOffer) =>
+      o.id === 'cash-back-vinted' || o.id === 'ref-vinted' || o.name.toLowerCase().includes('vinted');
 
-    // 1-18 exact order as requested by user:
-    // 1: Stake, 2: Polymarket, 3: Coinbase, 4: Tilt, 5: Ero, 6: Rips, followed by other verified partners
+    // 1-9+ exact order as requested by user:
+    // 1: Stake, 2: Kalshi ($55), 3: Poly, 4: Draft Kings, 5: FanDuel, 6: Prize Picks ($50), 7: Ero, 8: Freecash, 9: Gems Loot, 10: Coinbase, 11: Vinted
     const orderedFinders = [
-      isStake,        // 1: Stake.us
-      isPolymarket,   // 2: Polymarket
-      isCoinbase,     // 3: Coinbase (moved to #3)
-      isTilt,         // 4: Tilt (moved to #4)
-      isEro,          // 5: Ero (moved to #5)
-      isRips,         // 6: Rips (moved to #6)
-      isKalshi,       // 7: Kalshi
+      isStake,        // 1: Stake
+      isKalshi,       // 2: Kalshi
+      isPolymarket,   // 3: Poly (Polymarket)
+      isDraftKings,   // 4: Draft Kings
+      isFanDuel,      // 5: FanDuel
+      isPrizePicks,   // 6: Prize Picks
+      isEro,          // 7: Ero
       isFreecash,     // 8: Freecash
       isGemsloot,     // 9: Gems Loot
-      isDraftKings,   // 10: DraftKings
-      isReBet,        // 11: ReBet
-      isOnyx,         // 12: Onyx Odds
-      isRipRush,      // 13: Rip Rush
-      isCrownCoins,   // 14: Crown Coins
-      isLonestar,     // 15: Lone Star
-      isModo,         // 16: Modo
-      isMyPrize,      // 17: MyPrize
-      isRealPrize,    // 18: Real Prize
+      isCoinbase,     // 10: Coinbase
+      isVinted,       // 11: Vinted ("vented")
+      isTilt,         // 12: Tilt
+      isRips,         // 13: Rips
+      isReBet,        // 14: ReBet
+      isOnyx,         // 15: Onyx Odds
+      isRipRush,      // 16: Rip Rush
+      isCrownCoins,   // 17: Crown Coins
+      isLonestar,     // 18: Lone Star
+      isModo,         // 19: Modo
+      isBabaCasino,   // 20: Baba Casino
+      isMyPrize,      // 21: MyPrize
+      isRealPrize,    // 22: Real Prize
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -493,15 +506,17 @@ export default function App() {
 
       // Sports Betting & Prediction Markets
       if (
-        ['sportzino', 'fliff', 'sleeper', 'dabble', 'underdog', 'prizepicks', 'draftkings', 'kalshi', 'polymarket', 'rebet', 'onyx'].includes(k) ||
+        ['sportzino', 'fliff', 'sleeper', 'dabble', 'underdog', 'prizepicks', 'draftkings', 'kalshi', 'polymarket', 'rebet', 'onyx', 'fanduel'].includes(k) ||
         cats.includes('sports-betting') ||
         cats.includes('sports') ||
         cats.includes('betting') ||
         desc.includes('sportsbook') ||
         desc.includes('dfs') ||
+        desc.includes('predicts') ||
         desc.includes('event contract') ||
         desc.includes('prediction market') ||
-        name.includes('sportsbook')
+        name.includes('sportsbook') ||
+        name.includes('fanduel')
       ) {
         return 'sports';
       }

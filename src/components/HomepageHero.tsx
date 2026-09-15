@@ -110,19 +110,52 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onExploreClick }) =>
           />
 
           {/* Live Activity Badges */}
-          <div className="hidden sm:flex flex-col gap-1.5 absolute top-3 right-3 max-w-[200px]">
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/85 backdrop-blur-md border border-amber-400/40 text-[11px] text-white shadow-lg">
+          <div className="hidden sm:flex flex-col gap-1.5 absolute top-3 right-3 max-w-[210px]">
+            <a
+              href="https://fndl.co/m0p4sk7"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/90 backdrop-blur-md border border-blue-400/50 text-[11px] text-white shadow-lg hover:border-blue-400 transition-colors"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="font-semibold text-slate-200 truncate">FanDuel Predicts</span>
+              <span className="ml-auto font-black text-sky-400 shrink-0">+$100</span>
+            </a>
+            <a
+              href="https://stake.us/?c=20ae01b862"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/90 backdrop-blur-md border border-emerald-400/50 text-[11px] text-white shadow-lg hover:border-emerald-400 transition-colors"
+            >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-semibold text-slate-200">Sofi Plus</span>
-              <span className="ml-auto font-black text-emerald-400">+$30</span>
-            </div>
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/85 backdrop-blur-md border border-amber-400/40 text-[11px] text-white shadow-lg">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <span className="font-semibold text-slate-200">Kalshi</span>
-              <span className="ml-auto font-black text-amber-400">+$25</span>
+              <span className="font-semibold text-slate-200 truncate">Stake.us</span>
+              <span className="ml-auto font-black text-emerald-400 shrink-0">+$25</span>
+            </a>
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/85 backdrop-blur-md border border-emerald-400/40 text-[11px] text-white shadow-lg">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="font-semibold text-slate-200 truncate">Sofi Plus</span>
+              <span className="ml-auto font-black text-emerald-400 shrink-0">+$30</span>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* MOBILE REMINDER STRIP FOR MAIN PAGE */}
+      <div className="sm:hidden w-full max-w-2xl px-2 flex flex-col gap-1.5 my-1">
+        <a
+          href="https://stake.us/?c=20ae01b862"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-neutral-900/90 to-emerald-950/80 border border-emerald-500/40 text-[11px] text-emerald-200 shadow-md active:scale-95 transition-transform"
+        >
+          <span className="flex items-center gap-1.5 font-medium truncate">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <strong className="text-white font-bold">Stake.us:</strong> Instant $25 Free Cash (Code 20ae01b862)
+          </span>
+          <span className="ml-2 font-black text-emerald-400 text-[10px] uppercase tracking-wider shrink-0 bg-emerald-500/20 px-2 py-0.5 rounded-md border border-emerald-400/30">Instant $25</span>
+        </a>
       </div>
 
       {/* BOTTOM SECTIONS - Completely swaps between Boomer & Gen Z content */}

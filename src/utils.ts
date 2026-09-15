@@ -148,6 +148,7 @@ export function getAppDeduplicationKey(offer: {
   if (name.includes('dabble') || domain.includes('dabble')) return 'dabble';
   if (name.includes('underdog') || domain.includes('underdog')) return 'underdog';
   if (name.includes('prizepick') || domain.includes('prizepick')) return 'prizepicks';
+  if (name.includes('baba') || domain.includes('babacasino') || id.includes('baba')) return 'babacasino';
   if (name.includes('fanduel') || domain.includes('fanduel')) return 'fanduel';
   if (name.includes('betmgm') || domain.includes('betmgm')) return 'betmgm';
   if (name.includes('caesars') || domain.includes('caesars')) return 'caesars';

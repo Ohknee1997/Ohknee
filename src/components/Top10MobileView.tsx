@@ -119,28 +119,40 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
       o.id === '15' || o.name.toLowerCase().includes('myprize') || o.name.toLowerCase().includes('my prize');
     const isRealPrize = (o: EnrichedOffer) =>
       o.id === '19' || o.name.toLowerCase().includes('real prize') || o.name.toLowerCase().includes('realprize');
+    const isFanDuel = (o: EnrichedOffer) =>
+      o.id === 'fast-fanduel' || o.id === 'sports-fanduel' || o.name.toLowerCase().includes('fanduel');
+    const isPrizePicks = (o: EnrichedOffer) =>
+      o.id === 'fast-prizepicks' || o.id === 'sports-2' || o.id === 'sports-prizepicks' || o.name.toLowerCase().includes('prizepick');
+    const isBabaCasino = (o: EnrichedOffer) =>
+      o.id === '3' || o.id.includes('baba') || o.name.toLowerCase().includes('baba');
+    const isVinted = (o: EnrichedOffer) =>
+      o.id === 'cash-back-vinted' || o.id === 'ref-vinted' || o.name.toLowerCase().includes('vinted');
 
-    // 1-18 exact order as requested by user:
-    // 1: Stake, 2: Polymarket, 3: Coinbase, 4: Tilt, 5: Ero, 6: Rips, followed by other verified partners
+    // 1-9+ exact order as requested by user:
+    // 1: Stake, 2: Kalshi ($55), 3: Poly, 4: Draft Kings, 5: FanDuel, 6: Prize Picks ($50), 7: Ero, 8: Freecash, 9: Gems Loot, 10: Coinbase, 11: Vinted
     const orderedFinders = [
-      isStake,        // 1: Stake.us
-      isPolymarket,   // 2: Polymarket
-      isCoinbase,     // 3: Coinbase (moved to #3)
-      isTilt,         // 4: Tilt (moved to #4)
-      isEro,          // 5: Ero (moved to #5)
-      isRips,         // 6: Rips (moved to #6)
-      isKalshi,       // 7: Kalshi
+      isStake,        // 1: Stake
+      isKalshi,       // 2: Kalshi
+      isPolymarket,   // 3: Poly (Polymarket)
+      isDraftKings,   // 4: Draft Kings
+      isFanDuel,      // 5: FanDuel
+      isPrizePicks,   // 6: Prize Picks
+      isEro,          // 7: Ero
       isFreecash,     // 8: Freecash
       isGemsloot,     // 9: Gems Loot
-      isDraftKings,   // 10: DraftKings
-      isReBet,        // 11: ReBet
-      isOnyx,         // 12: Onyx Odds
-      isRipRush,      // 13: Rip Rush
-      isCrownCoins,   // 14: Crown Coins
-      isLonestar,     // 15: Lone Star
-      isModo,         // 16: Modo
-      isMyPrize,      // 17: MyPrize
-      isRealPrize,    // 18: Real Prize
+      isCoinbase,     // 10: Coinbase
+      isVinted,       // 11: Vinted ("vented")
+      isTilt,         // 12: Tilt
+      isRips,         // 13: Rips
+      isReBet,        // 14: ReBet
+      isOnyx,         // 15: Onyx Odds
+      isRipRush,      // 16: Rip Rush
+      isCrownCoins,   // 17: Crown Coins
+      isLonestar,     // 18: Lone Star
+      isModo,         // 19: Modo
+      isBabaCasino,   // 20: Baba Casino
+      isMyPrize,      // 21: MyPrize
+      isRealPrize,    // 22: Real Prize
     ];
 
     const orderedOffers: EnrichedOffer[] = [];
@@ -309,13 +321,21 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     },
     polymarket: {
       brief:
-        'Link Discord for $5 free to unlock your $25 reward without a deposit!',
+        'Join our squad for $60 bonus! (Link Discord for $5 free to start without a deposit)',
       detail:
-        'Join our squad on Polymarket to trade event and crypto predictions. If you cannot afford to make a deposit, once you verify your ID, go to the bottom right, tap "Rewards", and find the "Link Discord" button — that gives you $5 instantly! Then make a trade with that free $5, and you will get your full $25 bonus.',
+        'Join our squad on Polymarket to trade event and crypto predictions and claim your $60 bonus! If you cannot afford to make a deposit, once you verify your ID, go to the bottom right, tap "Rewards", and find the "Link Discord" button — that gives you $5 instantly! Then make a trade with that free $5 to trigger the bonus rewards.',
     },
     draftkings: {
       brief: 'Top picks and predictions on sports and pop culture with fast cashouts.',
       detail: 'Top picks and predictions on sports and pop culture with fast bonus cashouts. Verified referral bonus for new signups.',
+    },
+    fanduel: {
+      brief: 'Trade $1+ daily for 5 days to earn a $20 daily Predicts Bonus (up to $100 total rewards)!',
+      detail: 'FanDuel Predicts offers regulated event and sports predictions. Trade $1+ daily for 5 days to earn a $20 daily Predicts Bonus (up to $100 total bonus rewards)! https://fndl.co/m0p4sk7',
+    },
+    prizepicks: {
+      brief: 'Daily fantasy sports player props with instant $50 bonus entry credit.',
+      detail: 'PrizePicks gives you instant player prediction entries across all major sports leagues. Sign up and get your $50 bonus entry credit! https://prizepicks.onelink.me/FjtC/oh2itiyc',
     },
     ero: {
       brief: 'Earn real cash completing brand missions and app tasks with an instant 50% day-one boost.',
@@ -347,9 +367,9 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     },
     kalshi: {
       brief:
-        'Similar to Polymarket: trade $25 (even with just $1, buy & sell 25 times) for $50 each!',
+        'Trade event contracts on real-world news and markets for a $55 bonus!',
       detail:
-        'Kalshi allows you to trade regulated event contracts on real-world news and markets. Kalshi is pretty similar to Polymarket: you just need to make a trade for $25. Even if you only deposit $1, you can just buy and sell a $1 offer 25 times, and then do the same thing in predictions, and we will both get $50 each! https://kalshi.com/sign-up/?referral=18cd159f-1a05-4412-9368-43ecd3d21187&m=true',
+        'Kalshi allows you to trade regulated event contracts on real-world news and markets for a $55 bonus! You just need to make trades to qualify. Even if you only deposit $1, you can just buy and sell a $1 offer multiple times to unlock the $55 reward! https://kalshi.com/sign-up/?referral=18cd159f-1a05-4412-9368-43ecd3d21187&m=true',
     },
     coinbase: {
       brief: 'Crypto exchange signup with instant learning tasks and trading reward credits.',
@@ -674,10 +694,10 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
               })()
             ) : (
               <>
-                {/* Banner Header: Title Centered in Very Middle, Nice Radiant Amber Color, Far Right Blank */}
+                {/* Banner Header: Title Centered in Very Middle, Bright Neon Green */}
                 <div className="flex items-center justify-center pb-1.5 mb-1.5 border-b border-slate-800/80 text-center w-full">
-                  <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-amber-300 drop-shadow-[0_0_12px_rgba(252,211,77,0.45)] font-['Righteous',sans-serif]">
-                    GUIDE FOR DUMMIES
+                  <span className="text-[13px] xs:text-sm sm:text-base md:text-lg font-bold uppercase tracking-tight xs:tracking-normal sm:tracking-wide text-[#00ff88] drop-shadow-[0_0_12px_rgba(0,255,136,0.65)] font-['Righteous',sans-serif] truncate">
+                    100 VERIFIED AND TRUSTED SIGNUP BONUSES
                   </span>
                 </div>
 

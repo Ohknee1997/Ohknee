@@ -95,8 +95,8 @@ export function enrichCard(card: CardData): EnrichedOffer {
   if (tabId === 'casino-codes') {
     categories.push('sweepstakes');
     categories.push('bonuses-promos');
-    if (['30', '19', '13', '4', '9', '1'].includes(card.id)) {
-      // Zula, Real Prize, Modo, Crown Coins, High 5, Chanced
+    if (['30', '19', '13', '4', '9', '1', '3'].includes(card.id)) {
+      // Zula, Real Prize, Modo, Crown Coins, High 5, Chanced, Baba Casino
       isFeatured = true;
       categories.push('featured');
       badgeType = 'HOT';

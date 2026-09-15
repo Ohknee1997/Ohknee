@@ -83,7 +83,7 @@
       domain: 'draftkings.com',
       payout: '$200 Bonus',
       payoutTag: 'POPULAR',
-      signupUrl: 'https://predictions.draftkings.com/r/pd/oh_knee/US-TX-SA/US-TX',
+      signupUrl: 'https://sportsbook.draftkings.com/r/sb/eamaya97/US-TX-SA/US-TX',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
       orderNumber: 5,
@@ -659,7 +659,7 @@
       domain: 'draftkings.com',
       payout: '$200 Bonus',
       payoutTag: 'FREE START',
-      signupUrl: 'https://predictions.draftkings.com/r/pd/oh_knee/US-TX-SA/US-TX',
+      signupUrl: 'https://sportsbook.draftkings.com/r/sb/eamaya97/US-TX-SA/US-TX',
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
       note: 'Sign up and make predictions on sports & events with fast $200 bonus cashouts.'
