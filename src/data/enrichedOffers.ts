@@ -22,12 +22,13 @@ export interface EnrichedOffer extends CardData {
     | 'sweepstakes'
     | 'casino'
     | 'play-to-earn'
+    | 'ripping-cards'
     | 'other'
   >;
   platforms: Array<'desktop' | 'android' | 'apple'>;
   rewardDisplay: string;
   rewardValue: number; // For sorting
-  badgeType?: 'HOT' | 'FAST' | 'NEW' | 'POPULAR' | 'TOP PICK' | 'INSTANT' | 'DAILY' | 'SIGNUP';
+  badgeType?: 'HOT' | 'FAST' | 'NEW' | 'POPULAR' | 'TOP PICK' | 'INSTANT' | 'DAILY' | 'SIGNUP' | 'FREE PACK';
   badgeColor?: string;
   isFeatured?: boolean;
   descriptionText?: string;
@@ -59,6 +60,23 @@ export function enrichCard(card: CardData): EnrichedOffer {
   const id = card.id.toLowerCase();
   const name = card.name.toLowerCase();
   const tabId = card.tabId;
+
+  // 1. RIPPING CARDS (Card packs, pack breaks, digital collectibles)
+  if (
+    name.includes('mintpull') ||
+    name.includes('rip rush') ||
+    name.includes('riprush') ||
+    name.includes('rips') ||
+    id.includes('mintpull') ||
+    id.includes('riprush') ||
+    id.includes('rips') ||
+    tabId === 'ripping-cards'
+  ) {
+    categories.push('ripping-cards');
+    categories.push('featured');
+    isFeatured = true;
+    badgeType = 'FREE PACK';
+  }
 
   // 1. FAST & EASY CATEGORY
   if (tabId === 'fast-easy-money') {
@@ -128,11 +146,12 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('onepay') ||
     name.includes('aven') ||
     name.includes('sendwave') ||
+    name.includes('chime') ||
     id.includes('banking')
   ) {
     categories.push('banking');
     categories.push('finance');
-    if (name.includes('sofi')) {
+    if (name.includes('sofi') || name.includes('chime') || name.includes('sendwave')) {
       isFeatured = true;
       categories.push('featured');
       badgeType = 'TOP PICK';
@@ -147,6 +166,7 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('koinly') ||
     name.includes('gemini') ||
     name.includes('webull') ||
+    name.includes('x.place') ||
     name.includes('crypto') ||
     name.includes('polymarket') ||
     id.includes('crypto')
@@ -160,12 +180,13 @@ export function enrichCard(card: CardData): EnrichedOffer {
     }
   }
 
-  // 6. FINANCE (Ava, MoneyLion, Debbie, Self, Robinhood, Kalshi, Polymarket, etc.)
+  // 6. FINANCE (Ava, MoneyLion, Debbie, Self, Robinhood, Kalshi, Polymarket, Chime, etc.)
   if (
     name.includes('ava') ||
     name.includes('moneylion') ||
     name.includes('debbie') ||
     name.includes('self') ||
+    name.includes('chime') ||
     name.includes('robinhood') ||
     name.includes('kalshi') ||
     name.includes('polymarket') ||
@@ -174,7 +195,7 @@ export function enrichCard(card: CardData): EnrichedOffer {
     if (!categories.includes('finance')) {
       categories.push('finance');
     }
-    if (name.includes('kalshi') || name.includes('moneylion') || name.includes('polymarket')) {
+    if (name.includes('kalshi') || name.includes('moneylion') || name.includes('polymarket') || name.includes('chime')) {
       isFeatured = true;
       categories.push('featured');
       badgeType = 'HOT';
@@ -192,7 +213,9 @@ export function enrichCard(card: CardData): EnrichedOffer {
     name.includes('joko') ||
     name.includes('shopback') ||
     name.includes('snaplii') ||
-    name.includes('franki')
+    name.includes('franki') ||
+    name.includes('vinted') ||
+    name.includes('goodwall')
   ) {
     categories.push('signup-trial');
     if (!badgeType) badgeType = 'SIGNUP';

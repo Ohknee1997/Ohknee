@@ -176,34 +176,43 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     };
 
     // User requested: "after real prize the casino around 16 or 17 after that in the order of apps I don't want any casino apps until the very bottom so after real prize move the rest of the casino apps to the bottom and bring up all of my other apps to showcase those better just until 16 or around where real prize is."
-    // Non-casino apps priority sequence to showcase right after Real Prize
+    // Non-casino apps priority sequence to showcase right after Real Prize (ONLY verified referral partners)
     const nonCasinoPriorityFinders = [
-      (o: EnrichedOffer) => o.id === 'fast-onepay' || o.name.toLowerCase().includes('onepay') || o.name.toLowerCase().includes('one pay'),
+      (o: EnrichedOffer) => o.id === 'fast-onepay' || o.id === 'banking-0' || o.name.toLowerCase().includes('onepay') || o.name.toLowerCase().includes('one pay'),
+      (o: EnrichedOffer) => o.id === 'banking-chime' || o.name.toLowerCase().includes('chime'),
       (o: EnrichedOffer) => o.id === 'cash-back-1' || o.name.toLowerCase().includes('coins back') || o.name.toLowerCase().includes('coinsback') || o.name.toLowerCase().includes('shopback'),
       (o: EnrichedOffer) => o.id === 'banking-1' || o.name.toLowerCase().includes('sofi'),
       (o: EnrichedOffer) => o.id === 'banking-2' || o.name.toLowerCase().includes('aven'),
       (o: EnrichedOffer) => o.id === 'banking-3' || o.name.toLowerCase().includes('sendwave'),
       (o: EnrichedOffer) => o.id === 'banking-4' || o.name.toLowerCase().includes('self'),
-      (o: EnrichedOffer) => o.id === 'finance-robinhood' || o.name.toLowerCase().includes('robinhood'),
-      (o: EnrichedOffer) => o.id === 'finance-webull' || o.name.toLowerCase().includes('webull'),
-      (o: EnrichedOffer) => o.id === 'finance-moneylion' || o.name.toLowerCase().includes('moneylion'),
-      (o: EnrichedOffer) => o.id === 'finance-ava' || o.name.toLowerCase().includes('meetava') || o.name.toLowerCase() === 'ava',
-      (o: EnrichedOffer) => o.id === 'sports-dabble' || o.name.toLowerCase().includes('dabble'),
-      (o: EnrichedOffer) => o.id === 'sports-underdog' || o.name.toLowerCase().includes('underdog'),
-      (o: EnrichedOffer) => o.id === 'sports-prizepicks' || o.name.toLowerCase().includes('prizepicks'),
-      (o: EnrichedOffer) => o.id === 'sports-sportzino' || o.name.toLowerCase().includes('sportzino'),
-      (o: EnrichedOffer) => o.id === 'sports-fliff' || o.name.toLowerCase().includes('fliff'),
-      (o: EnrichedOffer) => o.id === 'sports-sleeper' || o.name.toLowerCase().includes('sleeper'),
-      (o: EnrichedOffer) => o.id === 'crypto-kraken' || o.name.toLowerCase().includes('kraken'),
-      (o: EnrichedOffer) => o.id === 'crypto-gemini' || o.name.toLowerCase().includes('gemini'),
-      (o: EnrichedOffer) => o.id === 'crypto-bydfi' || o.name.toLowerCase().includes('bydfi'),
-      (o: EnrichedOffer) => o.id === 'crypto-koinly' || o.name.toLowerCase().includes('koinly'),
-      (o: EnrichedOffer) => o.id === 'cash-back-fetch' || o.name.toLowerCase().includes('fetch'),
-      (o: EnrichedOffer) => o.id === 'cash-back-debbie' || o.name.toLowerCase().includes('debbie'),
-      (o: EnrichedOffer) => o.id === 'cash-back-joko' || o.name.toLowerCase().includes('joko'),
-      (o: EnrichedOffer) => o.id === 'cash-back-snaplii' || o.name.toLowerCase().includes('snaplii'),
-      (o: EnrichedOffer) => o.id === 'cash-back-franki' || o.name.toLowerCase().includes('franki'),
-      (o: EnrichedOffer) => o.id === 'cash-back-myappfree' || o.name.toLowerCase().includes('myappfree'),
+      (o: EnrichedOffer) => o.id === 'cash-back-vinted' || o.name.toLowerCase().includes('vinted'),
+      (o: EnrichedOffer) => o.id === 'fast-goodwall' || o.name.toLowerCase().includes('goodwall'),
+      (o: EnrichedOffer) => o.id === 'free-crypto-xplace' || o.name.toLowerCase().includes('x.place'),
+      (o: EnrichedOffer) => o.id === 'trading-cards-1' || o.id === 'finance-robinhood' || o.name.toLowerCase().includes('robinhood'),
+      (o: EnrichedOffer) => o.id === 'sports-0' || o.id === 'sports-dabble' || o.name.toLowerCase().includes('dabble'),
+      (o: EnrichedOffer) => o.id === 'sports-2' || o.id === 'sports-prizepicks' || o.name.toLowerCase().includes('prizepicks'),
+      (o: EnrichedOffer) => o.id === 'free-crypto-3' || o.id === 'crypto-kraken' || o.name.toLowerCase().includes('kraken'),
+      (o: EnrichedOffer) => o.id === 'free-crypto-1' || o.id === 'crypto-koinly' || o.name.toLowerCase().includes('koinly'),
+      (o: EnrichedOffer) => o.id === 'instant-cash-3' || o.id === 'cash-back-fetch' || o.name.toLowerCase().includes('fetch'),
+      (o: EnrichedOffer) => o.id === 'instant-cash-1' || o.id === 'cash-back-debbie' || o.name.toLowerCase().includes('debbie'),
+      (o: EnrichedOffer) => o.id === 'cash-back-0' || o.id === 'cash-back-joko' || o.name.toLowerCase().includes('joko'),
+      (o: EnrichedOffer) => o.id === 'crypto-gate' || o.name.toLowerCase().includes('gate'),
+      (o: EnrichedOffer) => o.id === 'crypto-uphold' || o.name.toLowerCase().includes('uphold'),
+      (o: EnrichedOffer) => o.id === 'instant-cash-2' || o.id === 'cash-back-myappfree' || o.name.toLowerCase().includes('myfreeapp'),
+      (o: EnrichedOffer) => o.id === 'fin-paypal' || o.name.toLowerCase().includes('paypal'),
+      (o: EnrichedOffer) => o.id === 'fin-sezzle' || o.name.toLowerCase().includes('sezzle'),
+      (o: EnrichedOffer) => o.id === 'fin-copper' || o.name.toLowerCase().includes('copper'),
+      (o: EnrichedOffer) => o.id === 'invest-acorns' || o.name.toLowerCase().includes('acorns'),
+      (o: EnrichedOffer) => o.id === 'fin-cashapp' || o.name.toLowerCase().includes('cash app'),
+      (o: EnrichedOffer) => o.id === 'fin-attapoll' || o.name.toLowerCase().includes('attapoll'),
+      (o: EnrichedOffer) => o.id === 'fin-cashgiraffe' || o.name.toLowerCase().includes('cash giraffe'),
+      (o: EnrichedOffer) => o.id === 'fin-benjamin' || o.name.toLowerCase().includes('benjamin'),
+      (o: EnrichedOffer) => o.id === 'fin-qmee' || o.name.toLowerCase().includes('qmee'),
+      (o: EnrichedOffer) => o.id === 'fin-yell' || o.name.toLowerCase().includes('yell'),
+      (o: EnrichedOffer) => o.id === 'fin-upside' || o.name.toLowerCase().includes('upside'),
+      (o: EnrichedOffer) => o.id === 'banking-go2bank' || o.name.toLowerCase().includes('go2bank'),
+      (o: EnrichedOffer) => o.id === 'invest-public' || o.name.toLowerCase().includes('public'),
+      (o: EnrichedOffer) => o.id === 'fin-gomining' || o.name.toLowerCase().includes('gomining'),
     ];
 
     const nonCasinoPriorityOffers: EnrichedOffer[] = [];
@@ -332,15 +341,19 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
       brief: 'Download Rip Rush and enter code UCLEKH6 when registering to get a free card pack.',
       detail: 'Use my link to win on Rip Rush! Download the game using my link, then enter code UCLEKH6 when you register to get a card pack for free. https://riprush.onelink.me/se7Y/t1tr9df3?deep_link_sub1=O9m5kGxxmsNtOM7n57QeBLOKIG43',
     },
+    mintpull: {
+      brief: 'Grab a FREE card pack on MintPull with invite code M4VUN4.',
+      detail: "Grab a FREE card pack on MintPull! Use my invite code M4VUN4 or just tap the link below to claim yours instantly. Let's win big! https://mintpullios.onelink.me/neMv/86iumkry?invite_code=M4VUN4",
+    },
     kalshi: {
       brief:
         'Similar to Polymarket: trade $25 (even with just $1, buy & sell 25 times) for $50 each!',
       detail:
-        'Kalshi allows you to trade regulated event contracts on real-world news and markets. Kalshi is pretty similar to Polymarket: you just need to make a trade for $25. Even if you only deposit $1, you can just buy and sell a $1 offer 25 times, and then do the same thing in predictions, and we will both get $50 each!',
+        'Kalshi allows you to trade regulated event contracts on real-world news and markets. Kalshi is pretty similar to Polymarket: you just need to make a trade for $25. Even if you only deposit $1, you can just buy and sell a $1 offer 25 times, and then do the same thing in predictions, and we will both get $50 each! https://kalshi.com/sign-up/?referral=18cd159f-1a05-4412-9368-43ecd3d21187&m=true',
     },
     coinbase: {
       brief: 'Crypto exchange signup with instant learning tasks and trading reward credits.',
-      detail: 'Coinbase signup rewards and crypto earn modules give you instant crypto deposits for learning and trading.',
+      detail: 'Coinbase lets you buy, sell, and trade crypto safely. Sign up with my link and start earning free crypto bonuses. https://coinbase.com/join/R6Z6SB3?src=android-link',
     },
     crowncoins: {
       brief: 'Daily free sweeps coins, loyalty wheel spins, and top-tier jackpot slots.',
@@ -364,11 +377,39 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     },
     onepay: {
       brief: 'Verify your ID and deposit to get an instant 25 cash bonus.',
-      detail: 'OnePay provides fast mobile banking with zero maintenance fees, instant ID verification bonuses, and seamless deposits.',
+      detail: 'OnePay provides fast mobile banking with zero maintenance fees, instant ID verification bonuses, and seamless deposits with code a0pJVrI0m. https://web.onepay.com/wlink/refer-a-friend?product=one_banking&referral_code=a0pJVrI0m&referrer_campaign_id=campaign.db1edd0a-4a5b-4651-8c20-d0fb7e98fec5',
+    },
+    chime: {
+      brief: 'Open account with direct deposit to unlock $100 referral cash bonus.',
+      detail: 'Chime mobile banking with fee-free overdraft, early direct deposit, and a $100 cash bonus when you sign up with referral. https://www.chime.com/r/oniamaya/?c=s',
+    },
+    self: {
+      brief: 'Build credit and unlock savings with credit builder account rewards.',
+      detail: 'Self Credit Builder helps you build credit history with credit bureaus while saving money, with bonus referral perks using code FI4EZ0Y8. https://self.inc/refer/FI4EZ0Y8',
+    },
+    koinly: {
+      brief: 'Crypto tax calculator and portfolio tracking bonus.',
+      detail: 'Koinly simplifies crypto tax reporting and tracking across wallets with a referral credit on upgrades. https://koinly.io/?via=A6A33D50&utm_source=friend',
+    },
+    vinted: {
+      brief: 'Buy and sell secondhand clothes with invite voucher bonus credits.',
+      detail: 'Vinted is an online marketplace for buying and selling secondhand fashion. Sign up with invite code ohknee97. https://www.vinted.com/invite/ohknee97',
+    },
+    goodwall: {
+      brief: 'Join youth challenges, build social impact skills, and earn instant rewards.',
+      detail: 'Goodwall connects you with skill-building challenges, courses, and reward incentives. Sign up using my link for bonus rewards. https://goodwall.onelink.me/45N9/cazsnfmp',
+    },
+    xplace: {
+      brief: 'Web3 crypto tasks and reward platform with referral code Ohknee29.',
+      detail: 'x.place rewards users for discovering web3 games, quests, and community airdrops. Enter referral code Ohknee29 during signup. https://x.place/ref/Ohknee29',
+    },
+    sendwave: {
+      brief: 'Get $20.00 credit towards your first transfer with referral code 1ADY9.',
+      detail: 'Sendwave offers fast, zero-fee international money transfers. Use code 1ADY9 to get a $20.00 credit towards your first transfer. Download at https://try.sendwave.com/kjap/alct9oam',
     },
     coinsback: {
       brief: 'Instant shopping cashback and fast rebate bonus tracker across retail brands.',
-      detail: 'CoinsBack / ShopBack unlocks automatic cashback across thousands of retail stores with direct bank payouts.',
+      detail: 'CoinsBack / ShopBack unlocks automatic cashback across thousands of retail stores with direct bank payouts. Code: dp9DMq. https://app.shopback.com/dp9DMq',
     },
     sofi: {
       brief: 'High-yield checking, automated investing, and direct deposit cash bonuses.',
@@ -376,19 +417,11 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
     },
     robinhood: {
       brief: 'Commission-free stock and crypto trading with instant sign-up fractional shares.',
-      detail: 'Robinhood unlocks stock, ETF, and crypto trading with fractional shares and recurring bonus deposits.',
-    },
-    webull: {
-      brief: 'Free fractional stocks upon deposit and advanced market analytics.',
-      detail: 'Webull gives free promotional stocks when opening and funding an account, plus after-hours trading tools.',
+      detail: 'Robinhood unlocks stock, ETF, and crypto trading with fractional shares and recurring bonus deposits. https://join.robinhood.com/onia2',
     },
     kraken: {
       brief: 'Regulated crypto exchange with instant Bitcoin purchases and low fees.',
-      detail: 'Kraken allows secure crypto trading, instant fiat deposits, and yield staking with enterprise-grade security.',
-    },
-    gemini: {
-      brief: 'Licensed digital asset exchange with crypto rewards and trading tools.',
-      detail: 'Gemini provides insured crypto custody, instant crypto purchases, and automated dollar-cost averaging.',
+      detail: 'Kraken allows secure crypto trading, instant fiat deposits, and yield staking with enterprise-grade security. https://invite.kraken.com/JDNW/wsv48yot',
     },
     zula: {
       brief: 'Daily free coins, fish hunter games, and sweepstakes slot tournaments.',
@@ -417,7 +450,8 @@ export const Top10MobileView: React.FC<Top10MobileViewProps> = ({
             : offer.descriptionText || `Complete registration on ${offer.name} to claim your verified rewards.`);
 
       const extractedUrlMatch = detailText.match(/https?:\/\/[^\s]+/);
-      const referralUrl = extractedUrlMatch ? extractedUrlMatch[0] : (offer.signupUrl || '');
+      // ALWAYS prioritize verified offer signupUrl referral link first!
+      const referralUrl = offer.signupUrl || (extractedUrlMatch ? extractedUrlMatch[0] : '#');
 
       return {
         num: idx + 1,

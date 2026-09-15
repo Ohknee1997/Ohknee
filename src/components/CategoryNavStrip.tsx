@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Zap, Coins, Star } from 'lucide-react';
+import { Flame, Zap, Coins, Star, Sparkles } from 'lucide-react';
 
 export interface CategoryTabItem {
   id: string;
@@ -16,6 +16,13 @@ export const CATEGORY_NAV_TABS: CategoryTabItem[] = [
     title: 'Featured',
     subtitle: 'Top Rewards',
     icon: <Flame size={20} className="stroke-[2.2]" />,
+  },
+  {
+    id: 'ripping-cards',
+    rowId: 'row-ripping-cards',
+    title: 'Ripping Cards',
+    subtitle: 'Free Packs & Breaks',
+    icon: <Sparkles size={20} className="stroke-[2.2]" />,
   },
   {
     id: 'fast-offers',
@@ -51,10 +58,10 @@ export const CategoryNavStrip: React.FC<CategoryNavStripProps> = ({
 }) => {
   return (
     <div className="w-full mb-4 sm:mb-5">
-      {/* 4 Categorized Tabs at Top - Responsive 2x2 grid on mobile, 4 in a row on tablet/desktop */}
+      {/* 5 Categorized Tabs at Top - Responsive grid */}
       <nav
         aria-label="Category Navigation"
-        className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 py-1 px-0.5"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 py-1 px-0.5"
       >
         {CATEGORY_NAV_TABS.map((tab) => {
           const isActive = activeCategory === tab.id;

@@ -123,6 +123,7 @@ export function getAppDeduplicationKey(offer: {
   if (name.includes('onyx') || domain.includes('onyx') || id.includes('onyx')) return 'onyx';
   if (name.includes('rip rush') || name.includes('riprush') || id.includes('riprush')) return 'riprush';
   if (name.includes('rip') || domain.includes('rips') || id.includes('rips')) return 'rips';
+  if (name.includes('mintpull') || domain.includes('mintpull') || id.includes('mintpull')) return 'mintpull';
   if (name.includes('kalshi') || domain.includes('kalshi') || id.includes('kalshi')) return 'kalshi';
   if (name.includes('coinbase') || domain.includes('coinbase') || id.includes('coinbase')) return 'coinbase';
   if (name.includes('crown coin') || name.includes('crowncoin') || domain.includes('crowncoins') || id.includes('crowncoins')) return 'crowncoins';
@@ -167,6 +168,11 @@ export function getAppDeduplicationKey(offer: {
   if (name.includes('myappfree') || domain.includes('myappfree')) return 'myappfree';
   if (name.includes('aven') || domain.includes('aven')) return 'aven';
   if (name.includes('sendwave') || domain.includes('sendwave')) return 'sendwave';
+  if (name.includes('self') || domain.includes('self.inc') || id.includes('self')) return 'self';
+  if (name.includes('chime') || domain.includes('chime') || id.includes('chime')) return 'chime';
+  if (name.includes('vinted') || domain.includes('vinted') || id.includes('vinted')) return 'vinted';
+  if (name.includes('goodwall') || domain.includes('goodwall') || id.includes('goodwall')) return 'goodwall';
+  if (name.includes('x.place') || domain.includes('x.place') || id.includes('xplace')) return 'xplace';
   if (name.includes('moneylion') || domain.includes('moneylion')) return 'moneylion';
   if (name.includes('swagbucks') || domain.includes('swagbucks')) return 'swagbucks';
   if (name.includes('inboxdollar') || domain.includes('inboxdollars')) return 'inboxdollars';

@@ -12,6 +12,7 @@ export type PlatformFilter = 'all' | 'apple' | 'android' | 'desktop';
 export type CategoryFilter =
   | 'all'
   | 'fast-easy'
+  | 'ripping-cards'
   | 'featured'
   | 'finance'
   | 'signup-trial'

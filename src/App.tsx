@@ -74,52 +74,70 @@ export default function App() {
   const [allOffers, setAllOffers] = useState<EnrichedOffer[]>(() => {
     const savedCustomCards = getFromStorage<CardData[] | null>(STORE_CARDS, null);
     const initialOffers = getAllEnrichedOffers();
+    const removedCardIds = new Set([
+      'instant-cash-0', // MetaWin
+      'free-crypto-2', // BYDFi
+      'free-crypto-6', // Gemini Crypto
+      'free-crypto-7', // Webull Crypto
+      'cash-back-2', // Snaplii
+      'cash-back-3', // Snaplii Deposit
+      'cash-back-4', // Franki
+      'sports-1', // Underdog
+      'sports-4', // Fliff Sportsbook
+      'sports-5', // Sleeper Fantasy
+      'finance-ava', // Ava
+      'finance-moneylion', // MoneyLion
+    ]);
+    const removedNames = new Set([
+      'metawin', 'bydfi', 'gemini crypto', 'gemini', 'webull crypto', 'webull',
+      'snaplii', 'snaplii deposit', 'franki', 'underdog', 'fliff', 'fliff sportsbook',
+      'sleeper', 'sleeper fantasy', 'ava', 'moneylion'
+    ]);
+
     if (savedCustomCards && Array.isArray(savedCustomCards) && savedCustomCards.length > 0) {
       const initialMap = new Map(initialOffers.map((o) => [o.id, o]));
-      const existingIds = new Set(savedCustomCards.map((c) => c.id));
+      const nameMap = new Map(initialOffers.map((o) => [o.name.toLowerCase().trim(), o]));
+
+      // Purge any stale generic cards that have no referral links
+      const filteredCustomCards = savedCustomCards.filter((c) => {
+        if (removedCardIds.has(c.id)) return false;
+        const normName = (c.name || '').toLowerCase().trim();
+        if (removedNames.has(normName) && !nameMap.has(normName)) return false;
+        return true;
+      });
+
+      const existingIds = new Set(filteredCustomCards.map((c) => c.id));
       const missingOffers = initialOffers.filter((o) => !existingIds.has(o.id));
-      // For key partner offers, ensure latest payout & instructions take precedence over stale localStorage cache
-      const updatedIds = new Set([
-        'fast-gemsloot',
-        'fast-polymarket',
-        'fast-draftkings',
-        'fast-tilt',
-        'fast-kalshi',
-        'fast-coinbase',
-        '4', // Crown Coins
-        '10', // Lonestar
-        '13', // Modo
-        '15', // MyPrize
-        '30', // Zula
-        'cash-back-1', // CoinsBack / ShopBack
-        'fast-ero',
-        'ref-ero',
-        'ref-polymarket',
-        'ref-draftkings',
-      ]);
-      const merged = savedCustomCards.map((c) => {
-        const canonical = initialMap.get(c.id);
-        if (canonical && updatedIds.has(c.id)) {
-          const updated = {
+
+      const merged = filteredCustomCards.map((c) => {
+        const canonical = initialMap.get(c.id) || nameMap.get((c.name || '').toLowerCase().trim());
+        if (canonical) {
+          const updated: CardData = {
             ...c,
+            name: canonical.name,
             payout: canonical.payout,
             instructionSub: canonical.instructionSub,
             code: canonical.code,
+            // CRITICAL: Always use canonical referral URL to prevent generic link leakage
+            signupUrl: canonical.signupUrl,
+            orderNumber: canonical.orderNumber !== undefined ? canonical.orderNumber : c.orderNumber,
           };
           if (!canonical.code) {
             delete updated.code;
           }
+          if (c.id === 'fast-polymarket' || c.id === 'ref-polymarket' || c.name.toLowerCase().includes('polymarket')) {
+            delete updated.code;
+          }
           return enrichCard(updated);
-        }
-        if (c.id === 'fast-polymarket' || c.id === 'ref-polymarket' || c.name.toLowerCase().includes('polymarket')) {
-          const copy = { ...c };
-          delete copy.code;
-          return enrichCard(copy);
         }
         return enrichCard(c);
       });
-      return [...merged, ...missingOffers];
+
+      const finalOffers = [...merged, ...missingOffers];
+      saveToStorage(STORE_CARDS, finalOffers);
+      return finalOffers;
     }
+    saveToStorage(STORE_CARDS, initialOffers);
     return initialOffers;
   });
 
@@ -373,11 +391,15 @@ export default function App() {
 
     const nonCasinoPriorityFinders = [
       (o: EnrichedOffer) => o.id === 'fast-onepay' || o.name.toLowerCase().includes('onepay') || o.name.toLowerCase().includes('one pay'),
+      (o: EnrichedOffer) => o.id === 'banking-chime' || o.name.toLowerCase().includes('chime'),
       (o: EnrichedOffer) => o.id === 'cash-back-1' || o.name.toLowerCase().includes('coins back') || o.name.toLowerCase().includes('coinsback') || o.name.toLowerCase().includes('shopback'),
       (o: EnrichedOffer) => o.id === 'banking-1' || o.name.toLowerCase().includes('sofi'),
       (o: EnrichedOffer) => o.id === 'banking-2' || o.name.toLowerCase().includes('aven'),
       (o: EnrichedOffer) => o.id === 'banking-3' || o.name.toLowerCase().includes('sendwave'),
       (o: EnrichedOffer) => o.id === 'banking-4' || o.name.toLowerCase().includes('self'),
+      (o: EnrichedOffer) => o.id === 'cash-back-vinted' || o.name.toLowerCase().includes('vinted'),
+      (o: EnrichedOffer) => o.id === 'fast-goodwall' || o.name.toLowerCase().includes('goodwall'),
+      (o: EnrichedOffer) => o.id === 'free-crypto-xplace' || o.name.toLowerCase().includes('x.place'),
       (o: EnrichedOffer) => o.id === 'finance-robinhood' || o.name.toLowerCase().includes('robinhood'),
       (o: EnrichedOffer) => o.id === 'finance-webull' || o.name.toLowerCase().includes('webull'),
       (o: EnrichedOffer) => o.id === 'finance-moneylion' || o.name.toLowerCase().includes('moneylion'),
@@ -486,7 +508,7 @@ export default function App() {
 
       // Crypto Exchanges, Wallets & Web3
       if (
-        ['coinbase', 'kraken', 'gemini', 'bydfi', 'koinly', 'metawin'].includes(k) ||
+        ['coinbase', 'kraken', 'gemini', 'bydfi', 'koinly', 'metawin', 'xplace'].includes(k) ||
         cats.includes('crypto') ||
         name.includes('crypto') ||
         desc.includes('bitcoin') ||
@@ -499,7 +521,7 @@ export default function App() {
 
       // Finance, Banking, Credit & Stocks
       if (
-        ['sofi', 'robinhood', 'onepay', 'aven', 'sendwave', 'moneylion', 'self', 'meetava', 'webull'].includes(k) ||
+        ['sofi', 'robinhood', 'onepay', 'aven', 'sendwave', 'moneylion', 'self', 'meetava', 'webull', 'chime'].includes(k) ||
         cats.includes('banking') ||
         cats.includes('finance') ||
         name.includes('bank') ||
@@ -515,7 +537,7 @@ export default function App() {
 
       // Fast Tasks, Cashback, Receipts & Instant Rewards
       if (
-        ['freecash', 'gemsloot', 'tilt', 'coinsback', 'fetch', 'debbie', 'joko', 'snaplii', 'franki', 'myappfree', 'rips', 'riprush'].includes(k) ||
+        ['freecash', 'gemsloot', 'tilt', 'coinsback', 'fetch', 'debbie', 'joko', 'snaplii', 'franki', 'myappfree', 'rips', 'riprush', 'vinted', 'goodwall'].includes(k) ||
         cats.includes('fast-easy') ||
         cats.includes('signup-trial') ||
         o.tabId === 'fast-easy-money' ||

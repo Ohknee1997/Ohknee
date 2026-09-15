@@ -10,6 +10,23 @@
   const CARDS_DATA = [
     // --- Fast Easy Money ($100-$150) ---
     {
+      id: 'fast-freecash',
+      name: 'Freecash',
+      domain: 'freecash.com',
+      payout: '$15 ($30–$230 Bonus)',
+      payoutTag: 'FREE START',
+      code: 'AMJJ6',
+      signupUrl: 'https://freecash.com/r/AMJJ6',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 1,
+      showStarsTopper: true,
+      note: 'Enter referral code "AMJJ6" on signup (sign up, download any random game and open it for 2 minutes) to unlock bonus spins and instant withdrawals to PayPal or Crypto.',
+      images: [
+        'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
       id: 'fast-stake',
       name: 'Stake.us',
       domain: 'stake.us',
@@ -18,9 +35,9 @@
       signupUrl: 'https://stake.us/?c=20ae01b862',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
-      orderNumber: 1,
+      orderNumber: 2,
       showStarsTopper: true,
-      note: 'Stake.us daily reload & level-up bonus strategy. Log in daily to claim your free $1 SC + Gold Coins. Wager smart on high RTP originals (Dice/Plinko 99% RTP) to cash out crypto instantly.',
+      note: 'Stake.us daily reload & level-up bonus strategy. (Do Freecash before Stake.us! There\'s an offer for 30 extra and 200 extra!) Log in daily to claim free SC.',
       images: [
         'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop&q=80',
         'https://images.unsplash.com/photo-1605870445919-838d190e8e1b?w=600&auto=format&fit=crop&q=80'
@@ -36,28 +53,11 @@
       signupUrl: 'https://gemsloot.com/?aff=ohknee',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
-      orderNumber: 2,
+      orderNumber: 3,
       showStarsTopper: true,
       note: 'Use code "ohknee" during registration. Complete the starter offerwall tasks and spin the daily reward wheel for instant withdrawals.',
       images: [
         'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&auto=format&fit=crop&q=80'
-      ]
-    },
-    {
-      id: 'fast-freecash',
-      name: 'Freecash',
-      domain: 'freecash.com',
-      payout: 'Prize Wheel / Bonus',
-      payoutTag: 'FREE START',
-      code: 'Mula20',
-      signupUrl: 'https://freecash.com/r/Mula20',
-      signupLabel: 'SIGN UP',
-      tabId: 'fast-easy-money',
-      orderNumber: 3,
-      showStarsTopper: true,
-      note: 'Enter bonus code "Mula20" on signup to unlock the free prize wheel (up to $250). Complete 2 quick app download offers to cash out $20+ instantly to PayPal, Crypto, or Visa.',
-      images: [
-        'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80'
       ]
     },
     {
@@ -97,33 +97,106 @@
       id: 'fast-kalshi',
       name: 'Kalshi',
       domain: 'kalshi.com',
-      payout: '$50 Bonus',
+      payout: '$25 Bonus',
       payoutTag: 'TOP PICK',
-      signupUrl: 'https://kalshi.com',
+      signupUrl: 'https://kalshi.com/sign-up/?referral=18cd159f-1a05-4412-9368-43ecd3d21187&m=true',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 5,
+      showStarsTopper: true,
+      note: 'Regulated prediction marketplace. Trade event contracts on real-world news and markets for a $25 bonus!',
+      images: [
+        'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80'
+      ]
+    },
+    {
+      id: 'fast-ero',
+      name: 'Ero',
+      domain: 'ero.app',
+      payout: '$25 Bonus',
+      payoutTag: 'INSTANT CASH',
+      code: 'uoj7nba2x5',
+      signupUrl: 'https://ero.app/r/uoj7nba2x5?link=u63qfmappxxh',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
       orderNumber: 6,
       showStarsTopper: true,
-      note: 'Regulated prediction marketplace. Sign up and fund $100 to receive instant trade credits. Trade high-probability contracts to lock in profit.',
+      note: 'Earn real cash rewards completing brand missions and testing apps with a 50% day-one boost. Enter code uoj7nba2x5.',
       images: [
-        'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80'
+        'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80'
       ]
     },
     {
       id: 'fast-coinbase',
       name: 'Coinbase',
       domain: 'coinbase.com',
-      payout: '$10–$75 Crypto',
+      payout: '$30 Bonus',
       payoutTag: 'EASY FAST',
-      signupUrl: 'https://www.coinbase.com',
+      code: 'R6Z6SB3',
+      signupUrl: 'https://coinbase.com/join/R6Z6SB3?src=android-link',
       signupLabel: 'SIGN UP',
       tabId: 'fast-easy-money',
       orderNumber: 7,
       showStarsTopper: true,
-      note: 'Coinbase Learn & Earn quizzes give you $10–$75 in crypto within 15 minutes. Take each 1-minute quiz and convert all rewards into USDC or cash out instantly.',
+      note: 'Buy $25 USDC or trade crypto to get $30 bonus! (Do Freecash first! Freecash offer for additional $30!) Also take quizzes for bonus crypto.',
       images: [
         'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop&q=80'
       ]
+    },
+    {
+      id: 'fast-onepay',
+      name: 'OnePay',
+      domain: 'onepay.com',
+      payout: '$6 ~ $50 Bonus',
+      payoutTag: 'INSTANT BONUS',
+      code: 'a0pJVrI0m',
+      signupUrl: 'https://web.onepay.com/wlink/refer-a-friend?product=one_banking&referral_code=a0pJVrI0m&referrer_campaign_id=campaign.db1edd0a-4a5b-4651-8c20-d0fb7e98fec5',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 8,
+      showStarsTopper: true,
+      note: 'Deposit and verify ID to unlock welcome bonus using referral code a0pJVrI0m directly to your OnePay mobile banking account.'
+    },
+    {
+      id: 'fast-goodwall',
+      name: 'Goodwall',
+      domain: 'goodwall.io',
+      payout: '$5–$25 Rewards',
+      payoutTag: 'REWARD BOOST',
+      signupUrl: 'https://goodwall.onelink.me/45N9/cazsnfmp',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 9,
+      showStarsTopper: true,
+      note: 'Complete skill missions and social challenges to unlock cash and rewards.'
+    },
+    {
+      id: 'cash-back-vinted',
+      name: 'Vinted',
+      domain: 'vinted.com',
+      payout: '$15–$30 Credits',
+      payoutTag: 'INVITE BONUS',
+      code: 'ohknee97',
+      signupUrl: 'https://www.vinted.com/invite/ohknee97',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 10,
+      showStarsTopper: true,
+      note: 'Buy and sell secondhand clothes with invite voucher bonus credits.'
+    },
+    {
+      id: 'fast-sendwave',
+      name: 'Sendwave',
+      domain: 'sendwave.com',
+      payout: '$10 Credit',
+      payoutTag: 'TRANSFER CREDIT',
+      code: '1ADY9',
+      signupUrl: 'https://try.sendwave.com/kjap/alct9oam',
+      signupLabel: 'SIGN UP',
+      tabId: 'fast-easy-money',
+      orderNumber: 11,
+      showStarsTopper: true,
+      note: 'Use code 1ADY9 to get a credit towards your first transfer! Download at https://try.sendwave.com/kjap/alct9oam'
     },
 
     // --- Casino Codes ---
@@ -209,94 +282,364 @@
 
     // --- Literal Free Money ---
     {
-      id: 'free-swagbucks',
-      name: 'Swagbucks',
-      domain: 'swagbucks.com',
-      payout: '$10 Bonus',
-      payoutTag: 'INSTANT',
-      signupUrl: 'https://www.swagbucks.com',
+      id: 'free-debbie',
+      name: 'Debbie',
+      domain: 'joindebbie.com',
+      payout: '$20 Bonus',
+      payoutTag: 'FREE START',
+      code: '2EMIC9801',
+      signupUrl: 'https://joindebbie.com/?ref_id=2EMIC9801',
       signupLabel: 'SIGN UP',
       tabId: 'free-money',
-      note: 'Get $10 welcome bonus when you earn 300 SB in your first 30 days. Complete quick surveys and search rewards.'
+      note: 'Debt payoff and savings rewards app with $20 bonus. (Do the SoFi offer first!)'
     },
     {
-      id: 'free-kashkick',
-      name: 'KashKick',
-      domain: 'kashkick.com',
-      payout: '$50+ Payouts',
-      payoutTag: 'DIRECT DEPOSIT',
-      signupUrl: 'https://kashkick.com',
+      id: 'free-myfreeapp',
+      name: 'MyFreeApp',
+      domain: 'myfreeapp.io',
+      payout: '$9 Bonus',
+      payoutTag: 'FREE START',
+      code: 'JCEHNRER',
+      signupUrl: 'https://www.myfreeapp.io?referral_code=JCEHNRER',
       signupLabel: 'SIGN UP',
       tabId: 'free-money',
-      note: 'Earn real cash by testing mobile games and reaching level milestones. Direct PayPal payout.'
+      note: 'Earn real cash testing apps and playing games with referral code JCEHNRER.'
     },
     {
-      id: 'free-inboxdollars',
-      name: 'InboxDollars',
-      domain: 'inboxdollars.com',
-      payout: '$5 Free Cash',
-      payoutTag: 'SIGNUP BONUS',
-      signupUrl: 'https://www.inboxdollars.com',
+      id: 'free-fetch',
+      name: 'Fetch',
+      domain: 'fetch.com',
+      payout: '$3 Bonus',
+      payoutTag: 'FREE START',
+      code: 'K1K9U6',
+      signupUrl: 'https://referral.fetch.com/vvv3/referralqr?code=K1K9U6',
       signupLabel: 'SIGN UP',
       tabId: 'free-money',
-      note: 'Instant $5 signup reward. Read paid emails, watch short clips, and complete scratch-off games.'
+      note: 'Snap your first receipt and enter code K1K9U6 for bonus reward points.'
     },
     {
-      id: 'free-rakuten',
-      name: 'Rakuten',
-      domain: 'rakuten.com',
-      payout: '$30 Cash Back',
-      payoutTag: 'PROMO BONUS',
-      signupUrl: 'https://www.rakuten.com',
+      id: 'free-kraken',
+      name: 'Kraken',
+      domain: 'kraken.com',
+      payout: '$75 Bonus',
+      payoutTag: 'TRADE REWARD',
+      signupUrl: 'https://invite.kraken.com/JDNW/wsv48yot',
       signupLabel: 'SIGN UP',
       tabId: 'free-money',
-      note: 'Spend $30 on any store you already shop at (Walmart, Target, Nike) and get $30 cash back check or PayPal.'
+      note: 'Sign up and trade crypto to unlock up to $75 in rewards.'
+    },
+    {
+      id: 'free-joko',
+      name: 'Joko',
+      domain: 'joko.com',
+      payout: '$5 Bonus',
+      payoutTag: 'FREE START',
+      signupUrl: 'https://hellojoko.app.link/tyX38HoTyP',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Automatic shopping cashback and discounts with $5 welcome reward.'
+    },
+    {
+      id: 'free-gate',
+      name: 'Gate.io',
+      domain: 'us.gate.com',
+      payout: '$5 Bonus',
+      payoutTag: 'REWARDS HUB',
+      code: 'VQRBVFHFVG',
+      signupUrl: 'https://us.gate.com/rewards_hub?ch=RewardsHub&ref=VQRBVFHFVG&ref_type=145',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Crypto trading rewards hub bonus with promo code VQRBVFHFVG.'
+    },
+    {
+      id: 'free-uphold',
+      name: 'Uphold',
+      domain: 'uphold.com',
+      payout: '$20 Bonus',
+      payoutTag: 'CRYPTO WALLET',
+      signupUrl: 'https://wallet.uphold.com/signup?referral=6647f8bac0&campaign=uw_p_d_w_acq_raf&utm_source=raf&utm_medium=referafriend',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Multi-asset trading wallet bonus. (Freecash offer for an additional $40!)'
+    },
+    {
+      id: 'free-giraffe',
+      name: 'Cash Giraffe',
+      domain: 'cashgiraffe.online',
+      payout: '$4 Bonus',
+      payoutTag: 'PLAY & EARN',
+      signupUrl: 'https://cashgiraffe.online/invite/TfPcqzqg',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Play Android games and collect gems redeemable for instant PayPal cash.'
+    },
+    {
+      id: 'free-benjamin',
+      name: 'Benjamin',
+      domain: 'benjaminone.com',
+      payout: '$1 Bonus',
+      payoutTag: 'DAILY CASHBACK',
+      signupUrl: 'https://benjaminone.onelink.me/J580/5sf18auk',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Get daily cash back on card purchases and gift card boosts.'
+    },
+    {
+      id: 'free-qmee',
+      name: 'Qmee',
+      domain: 'qmee.com',
+      payout: '$1 Instant',
+      payoutTag: 'NO MINIMUM',
+      signupUrl: 'https://www.qmee.com/dashboard',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Instant cashout survey and search rewards platform with no minimum withdrawal.'
+    },
+    {
+      id: 'free-attapoll',
+      name: 'AttaPoll',
+      domain: 'attapoll.app',
+      payout: '$0.50 Bonus',
+      payoutTag: 'SURVEY BONUS',
+      code: 'ysmwy',
+      signupUrl: 'https://attapoll.app/join/ysmwy',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Paid mobile surveys with instant cashout thresholds. Use code ysmwy.'
+    },
+    {
+      id: 'free-upside',
+      name: 'Upside',
+      domain: 'upside.com',
+      payout: '40¢/gal Bonus',
+      payoutTag: 'GAS CASHBACK',
+      code: 'ONI9733',
+      signupUrl: 'https://upside.app.link/ONI9733',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Get up to 40¢/gal cash back on gas and dining with promo code ONI9733.'
+    },
+    {
+      id: 'free-gomining',
+      name: 'GoMining',
+      domain: 'gomining.com',
+      payout: '$5 Bonus',
+      payoutTag: 'MINING REWARDS',
+      code: 'OMO0LDP',
+      signupUrl: 'https://gomining.com/?ref=OMO0LDP',
+      signupLabel: 'SIGN UP',
+      tabId: 'free-money',
+      note: 'Digital Bitcoin mining liquid hash-rate rewards. (Depends on how you set it up and what coin you choose).'
     },
 
     // --- Referrals / Signup / Bonuses ---
     {
+      id: 'ref-dabble',
+      name: 'Dabble',
+      domain: 'dabble.com',
+      payout: '$10 Free Entry',
+      payoutTag: 'FREE START',
+      signupUrl: 'https://click.dabble.com/GaFA/3mz3pmcr',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Get $10 free entry cash for DFS and player picks, no deposit required!'
+    },
+    {
+      id: 'ref-prizepicks',
+      name: 'PrizePicks',
+      domain: 'prizepicks.com',
+      payout: '$25 Bonus',
+      payoutTag: 'DEPOSIT MATCH',
+      signupUrl: 'https://prizepicks.onelink.me/FjtC/oh2itiyc',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Daily fantasy sports player props with instant $25 bonus entry credit.'
+    },
+    {
+      id: 'ref-ero',
+      name: 'Ero',
+      domain: 'ero.app',
+      payout: '$25 Bonus',
+      payoutTag: 'FREE START',
+      code: 'uoj7nba2x5',
+      signupUrl: 'https://ero.app/r/uoj7nba2x5?link=u63qfmappxxh',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Earn real cash rewards completing brand missions and testing apps with a 50% day-one boost. Enter code uoj7nba2x5.'
+    },
+    {
       id: 'ref-robinhood',
       name: 'Robinhood',
       domain: 'robinhood.com',
-      payout: 'Free Stock ($5–$200)',
-      payoutTag: 'GUARANTEED',
-      signupUrl: 'https://join.robinhood.com',
+      payout: '$7–$30 Free Stock',
+      payoutTag: 'FREE STOCK',
+      signupUrl: 'https://join.robinhood.com/onia2',
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
-      note: 'Sign up and link your bank account to receive 100% free fractional stock (valued up to $200).'
-    },
-    {
-      id: 'ref-webull',
-      name: 'Webull',
-      domain: 'webull.com',
-      payout: 'Up to 12 Free Stocks',
-      payoutTag: 'HOT PROMO',
-      signupUrl: 'https://www.webull.com',
-      signupLabel: 'SIGN UP',
-      tabId: 'referrals',
-      note: 'Deposit any amount (even $1) to receive multiple free stock slices.'
+      note: 'Sign up and link your bank account to receive free stock valued between $7 and $30.'
     },
     {
       id: 'ref-sofi',
       name: 'SoFi Bank',
       domain: 'sofi.com',
-      payout: '$25–$300 Bonus',
+      payout: '$13 Bonus',
       payoutTag: 'BANK BONUS',
-      signupUrl: 'https://www.sofi.com',
+      signupUrl: 'https://www.sofi.com/invite/relay?gcp=66005484-b2ad-44f8-8c3d-92a5d2bd3adb&isAliasGcp=false',
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
-      note: 'Open a fee-free checking & savings account to claim $25 instant bonus or up to $300 with direct deposit.'
+      note: 'Get started with SoFi banking & financial rewards with exclusive invite reward.'
     },
     {
       id: 'ref-chime',
       name: 'Chime',
       domain: 'chime.com',
-      payout: '$100 Referral',
+      payout: '$100 Bonus',
       payoutTag: 'CASH BONUS',
-      signupUrl: 'https://www.chime.com',
+      signupUrl: 'https://www.chime.com/r/oniamaya/?c=s',
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
-      note: 'Receive $100 free cash bonus after your first qualifying direct deposit of $200+ within 45 days.'
+      note: 'Set up direct deposit and deposit $200 or more in 14 days or less to get $100 cash bonus!'
+    },
+    {
+      id: 'ref-aven',
+      name: 'Aven',
+      domain: 'aven.com',
+      payout: '$5 Bonus',
+      payoutTag: 'FREE START',
+      code: 'OA25YEFBGX',
+      signupUrl: 'https://aven.com/advisor',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'MUST ENTER REFERRAL CODE OA25YEFBGX to unlock $5 bonus credit!'
+    },
+    {
+      id: 'ref-self',
+      name: 'Self Credit Builder',
+      domain: 'self.inc',
+      payout: '$20 Bonus',
+      payoutTag: 'CREDIT BUILDER',
+      code: 'FI4EZ0Y8',
+      signupUrl: 'https://self.inc/refer/FI4EZ0Y8',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Build credit and savings with a Self Credit Builder Account using referral code FI4EZ0Y8.'
+    },
+    {
+      id: 'ref-koinly',
+      name: 'Koinly',
+      domain: 'koinly.io',
+      payout: '$25 Credit',
+      payoutTag: 'PORTFOLIO BONUS',
+      code: 'A6A33D50',
+      signupUrl: 'https://koinly.io/?via=A6A33D50&utm_source=friend',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Track crypto portfolios and calculate taxes across exchanges with referral credit.'
+    },
+    {
+      id: 'ref-paypal',
+      name: 'PayPal',
+      domain: 'paypal.com',
+      payout: '$10 Cash Bonus',
+      payoutTag: 'CASH BONUS',
+      signupUrl: 'https://py.pl/26zAwV',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Send or spend $5 and receive a $10 bonus reward directly to your PayPal account.'
+    },
+    {
+      id: 'ref-sezzle',
+      name: 'Sezzle',
+      domain: 'sezzle.com',
+      payout: '$10 Credit',
+      payoutTag: 'SPEND CREDIT',
+      signupUrl: 'https://szzl.io/89uvs2',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Buy now pay later with $10 in bonus spend credits on signup.'
+    },
+    {
+      id: 'ref-copper',
+      name: 'Copper',
+      domain: 'cpr.gg',
+      payout: '$3 Bonus',
+      payoutTag: 'REWARD BONUS',
+      signupUrl: 'https://cpr.gg/r/ZLPTIZ',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Banking, rewards, and financial literacy app bonus.'
+    },
+    {
+      id: 'ref-acorns',
+      name: 'Acorns',
+      domain: 'acorns.com',
+      payout: '$20 Bonus',
+      payoutTag: 'INVEST BONUS',
+      code: 'RI20',
+      signupUrl: 'https://signup.acorns.com/?s1=impactradius&s4=recurinvest20&promo_code=RI20&clickid=0::zjLSJ6xycWc30-i16YTNuUkpSYgREvzTtUo0&irgwc=1&afsrc=1&iradtype=TEXT_LINK&irmpname=Fluent%20-%20Acorns&s2=1411014&s1=impactradius&sharedid=34631_816992&s4=recurinvest20&email=oniamaya25%40gmail.com',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Automated micro-investing and roundups with $20 recurring investment bonus.'
+    },
+    {
+      id: 'ref-cashapp',
+      name: 'Cash App',
+      domain: 'cash.app',
+      payout: '$5 Bonus',
+      payoutTag: 'INSTANT $5',
+      code: 'B7X7MPD',
+      signupUrl: 'https://cash.app/app/B7X7MPD',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Send $5 to a friend to receive your instant $5 welcome bonus using code B7X7MPD.'
+    },
+    {
+      id: 'ref-yell',
+      name: 'Yell Payment',
+      domain: 'yellpayment.com',
+      payout: '$5 Bonus',
+      payoutTag: 'INVITE CREDIT',
+      code: '26845623',
+      signupUrl: 'https://api-b2c.yellpayment.com/referral?code=26845623',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Payment and money transfer rewards with referral code 26845623.'
+    },
+    {
+      id: 'ref-go2bank',
+      name: 'GO2bank',
+      domain: 'go2bank.com',
+      payout: '$50 Bonus',
+      payoutTag: 'DIRECT DEPOSIT',
+      code: 'Oni15',
+      signupUrl: 'https://share.go2bank.com/Oni15',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Direct deposit at least $200 within 45 days to get $50 cash bonus!'
+    },
+    {
+      id: 'ref-public',
+      name: 'Public',
+      domain: 'public.com',
+      payout: '$100 Bonus',
+      payoutTag: 'HIGH BONUS',
+      code: 'Oni78253',
+      signupUrl: 'https://share.public.com/Oni78253',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Invest in stocks, ETFs, crypto and high-yield treasuries. Deposit $1,000 for $100 bonus!'
+    },
+    {
+      id: 'ref-xplace',
+      name: 'x.place',
+      domain: 'x.place',
+      payout: 'Crypto Airdrop',
+      payoutTag: 'INVITE PASS',
+      code: 'Ohknee29',
+      signupUrl: 'https://x.place/ref/Ohknee29',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Discover web3 quests and earn tokens with referral code Ohknee29.'
     },
     {
       id: 'ref-polymarket',
@@ -320,6 +663,18 @@
       signupLabel: 'SIGN UP',
       tabId: 'referrals',
       note: 'Sign up and make predictions on sports & events with fast $200 bonus cashouts.'
+    },
+    {
+      id: 'ref-sendwave',
+      name: 'Sendwave',
+      domain: 'sendwave.com',
+      payout: '$10 Credit',
+      payoutTag: 'TRANSFER CREDIT',
+      code: '1ADY9',
+      signupUrl: 'https://try.sendwave.com/kjap/alct9oam',
+      signupLabel: 'SIGN UP',
+      tabId: 'referrals',
+      note: 'Use code 1ADY9 to get a credit towards your first transfer! Download at https://try.sendwave.com/kjap/alct9oam'
     }
   ];
 
